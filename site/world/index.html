@@ -172,8 +172,41 @@ function setY(s,y){ s.position.y=s.userData.h/2+y; }
 const shadowTex=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');const gr=g.createRadialGradient(64,64,2,64,64,62);gr.addColorStop(0,'rgba(0,0,0,.55)');gr.addColorStop(.55,'rgba(0,0,0,.22)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);return new THREE.CanvasTexture(c);})();
 function groundShadow(w){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,w*0.58),new THREE.MeshBasicMaterial({map:shadowTex,transparent:true,depthWrite:false}));m.rotation.x=-Math.PI/2;m.position.y=0.09;scene.add(m);return m;}
 
+// ---------- a REAL 3D Dr. Mineral (built in code; scene-lit, casts shadow) ----------
+function makeSquirrel3D(){
+  const g=new THREE.Group();
+  const fur=new THREE.MeshStandardMaterial({color:0xab5a28,roughness:.72,metalness:0});
+  const cream=new THREE.MeshStandardMaterial({color:0xf0e3c8,roughness:.72});
+  const dark=new THREE.MeshStandardMaterial({color:0x1c120d,roughness:.5});
+  const M=(geo,mat,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);g.add(m);return m;};
+  // body + belly
+  const body=M(new THREE.SphereGeometry(0.72,28,22),fur,0,0.92,0); body.scale.set(0.82,1.08,0.72);
+  const belly=M(new THREE.SphereGeometry(0.5,22,18),cream,0,0.86,0.34); belly.scale.set(0.7,0.98,0.5);
+  // head + cheeks
+  M(new THREE.SphereGeometry(0.5,28,22),fur,0,1.78,0.06);
+  const cheek=M(new THREE.SphereGeometry(0.36,20,16),cream,0,1.64,0.36); cheek.scale.set(1,0.8,0.78);
+  // ears
+  [-1,1].forEach(s=>{const e=M(new THREE.ConeGeometry(0.17,0.36,14),fur,0.27*s,2.22,0); e.rotation.z=-0.18*s;});
+  // eyes + highlights + nose
+  [-1,1].forEach(s=>{ M(new THREE.SphereGeometry(0.1,16,14),dark,0.2*s,1.85,0.43);
+    const h=M(new THREE.SphereGeometry(0.032,8,8),new THREE.MeshBasicMaterial({color:0xffffff}),0.2*s+0.03,1.89,0.5); });
+  M(new THREE.SphereGeometry(0.075,14,12),dark,0,1.68,0.62);
+  // big bushy tail (curved tube + fluffy tip)
+  const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(0,0.5,-0.45),new THREE.Vector3(-0.15,0.4,-1.15),new THREE.Vector3(0,1.45,-1.5),new THREE.Vector3(0.1,2.4,-0.95),new THREE.Vector3(0,2.85,-0.15)]);
+  M(new THREE.TubeGeometry(curve,48,0.46,14,false),fur,0,0,0);
+  const tip=M(new THREE.SphereGeometry(0.52,18,16),fur,0,2.85,-0.15);
+  // arms + feet
+  [-1,1].forEach(s=>{const a=M(new THREE.SphereGeometry(0.18,16,12),fur,0.3*s,0.96,0.46); a.scale.set(1,1.35,1);});
+  [-1,1].forEach(s=>{const f=M(new THREE.SphereGeometry(0.2,16,12),fur,0.24*s,0.18,0.2); f.scale.set(1,0.5,1.45);});
+  // the acorn
+  const acb=M(new THREE.SphereGeometry(0.17,18,14),new THREE.MeshStandardMaterial({color:0x9a6a32,roughness:.55}),0,0.8,0.6); acb.scale.set(1,1.12,1);
+  M(new THREE.SphereGeometry(0.16,18,12,0,6.283,0,1.7),new THREE.MeshStandardMaterial({color:0x5a3a1e,roughness:.7}),0,0.93,0.6);
+  g.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; } });
+  return g;
+}
+
 // keepers
-const drM=sprite(URLS.hero,3.4); drM.position.set(0,0,0); setY(drM,0.05);
+const drM=makeSquirrel3D(); drM.position.set(0,0,0); scene.add(drM);
 const tally=sprite(URLS.tally,2.0); tally.position.set(lp.x+1.6,0,lp.z+0.4); setY(tally,0);
 const vellum=sprite(URLS.vellum,1.9); vellum.position.set(vp.x+1.6,0,vp.z+0.2); setY(vellum,0);
 // miners at the mines (bob)
@@ -181,7 +214,7 @@ const miners=[]; for(let i=0;i<3;i++){ const s=sprite(URLS.walk,1.8); const a=i/
 // haulers loop Mine -> Foundry carrying a crystal, then back
 const haulers=[]; for(let i=0;i<3;i++){ const s=sprite(URLS.walk,1.8); s.userData.t=i*0.66; haulers.push({s, crystal: octo(mp,0xd9b3ff,0.26,1.1), prev:0}); }
 // contact shadows for every character
-const shadowed=[drM,tally,vellum,...miners,...haulers.map(h=>h.s)];
+const shadowed=[tally,vellum,...miners,...haulers.map(h=>h.s)];
 const shadows=shadowed.map(s=>groundShadow(s.userData.h*0.95));
 
 // ---------- the growing chain (Foundry -> Ledger) ----------
@@ -223,7 +256,7 @@ function loop(){
   requestAnimationFrame(loop);
   const dt=Math.min(0.05,clock.getDelta()), t=clock.getElapsedTime();
   // keepers bob
-  setY(drM,0.05+Math.sin(t*1.4)*0.06); setY(tally,Math.sin(t*2+1)*0.05);
+  drM.position.y=Math.abs(Math.sin(t*1.4))*0.04; drM.rotation.y=Math.sin(t*0.25)*0.4; setY(tally,Math.sin(t*2+1)*0.05);
   // miners bob + occasional dig
   miners.forEach((s,i)=>{ const ph=s.userData.phase; setY(s,Math.abs(Math.sin(t*3+ph))*0.18); flip(s,Math.sin(t*0.6+i)<0); });
   // haulers Mine->Foundry->Mine
