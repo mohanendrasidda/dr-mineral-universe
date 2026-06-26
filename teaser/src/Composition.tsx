@@ -171,6 +171,15 @@ const Descent: React.FC = () => {
     extrapolateRight: "clamp",
   });
   const txt = fadeInOut(frame, 25, 70, 100);
+  const imgOp = interpolate(frame, [38, 95], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: ease,
+  });
+  const imgZoom = interpolate(frame, [38, 110], [1.12, 1.0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
   return (
     <AbsoluteFill style={{ background: BG }}>
       <AbsoluteFill
@@ -189,6 +198,18 @@ const Descent: React.FC = () => {
           borderRadius: "50%",
           background: `radial-gradient(circle, ${GOLD} 0%, ${GOLD2} 35%, transparent 70%)`,
           filter: "blur(6px)",
+        }}
+      />
+      <Img
+        src={staticFile("env-first-descent.png")}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          opacity: imgOp,
+          transform: `scale(${imgZoom})`,
         }}
       />
       <div
@@ -213,65 +234,46 @@ const Descent: React.FC = () => {
 const Cavern: React.FC = () => {
   const frame = useCurrentFrame();
   const { width, height } = useVideoConfig();
-  const N = 130;
-  const drift = Math.sin(frame * 0.01) * 12;
-  const titleOp = fadeInOut(frame, 40, 130, 175);
+  const reveal = interpolate(frame, [0, 45], [0, 1], {
+    extrapolateRight: "clamp",
+    easing: ease,
+  });
+  const zoom = interpolate(frame, [0, 190], [1.04, 1.15], {
+    extrapolateRight: "clamp",
+  });
+  const titleOp = fadeInOut(frame, 50, 135, 180);
   return (
-    <AbsoluteFill
-      style={{
-        background: `radial-gradient(90% 70% at 50% 6%, #2a2030 0%, #0e0a10 70%)`,
-      }}
-    >
-      {[...Array(N)].map((_, i) => {
-        const col = i % 14;
-        const row = Math.floor(i / 14);
-        const depth = row / 9;
-        const x =
-          width * 0.5 +
-          ((col - 6.5) / 6.5) * (width * 0.47) * (1 - depth * 0.45) +
-          drift * (1 - depth);
-        const y = height * 0.14 + depth * height * 0.78;
-        const size = 7 * (1 - depth * 0.6) + 2;
-        const reveal = interpolate(
-          frame,
-          [row * 6, row * 6 + 40],
-          [0, 1],
-          {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-            easing: ease,
-          }
-        );
-        const tw = 0.55 + 0.45 * Math.abs(Math.sin(frame * 0.05 + i));
-        return (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              left: x,
-              top: y,
-              width: size,
-              height: size,
-              borderRadius: "50%",
-              background: GOLD,
-              boxShadow: `0 0 ${size * 2.4}px ${size * 0.9}px ${GOLD2}aa`,
-              opacity: reveal * tw,
-            }}
-          />
-        );
-      })}
+    <AbsoluteFill style={{ background: "#0e0a10" }}>
+      <Img
+        src={staticFile("env-central-cavern.png")}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          opacity: reveal,
+          transform: `scale(${zoom})`,
+        }}
+      />
+      <AbsoluteFill
+        style={{
+          background:
+            "radial-gradient(80% 70% at 50% 32%, transparent, rgba(8,6,5,.55) 78%)",
+        }}
+      />
       <div
         style={{
           position: "absolute",
           width,
-          top: height * 0.4,
+          top: height * 0.42,
           textAlign: "center",
           color: INK,
           fontFamily: SERIF,
           fontSize: 50,
           letterSpacing: 1,
           opacity: titleOp,
-          textShadow: "0 2px 30px #000a",
+          textShadow: "0 2px 30px #000c",
         }}
       >
         A civilization beneath it.
