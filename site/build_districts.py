@@ -14,6 +14,37 @@ ACCESS = {
     "restricted": ("RESTRICTED", "#c4553b"),
 }
 
+# keyed character portraits to feature on a district page: slug -> [(file, name, role)]
+CHARS = {
+    "contribution-registry": [
+        ("char-vellum-v1.png", "Vellum", "Keeper of memory · tortoise"),
+        ("char-tally-v1.png", "Tally", "Apprentice · magpie"),
+    ],
+}
+
+def chars_block(slug):
+    items = CHARS.get(slug)
+    if not items:
+        return ""
+    figs = ""
+    for fn, name, role in items:
+        figs += (
+            '<figure style="margin:0; text-align:center; width:250px;">'
+            '<div style="position:relative; height:250px; display:flex; align-items:flex-end; justify-content:center;">'
+            '<div style="position:absolute; bottom:14px; width:190px; height:62px; border-radius:50%; background:radial-gradient(ellipse, rgba(231,183,101,.2), transparent 70%);"></div>'
+            f'<img src="../../assets/keyed/{fn}" alt="{html.escape(name)}" style="position:relative; max-height:250px; max-width:240px; object-fit:contain; filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));">'
+            '</div>'
+            f'<figcaption><div style="font-family:\'Cormorant Garamond\',serif; font-size:25px; color:#f4e7d0; margin-top:8px;">{html.escape(name)}</div>'
+            f'<div class="label" style="margin-top:4px;">{html.escape(role)}</div></figcaption>'
+            '</figure>'
+        )
+    return (
+        '<section style="max-width:900px; margin:0 auto; padding:24px 24px 0;">'
+        '<div class="label" style="text-align:center; margin-bottom:26px;">THE KEEPERS</div>'
+        f'<div style="display:flex; flex-wrap:wrap; gap:34px; justify-content:center;">{figs}</div>'
+        '</section>'
+    )
+
 # slug, name, glow, access, lead, who(flaw), essence, feature, walkIn, makes, secret, cinematic
 D = [
  ("contribution-registry","Contribution Registry","#9fc6e8","public",
@@ -151,6 +182,8 @@ PAGE = """<!DOCTYPE html>
  </div>
 </section>
 
+{chars_block}
+
 <main style="max-width:780px; margin:0 auto; padding:20px 24px 40px;">
  <div class="sec"><div class="label">WHO RUNS IT</div><p>{who}</p></div>
  <div class="sec"><div class="label">WALK IN</div><p>{walkIn}</p></div>
@@ -181,6 +214,7 @@ for (slug,name,glow,access,lead,who,essence,feature,walkIn,makes,secret,cinemati
         slug=slug, name=e(name), glow=glow, access=access, alabel=alabel, acolor=acolor,
         lead=e(lead), who=e(who), essence=e(essence), feature=e(feature), feature_short=e(feature_short),
         walkIn=e(walkIn), makes=e(makes), secret=e(secret), cinematic=e(cinematic),
+        chars_block=chars_block(slug),
     )
     (OUT / f"{slug}.html").write_text(page)
 
