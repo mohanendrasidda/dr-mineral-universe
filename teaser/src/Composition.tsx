@@ -2,6 +2,8 @@ import React from "react";
 import {
   AbsoluteFill,
   Sequence,
+  Img,
+  staticFile,
   interpolate,
   useCurrentFrame,
   useVideoConfig,
@@ -286,6 +288,10 @@ const Line: React.FC = () => {
     extrapolateRight: "clamp",
     easing: ease,
   });
+  const heroRise = interpolate(frame, [0, 55], [30, 0], {
+    extrapolateRight: "clamp",
+    easing: ease,
+  });
   return (
     <AbsoluteFill
       style={{
@@ -295,25 +301,40 @@ const Line: React.FC = () => {
       }}
     >
       <div
-        style={{ opacity: op, transform: `translateY(${rise}px)`, textAlign: "center" }}
+        style={{
+          opacity: op,
+          display: "flex",
+          alignItems: "center",
+          gap: 48,
+          maxWidth: 1120,
+          padding: "0 48px",
+        }}
       >
-        <div
-          style={{ marginBottom: 18, display: "flex", justifyContent: "center" }}
-        >
-          <AcornSVG size={54} />
-        </div>
-        <div
+        <Img
+          src={staticFile("drmineral-hero.png")}
           style={{
-            color: INK,
-            fontFamily: SERIF,
-            fontSize: 46,
-            fontStyle: "italic",
-            maxWidth: width * 0.7,
-            lineHeight: 1.3,
+            height: 430,
+            transform: `translateY(${heroRise}px)`,
+            filter: "drop-shadow(0 18px 50px rgba(231,183,101,.22))",
           }}
-        >
-          “I don't collect treasure.
-          <br />I collect discoveries.”
+        />
+        <div style={{ textAlign: "left", transform: `translateY(${rise}px)` }}>
+          <div style={{ marginBottom: 16 }}>
+            <AcornSVG size={44} />
+          </div>
+          <div
+            style={{
+              color: INK,
+              fontFamily: SERIF,
+              fontSize: 44,
+              fontStyle: "italic",
+              maxWidth: 520,
+              lineHeight: 1.32,
+            }}
+          >
+            “I don't collect treasure.
+            <br />I collect discoveries.”
+          </div>
         </div>
       </div>
     </AbsoluteFill>
