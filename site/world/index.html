@@ -84,6 +84,10 @@ const shaftLight=new THREE.SpotLight(0xfff0d0,80,70,Math.PI*0.14,0.55,1.3);
 shaftLight.position.set(0,32,0); shaftLight.target.position.set(0,0,0); scene.add(shaftLight); scene.add(shaftLight.target);
 shaftLight.castShadow=true; shaftLight.shadow.mapSize.set(2048,2048); shaftLight.shadow.camera.near=4; shaftLight.shadow.camera.far=64; shaftLight.shadow.bias=-0.0006; shaftLight.shadow.radius=4;
 
+// material helpers (defined before first use)
+const cMat=c=>new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:1.0,roughness:.3,metalness:.2});
+const glassMat=c=>new THREE.MeshPhysicalMaterial({color:c,emissive:c,emissiveIntensity:.5,metalness:0,roughness:.05,transmission:.92,ior:1.8,thickness:1.4,transparent:true,envMapIntensity:1.3});
+
 // ---------- underground cavern ----------
 const floor=new THREE.Mesh(new THREE.CircleGeometry(24,72),new THREE.MeshStandardMaterial({color:0x1c140d,roughness:.95,metalness:0}));
 floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
@@ -138,8 +142,6 @@ ZONES.forEach(z=>{
   plat.userData.zone=z; picker.push(plat);
   const pl=new THREE.PointLight(z.c,16,18,2); pl.position.copy(z.pos); pl.position.y=2.6; scene.add(pl); z.light=pl;
 });
-const cMat=c=>new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:1.0,roughness:.3,metalness:.2});
-const glassMat=c=>new THREE.MeshPhysicalMaterial({color:c,emissive:c,emissiveIntensity:.5,metalness:0,roughness:.05,transmission:.92,ior:1.8,thickness:1.4,transparent:true,envMapIntensity:1.3});
 function octo(p,c,h,y){const m=new THREE.Mesh(new THREE.OctahedronGeometry(h,0),glassMat(c)); m.position.set(p.x,(y||h*0.9),p.z); m.castShadow=true; scene.add(m); return m;}
 // Mines: crystal cluster
 const mp=Z('mines').pos; const mineCrys=[]; for(let i=0;i<7;i++){const a=i/7*6.28; mineCrys.push(octo(new THREE.Vector3(mp.x+Math.cos(a)*1.5,0,mp.z+Math.sin(a)*1.5),0xb98cff,0.4+Math.random()*0.5));}
