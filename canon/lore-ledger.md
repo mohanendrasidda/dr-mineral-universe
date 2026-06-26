@@ -10,6 +10,9 @@ Seeded from `docs/02_canon-registry.md` (Universe Bible v1.0). Related: [charact
 4. Contribution is preserved/verified by invisible infrastructure; characters rarely name the technology.
 5. Research is stewarded, not owned.
 6. No character is ever "finished" learning — even Dr. Mineral remains a student.
+7. **The laboratory's central mission:** to understand how *meaningful contributions can be recognized, preserved, and passed from one generation to the next.* Everything (the Contribution Registry, the machines, the unsigned-discovery mystery) serves this question. Blockchain is **one tool in this mission, not the mission.** Plant via environment/action; never lecture it.
+8. **Dr. Mineral never says "my laboratory" — always "our laboratory."** He does not claim it; it belongs to many, across generations.
+9. The way into the lab is **ingenious forgotten engineering, not magic.** The single acorn he carries is a key that *responds* — never random — explained (engineered) only much later.
 
 ## Tone & philosophy locks (from the Bible)
 - Hopeful, optimistic, cinematic, educational, emotionally grounded — never cynical or dystopian.

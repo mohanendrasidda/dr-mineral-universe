@@ -1,7 +1,7 @@
 # Chapter One — Acorns, Above
 
-*Book I — Dr. Mineral and the Unsigned Discovery · draft v1*
-*Beat ① — the double life, topside. Canon: ordinary campus squirrel, humble/curious, single acorn, no props; ends on the cusp of the tell (Ch 2).*
+*Book I — Dr. Mineral and the Unsigned Discovery · draft v2*
+*Beat ① — the double life, topside. Canon: ordinary campus squirrel, humble/curious, single acorn, no props; no magic (the wonders have explanations saved for later); name "Dr. Mineral" deliberately withheld until the descent in Ch 2; ends at the stone, before the underground is shown.*
 
 ---
 
@@ -9,58 +9,72 @@ On the kind of autumn morning when the whole campus smelled like cold coffee and
 
 This was not unusual. He thought that about a great many things.
 
-Students hurried past him with their bags and their bicycles and their enormous paper cups, and not one of them looked twice. Why would they? He was exactly what he appeared to be: a squirrel, on a step, holding an acorn. There were a hundred like him on the lawns and the low stone walls, cheeks full, tails up, busy with the serious autumn work of putting things away for winter. He fit right in. He had spent a long time learning how to fit right in.
+A pair of students came down the steps two at a time, close enough that their shadows fell over him, and the little squirrel did what every squirrel on the lawns was doing that morning: he went still. Perfectly, ordinarily still — paws frozen, tail low, just one more small brown nobody in a campus full of them. The students never broke their sentence. They stepped around him the way you step around a puddle, without seeing it, and were gone.
 
-What none of the students could have guessed — what they would not have believed even if a friend had whispered it to them — was that the small squirrel on the step was turning the acorn over and over not because he was hungry, and not because he meant to bury it, but because he was *measuring* it.
+When they had passed, the squirrel did not relax all at once. He let himself uncurl slowly, the way the other squirrels did, and a few feet away another one of his kind dug a quick hole, dropped an acorn in, patted the soil twice, and bounded off to forget where he'd put it. The little researcher went through the very same motions — dug, leaned down, pressed the earth — but his paw came up still holding the acorn. He had only pretended to bury it. He tucked it back into the fur at his cheek, the single acorn he carried every morning and had never once, in all his mornings, left in the ground.
 
-The shell was a shade darker than yesterday's. Heavier, too, for its size. He pressed it gently to his ear and tapped it once with a claw, the way you might knock on a door to find out whether anyone is home, and listened to the small dull sound it made. Full, then. Sound all the way through. He filed that away beside a thousand other small facts, in the careful, orderly place in his mind where he kept such things.
+Why he carried it, he could not entirely have told you. Only that it felt wrong to be without it, the way a sentence feels wrong with a word missing.
+
+He turned it over now, slow and careful, and not because he was hungry. He was *measuring* it. The shell was a shade darker than yesterday's. Heavier, too, for its size. He pressed it to his ear and tapped it once with a claw, the way you might knock on a door to find out whether anyone is home, and listened to the small dull sound it made. Full, then. Sound all the way through. He set the fact down gently beside a thousand others, in the careful, orderly place inside him that never seemed to fill up no matter how much he put into it.
 
 *Most of the world,* he thought, *walks right past the answers because it is in a hurry to get somewhere else.*
 
-He was not in a hurry. He never was. That was, if you wanted to know, his whole secret — or the first layer of it.
+He was not in a hurry. He never was.
 
-His name was Dr. Mineral, though no human had ever called him that, and no human ever would. To the people of the university he was nobody at all, which suited him perfectly. A nobody can go anywhere. A nobody can sit on the steps of the chemistry building and watch the way the morning light moved across a puddle and think for a long, contented hour about why the colors bent the way they did, and not one person will stop to ask him what he is doing. There is a great deal of freedom in being underestimated. Dr. Mineral had built quite a lot on it.
+So he went on his rounds.
 
-He tucked the dark acorn into the fur at his cheek — not to eat, but to keep, the way a person slips a thing they want to remember into a pocket — and set off across the quad on his morning rounds.
+He had favorites. The crack in the loading-dock concrete where, three springs running, a single stubborn dandelion had pushed up through solid grey and refused to be discouraged; he checked on it the way you check on an old friend. The drainpipe behind the engineering hall that sang a low, wet note whenever the wind came from the east. The bench by the duck pond where an old man in a grey coat came every morning at eight to feed the ducks and talk to them, gently, about nothing in particular, and never once noticed the squirrel on the railing learning the shapes of human kindness.
 
-He had favorites. The crack in the loading-dock concrete where, three springs running, a single stubborn dandelion had pushed through and refused to be discouraged; he checked on it the way you check on an old friend. The drainpipe behind the engineering hall that sang a low, wet note whenever the wind came from the east. The bench by the duck pond where an old man in a grey coat fed the ducks every morning at eight and talked to them, gently, about nothing in particular, and never once noticed the squirrel listening from the railing, learning the shapes of human kindness.
-
-Dr. Mineral collected all of it. Not in his cheeks — there was only room there for the one acorn — but in that orderly place inside, the place that never seemed to fill up no matter how much he put into it.
-
-*I don't collect treasure,* he told himself, the way he told himself most mornings, somewhere between the dandelion and the duck pond. *I collect discoveries.*
+*I don't collect treasure,* the little researcher told himself, somewhere between the dandelion and the duck pond, the way he told himself most mornings. *I collect discoveries.*
 
 It was the truest thing about him, and it was the part nobody saw.
 
-By the time the campus clock struck eleven he had crossed the lawns twice, climbed the big oak by the observatory steps to check whether its highest acorns had ripened (not quite), and stopped to watch a beetle the size of a lentil drag a crumb four times its own weight in a determined, hopeless-looking line toward a gap in the wall. He watched until the beetle made it. He found he was rooting for the beetle. He often was.
+It was on the path behind the chapel that he found the bird.
 
-And then, near noon, on his way back across the quieter side of the quad where the grass grew long against the foundation of the oldest building on campus, something happened that did not fit.
+A small one, brown and barred, sitting wrong in the open where the bicycles came fast around the hedge. One wing didn't fold the way the other did. When the squirrel came near, its whole body went tight with fear, its heart going so hard he could see it move beneath the feathers.
 
-It was very small. That was exactly why he noticed it.
+He could not mend a wing. He knew that the way he knew the weight of an acorn — plainly, without fuss. But he could do the smaller thing. Carefully, a half-step at a time so as not to frighten it worse, he came around to the open side and made himself a low wall between the bird and the path, and he nudged — soft, patient, never grabbing — until the frightened thing hopped, and hopped again, into the cool green dark under the hedge where no wheel and no cat could reach. There he stayed with it a while. Not doing anything. Just being a steady, breathing shape beside a small afraid one until its heartbeat eased.
 
-He set the dark acorn down in the grass — meaning only to rest his jaw a moment — and the acorn did not sit still.
+Then he went on, and did not look back, and no one anywhere had seen.
+
+He climbed the great oak by the observatory steps to check whether its highest acorns had ripened — not quite — and that was when the morning did the thing he would never afterward be able to explain to anyone, because there was nothing in it to explain. It was only weather and light.
+
+The wind came up out of the east. And all at once the whole crown of the oak turned over, ten thousand leaves flashing from green to gold to green in a single breath, and the light came down through them in long moving columns, and off the chapel roof a great flock of starlings lifted all together and folded through the air — leaning, pouring, becoming one wide thinking shape and then a thousand small ones again — and the squirrel who measured everything, who had a fact for the weight of an acorn and the song of a drainpipe, sat very still on the high branch and did not measure a single thing.
+
+He only watched.
+
+Because some things you do not study. You only love them, and are glad you were there.
+
+When the starlings had gone and the light had gone ordinary again, he came down the oak slowly, full of that quiet gladness, and crossed the lawn toward the oldest building on campus — the low one of dark stone that the maps still called by a name no living student remembered. And as he came into its long cool shadow he felt, underfoot, the thing he had felt there a hundred times and never once named: a hum. Faint. Patient. Less a sound than a kind of warmth in the ground, as though somewhere very far down something enormous was awake and quietly working.
+
+He always meant to wonder about it. He always forgot, the moment he left the shadow.
+
+He did not forget this time.
+
+This time, he set the dark acorn down in the grass — meaning only to rest his jaw a moment — and the acorn did not sit still.
 
 It rolled.
 
-That was all. It rolled, slowly, three or four of its own lengths, *uphill*, across grass that lay flat and windless in the noon stillness, and came to a stop against the base of the old stone wall with a tiny, definite click, as if it had arrived somewhere it had been going all along.
+That was all. It rolled, slowly, three or four of its own lengths, *uphill*, across grass that lay flat and windless in the noon stillness, and came to rest against the base of the old stone wall with a tiny, definite click, as if it had arrived somewhere it had been going all along.
 
 Any other squirrel would have chased it down, grumbled, and thought no more about it.
 
-Dr. Mineral did not move.
+The little researcher did not move.
 
-He looked at the acorn. He looked at the flat, still grass. He looked at the long shadow of the old building lying quiet across the lawn, and at the particular stone in the wall the acorn had stopped against — a stone he had passed ten thousand times and never once truly seen — and he felt the small familiar feeling he had spent his whole life learning to trust: the feeling of a question opening, like a door he had not known was there.
+He looked at the acorn. He looked at the flat, still grass. He looked at the one particular stone the acorn had stopped against — a stone he had passed ten thousand times and never once truly seen — and he felt the small, familiar, marvelous feeling he had spent his whole life learning to trust: the feeling of a question opening, like a door he had not known was there.
 
-Acorns do not roll uphill. Not on their own. Not in still air. There was a *reason*, and the reason was somewhere under the grass, and Dr. Mineral had never in his life walked away from a reason.
+Acorns do not roll uphill. Not on their own. Not in still air. There was a reason. And he had never, in all his life, walked away from a reason.
 
-He glanced once over his shoulder, the easy, unhurried glance of an ordinary squirrel on an ordinary morning, and made certain no one was watching.
+He glanced once over his shoulder — froze, for half a breath, into nothing but an ordinary squirrel — and found, as he always found, that no one in the whole hurrying world was watching.
 
-No one ever was.
+He crossed to the wall.
 
-Then he went to the wall, and the acorn, and the stone — and the question that was waiting there in the cool dark beneath the oldest building on campus, where the whole world he truly belonged to had been humming along, patient and unseen, all morning long, just beneath the feet of everyone in a hurry.
+He placed one small paw against the cool, old stone.
 
-He pressed his paw to the stone.
+And far beneath the earth, something answered.
 
 ---
 
-*End Chapter One.*
+*End of Chapter One.*
 
-*Next (Ch 2 — "The Tell"): the stone gives, and the ordinary squirrel goes down into the Hidden Laboratory. Hold the canon line — the way down is engineered, not magic; the wonder is in how cleverly it has been hidden in plain sight.*
+*Next (Ch 2 — "The Tell"): the stone gives. The squirrel goes down — and we learn, at last and with weight, the name they call him below ground: Dr. Mineral. Hold the canon — the way down is engineered, not magic; the hum has a maker; the acorn was never random.*
