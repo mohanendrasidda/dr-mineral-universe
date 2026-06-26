@@ -3,9 +3,19 @@
 Repo memory for Claude Code. Read `docs/` for full detail; this is the always-on summary.
 
 ## What this repo is
-The build home for **The Dr. Mineral Universe**, an original transmedia IP by Mohanendra Siddha (Sidd): a novel-anchored world plus its public web surface and visual-asset pipeline. Creative and canon-led — NOT a strategy/business repo.
+The build home for **The Dr. Mineral Universe**, an original transmedia IP by Mohanendra Siddha (Sidd): a **living universe** — an underground research *civilization* — that surfaces as an interactive website, animations, books, and education. Creative and canon-led — NOT a strategy/business repo.
 
-**Canon source of truth:** `docs/01_universe-bible-v1.md`. Nothing contradicts it without flagging a deliberate canon change.
+## ⭐ North star (v2 — the product is the world, not the book)
+Build **a world that keeps happening,** not a story that happens. Decisions serve the *universe*, not a single plot.
+- **The laboratory is a co-protagonist** — a bustling civilization (districts, daily life, society, festivals, engineering), not a backdrop. Aim: as unforgettable as Hogwarts / Pandora / Coruscant.
+- **Every district maps to a website feature** — explore a real place, not a menu. See `canon/district-atlas.md`.
+- **The lab evolves with versions** — every software release is a *physical expansion* (new wings, cranes, scaffolding). "TODAY IN THE LAB" is the content model; visitors return because the world grew. See `canon/growth-and-versions.md`.
+- **The campus squirrels are the hidden civilization** (Sidd's original inspiration) — every campus squirrel is secretly a lab member with a role; **many** entrances, each to a different district. See `canon/the-squirrel-network.md`.
+- **A research civilization that invents technology** — prototypes, failures, debugging, the joy of making. **Blockchain is ONE invention among many** (AI, robotics, distributed systems, cybersecurity, energy), emerging naturally. Audience includes students, developers, researchers, security/blockchain people. See `canon/technology-and-engineering.md`.
+- **Pixar rule: emotion + humor.** Dr. Mineral has real flaws and the lab has comedy; the funny beats make the emotional ones land. See his flaw sheet in `canon/characters.md`.
+- **The novel is one artifact, not the universe.** Book I (`book-one/`) is "a first thread," kept for its voice but subordinate to the world.
+
+**Canon source of truth:** `docs/01_universe-bible-v1.md` **as evolved by** `docs/06_universe-bible-v2.md` (the living-universe expansion — a *deliberate* canon change, esp. the broadened mission). v2 wins on conflict.
 
 ## Layout
 ```
@@ -20,11 +30,12 @@ assets/keyed/              ← transparent, production-ready cutouts
 ```
 
 ## Core canon (check before producing)
-- **Dr. Mineral:** campus squirrel, humble/curious/collaborative, secretly founder & Chief Researcher of the **Hidden Laboratory** beneath a university. "I don't collect treasure. I collect discoveries." Never revenge/fame/power.
-- No magic — everything has a scientific explanation. Research is stewarded, not owned. No one is ever "finished" learning.
-- 15 canon districts are fixed (add, don't rename/remove).
-- **Tone:** hopeful, cinematic, educational, never dystopian. Multi-level (kids + adults, same text).
-- **Blockchain is invisible** in-world — characters experience its benefits, never lecture it. If a draft explains the chain, it's broken.
+- **Mission (v2, broadened — deliberate canon change):** *"Our laboratory exists to discover, build, protect, preserve, and pass on knowledge that helps future generations contribute more than we could."* The Contribution Registry is **one department** of a larger research civilization, not the whole mission.
+- **Dr. Mineral:** campus squirrel, humble/curious/collaborative, secretly founder & Chief Researcher of the **Hidden Laboratory** beneath a university. "I don't collect treasure. I collect discoveries." Never revenge/fame/power. **Has real flaws + humor** (see characters.md) — he is not a saint.
+- No magic — everything has a scientific/engineered explanation. Research is stewarded, not owned. No one is ever "finished" learning.
+- The original 15 canon districts are fixed (add, don't rename/remove); the world now has **many more** — see `canon/district-atlas.md`.
+- **Tone:** hopeful, cinematic, educational, never dystopian; **emotion + humor** (Pixar). Multi-level (kids + adults, same text).
+- **Blockchain emerges, never lectures.** It is one of many inventions; characters experience benefits and *build* it as research, but a draft that explains the chain like a whitepaper is broken. Lead with curiosity, characters, the world.
 
 ## Registry discipline (the #1 habit)
 Before introducing any character/department/lore, check `canon/`. After establishing anything new, update `canon/`. Continuity via git history is the point.

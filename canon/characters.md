@@ -14,6 +14,26 @@ Seeded from `docs/02_canon-registry.md` (Universe Bible v1.0). Related: [departm
 
 **Book I minor/recurring:** the old **mole** (60 yrs on soil-water; the "will I be remembered?" voice), the **heron** (Observatory; "honor one and you erase the many"), the **stoat** (Innovation Workshop; voices the tempting easy answer), the **otter** and the **three mice** (trust fraying, then healing). Cast species/names as later books need them.
 
+## Dr. Mineral — flaws & humor (the Pixar register, v2)
+He was becoming *too perfect* — wise, calm, always right. Canon now: he is a brilliant engineer and a bit of a disaster, and the comedy is what makes you love him and makes the emotional beats land.
+
+**Flaws & running gags (use freely):**
+- Forgets to eat; loses whole days inside an experiment.
+- **Builds twenty things at once** — half-finished wonders everywhere.
+- Can never find his own tools (they're usually behind his ear or in his cheek with the acorn).
+- **Terrible handwriting** — his own journals defeat him; the Archives despair.
+- Falls asleep reading journals, face-down, mid-sentence.
+- **Burns his toast every single morning** (the bakery is both joke and comfort).
+- Gets giddy and over-excited over *tiny* discoveries; laughs too much.
+- **Trips over pipes because he's thinking;** walks into things mid-idea.
+- **Afraid of public speaking;** dreads the Contribution Ceremony address.
+- **A genuinely terrible dancer** (currently, and reluctantly, enrolled in lessons — no one is ever finished learning).
+
+**The rule:** flaws never touch his *core* (curious, kind, humble, "ours not mine"). He's clumsy and forgetful, never cruel or vain. The humor is warm. A misfired machine, an apprentice causing chaos, a confused assistant-bot — these *earn* the tender moments; they don't replace them.
+
+## The lab's comedy ensemble (seed as needed)
+Autonomous assistant-bots that get confused; apprentices who cause cheerful chaos; a gatehouse-keeper who takes the rules *very* seriously; the bakery crew; a famous researcher who can't find anything. Daily-life comedy lives in `daily-life-and-culture.md`.
+
 > Departments are run by different animal species. Casting the leads (which species runs which district, and why that species fits that science) is an early world-building decision — see `docs/03_book-one-foundation.md`, open decision **B**.
 
 ## Casting rules
