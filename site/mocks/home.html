@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lanternhold — The Dr. Mineral Universe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; background:#0a0807; color:#efe3cf; font-family:'Spectral',Georgia,serif; -webkit-font-smoothing:antialiased; overflow-x:hidden;}
+  ::selection{background:rgba(245,200,120,.32); color:#fff}
+  ::-webkit-scrollbar{width:10px}
+  ::-webkit-scrollbar-track{background:#0a0807}
+  ::-webkit-scrollbar-thumb{background:#2a2118; border-radius:6px}
+  ::-webkit-scrollbar-thumb:hover{background:#3a2f22}
+  @keyframes lampPulse{0%,100%{opacity:.82; transform:scale(1)}50%{opacity:1; transform:scale(1.06)}}
+  @keyframes twinkle{0%,100%{filter:brightness(.6)}50%{filter:brightness(1.55)}}
+  @keyframes moteRise{0%{transform:translateY(0);opacity:0}12%{opacity:.9}88%{opacity:.5}100%{transform:translateY(-74vh);opacity:0}}
+  @keyframes droneCross{0%{transform:translateX(-12vw)}100%{transform:translateX(112vw)}}
+  @keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  @keyframes cueBob{0%,100%{transform:translateY(0);opacity:.45}50%{transform:translateY(7px);opacity:1}}
+  @keyframes drawerIn{0%{transform:translateX(100%);opacity:.3}100%{transform:translateX(0);opacity:1}}
+  @keyframes bgFade{0%{opacity:0}100%{opacity:1}}
+  .dcard{transition:transform .35s cubic-bezier(.2,.7,.2,1), border-color .35s, box-shadow .35s;}
+  .dcard:hover{transform:translateY(-5px); border-color:var(--glow); box-shadow:0 20px 52px -24px var(--glow), inset 0 0 0 1px color-mix(in srgb, var(--glow) 26%, transparent);}
+  .dcard:focus-visible{outline:none; border-color:var(--glow); box-shadow:0 0 0 2px color-mix(in srgb, var(--glow) 50%, transparent);}
+  .xbtn{transition:border-color .25s, background .25s;}
+  .xbtn:hover{border-color:var(--glow); background:rgba(40,30,18,.7);}
+  /* image slot helper — labeled placeholders where real renders drop in */
+  .slot{position:relative; display:flex; align-items:center; justify-content:center; text-align:center;
+    border:1px dashed rgba(210,170,110,.35); border-radius:4px; color:rgba(225,190,140,.7);
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em;
+    background:repeating-linear-gradient(45deg, rgba(40,30,18,.18) 0 12px, rgba(20,15,10,.18) 12px 24px);}
+</style>
+</head>
+<body>
+<div id="root" style="position:relative; min-height:100vh;">
+
+  <!-- ============ HERO : THE FIRST SIGHT ============ -->
+  <section style="position:relative; height:100vh; min-height:700px; overflow:hidden; display:flex; align-items:flex-end; justify-content:center;">
+    <!-- OPTIONAL real backdrop slot (drop env-central-cavern.png here later) -->
+    <div class="slot" data-parallax="0.04" style="position:absolute; inset:0; border:none; opacity:.0;">env-central-cavern.png</div>
+
+    <div data-parallax="0.04" style="position:absolute; inset:0; pointer-events:none; background:radial-gradient(130% 78% at 50% 6%, rgba(245,196,107,.22), rgba(240,170,90,.06) 32%, transparent 56%), radial-gradient(100% 60% at 50% 116%, rgba(232,150,60,.20), transparent 60%), linear-gradient(180deg, #0c0a08 0%, #0a0806 55%, #080605 100%);"></div>
+
+    <div data-parallax="0.13" id="lights" style="position:absolute; inset:0; pointer-events:none; z-index:1;"></div>
+
+    <div data-parallax="0.06" style="position:absolute; inset:0; pointer-events:none; z-index:1;">
+      <div style="position:absolute; top:5.5%; left:50%; transform:translateX(-50%);">
+        <div style="position:absolute; left:-165px; top:-150px; width:330px; height:330px; border-radius:50%; background:radial-gradient(circle, rgba(255,224,160,.5), rgba(245,190,110,.16) 36%, transparent 68%); filter:blur(6px); animation:lampPulse 6.5s ease-in-out infinite;"></div>
+        <div style="position:absolute; left:-10px; top:-10px; width:20px; height:20px; border-radius:50%; background:radial-gradient(circle, #fff6e2, #f6c878 58%, #df9a3f); box-shadow:0 0 34px 9px rgba(250,205,130,.8); animation:lampPulse 6.5s ease-in-out infinite;"></div>
+      </div>
+    </div>
+
+    <div id="motes" style="position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:2;">
+      <div style="position:absolute; top:23%; left:0; width:50px; height:2px; border-radius:2px; background:linear-gradient(90deg, transparent, rgba(250,220,160,.95), transparent); box-shadow:0 0 16px rgba(250,210,140,.85); animation:droneCross 27s linear infinite;"></div>
+      <div style="position:absolute; top:62%; left:0; width:34px; height:2px; border-radius:2px; background:linear-gradient(90deg, transparent, rgba(150,210,200,.85), transparent); box-shadow:0 0 14px rgba(120,200,190,.7); animation:droneCross 38s linear 6s infinite;"></div>
+    </div>
+
+    <div style="position:absolute; inset:0; pointer-events:none; z-index:3; background:radial-gradient(82% 72% at 50% 28%, transparent, rgba(8,6,5,.45) 68%, rgba(6,5,4,.96));"></div>
+
+    <div data-parallax="0.05" style="position:relative; z-index:5; text-align:center; max-width:940px; padding:0 24px 11vh;">
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.34em; color:rgba(238,196,126,.78); margin-bottom:34px;">CENTRAL RESEARCH HALL &nbsp;·&nbsp; THE ATRIUM &nbsp;·&nbsp; YOU ARE HERE</div>
+      <h1 style="margin:0; font-family:'Cinzel',serif; font-weight:800; font-size:clamp(38px, 7.6vw, 108px); line-height:.92; letter-spacing:.02em; white-space:nowrap; color:#f6e9d0; text-shadow:0 0 44px rgba(245,196,107,.42), 0 0 4px rgba(245,196,107,.3);">LANTERNHOLD</h1>
+      <div style="display:flex; align-items:center; justify-content:center; gap:16px; margin:26px auto 0; max-width:560px; color:rgba(225,193,138,.55); font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.28em;">
+        <span style="flex:1; height:1px; background:linear-gradient(90deg,transparent,rgba(225,180,120,.5));"></span>
+        <span style="white-space:nowrap;">UNDERGROUND LABORATORY-CITY</span>
+        <span style="flex:1; height:1px; background:linear-gradient(90deg,rgba(225,180,120,.5),transparent);"></span>
+      </div>
+      <p style="margin:30px auto 0; max-width:680px; font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:500; font-size:clamp(21px, 2.5vw, 31px); line-height:1.4; color:#dcc9a8;">The beating hub where all galleries meet &mdash; and the first breathtaking sight of the city of gold light below.</p>
+      <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:10px 22px; margin-top:38px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; color:rgba(214,190,150,.62);">
+        <span style="display:inline-flex; align-items:center; gap:8px;"><span style="width:7px; height:7px; border-radius:50%; background:#f6c878; box-shadow:0 0 9px #f6c878; animation:lampPulse 6.5s ease-in-out infinite;"></span>LAMP&nbsp;: BURNING &mdash; NEVER DARK</span>
+        <span style="opacity:.4;">·</span>
+        <span>DEPTH&nbsp;: LEVEL 0 &mdash; THE HALL</span>
+        <span style="opacity:.4;">·</span>
+        <span>CONVENED BY BRAMBLE</span>
+      </div>
+    </div>
+
+    <div style="position:absolute; bottom:26px; left:50%; transform:translateX(-50%); z-index:5; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.3em; color:rgba(225,190,140,.6); animation:cueBob 2.6s ease-in-out infinite;">DESCEND<div style="font-size:14px; margin-top:6px;">&#8964;</div></div>
+  </section>
+
+  <!-- ============ TODAY IN THE LAB ============ -->
+  <div style="position:relative; z-index:6; display:flex; align-items:stretch; border-top:1px solid rgba(210,170,110,.18); border-bottom:1px solid rgba(210,170,110,.18); background:rgba(18,14,10,.72); overflow:hidden;">
+    <div style="flex-shrink:0; display:flex; align-items:center; gap:9px; padding:15px 22px; background:rgba(34,26,17,.85); border-right:1px solid rgba(210,170,110,.18); font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.18em; color:#f0c87e;"><span style="width:6px; height:6px; border-radius:50%; background:#7fb069; box-shadow:0 0 8px #7fb069;"></span>TODAY IN THE LAB</div>
+    <div style="position:relative; flex:1; overflow:hidden; -webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent); mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);">
+      <div id="ticker" style="display:flex; align-items:center; gap:0; white-space:nowrap; width:max-content; animation:tickerScroll 52s linear infinite; padding:15px 0;"></div>
+    </div>
+  </div>
+
+  <!-- ============ THE DISTRICTS ============ -->
+  <section style="position:relative; z-index:6; padding:118px 24px 30px; background:linear-gradient(180deg,#0a0807,#0c0a07);">
+    <div style="max-width:1240px; margin:0 auto;">
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.3em; color:rgba(238,196,126,.7); text-align:center;">THE MAP &nbsp;·&nbsp; ELEVEN GALLERIES</div>
+      <h2 style="margin:16px auto 0; max-width:880px; text-align:center; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:clamp(34px, 5vw, 58px); line-height:1.04; color:#f3e6cf;">Choose where to descend</h2>
+      <p style="margin:20px auto 0; max-width:620px; text-align:center; font-size:16.5px; line-height:1.65; color:rgba(214,199,170,.82);">Eleven galleries fall away from the Hall, each its own world, each its own keeper. The light pouring up from below &mdash; that is them, at work. Step into any one.</p>
+      <div id="districts" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(292px, 1fr)); gap:16px; margin-top:62px;"></div>
+    </div>
+  </section>
+
+  <!-- ============ OPEN QUESTION BOARDS ============ -->
+  <section style="position:relative; z-index:6; padding:104px 24px; background:linear-gradient(180deg,#0c0a07,#0b0907);">
+    <div style="max-width:1080px; margin:0 auto;">
+      <div style="text-align:center;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.3em; color:rgba(238,196,126,.7);">THE OPEN QUESTION BOARDS</div>
+        <h2 style="margin:16px auto 0; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:clamp(30px, 4.4vw, 50px); color:#f3e6cf;">Post what you&rsquo;re stuck on</h2>
+        <p style="margin:18px auto 0; max-width:600px; font-size:16px; line-height:1.65; color:rgba(214,199,170,.82);">Within the hour, someone who can help wanders by &mdash; that is the Hall&rsquo;s whole gift. Failures are pinned as proudly as wins.</p>
+      </div>
+      <div id="questions" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(322px,1fr)); gap:14px; margin-top:54px;"></div>
+    </div>
+  </section>
+
+  <!-- ============ THE QUIET THREAD ============ -->
+  <section style="position:relative; z-index:6; padding:96px 24px; background:#080605; text-align:center;">
+    <div style="max-width:740px; margin:0 auto;">
+      <div style="display:flex; align-items:center; justify-content:center; gap:16px; color:rgba(150,140,118,.5); margin-bottom:40px;">
+        <span style="flex:1; max-width:90px; height:1px; background:linear-gradient(90deg,transparent,rgba(150,140,118,.4));"></span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.3em;">UNFILED &nbsp;·&nbsp; AN OPEN MYSTERY</span>
+        <span style="flex:1; max-width:90px; height:1px; background:linear-gradient(90deg,rgba(150,140,118,.4),transparent);"></span>
+      </div>
+      <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(18px, 2.3vw, 25px); line-height:2.05; color:rgba(150,138,114,.92);">
+        <div>In the Foundry, a damaged link re-knit itself.</div>
+        <div>In the Loom Hall, a dropped thread mended overnight.</div>
+        <div>In the AI Center, the minds began speaking in a pattern no one designed.</div>
+        <div style="color:rgba(206,184,150,.9); margin-top:14px;">None of them have compared notes yet.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer style="position:relative; z-index:6; border-top:1px solid rgba(210,170,110,.18); padding:58px 24px 46px; background:#0a0806;">
+    <div style="max-width:1180px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:40px;">
+      <div>
+        <div style="font-family:'Cinzel',serif; font-weight:700; font-size:20px; letter-spacing:.08em; color:#f0e3ca;">LANTERNHOLD</div>
+        <div style="margin-top:10px; font-size:14px; line-height:1.6; color:rgba(204,188,158,.7);">Central Research Hall &mdash; the Atrium. The breathtaking first view, from which everything links.</div>
+      </div>
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.2em; color:rgba(238,196,126,.65); margin-bottom:16px;">ACCESS</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px; font-size:13.5px; color:rgba(214,199,170,.85);"><span style="width:8px; height:8px; border-radius:50%; background:#7fb069; box-shadow:0 0 8px #7fb069;"></span><strong style="font-weight:500; color:#e6d8bd;">Public</strong> &mdash; open to all who descend</div>
+          <div style="display:flex; align-items:center; gap:10px; font-size:13.5px; color:rgba(214,199,170,.85);"><span style="width:8px; height:8px; border-radius:50%; background:#e0a541; box-shadow:0 0 8px #e0a541;"></span><strong style="font-weight:500; color:#e6d8bd;">Members</strong> &mdash; lab members &amp; apprentices</div>
+          <div style="display:flex; align-items:center; gap:10px; font-size:13.5px; color:rgba(214,199,170,.85);"><span style="width:8px; height:8px; border-radius:50%; background:#c4553b; box-shadow:0 0 8px #c4553b;"></span><strong style="font-weight:500; color:#e6d8bd;">Restricted</strong> &mdash; by clearance only</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.2em; color:rgba(238,196,126,.65); margin-bottom:16px;">CONVENED BY</div>
+        <div style="font-size:14px; line-height:1.6; color:rgba(204,188,158,.78);"><strong style="font-weight:500; color:#e6d8bd;">Bramble</strong> &mdash; prairie dog, the one who keeps a thousand conversations from becoming chaos.</div>
+        <div style="margin-top:18px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.12em; color:rgba(200,182,150,.5);">THE HALL &middot; LEVEL 0 &middot; THE LAMP IS LIT</div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<div id="drawer-mount"></div>
+
+<script>
+(function(){
+  "use strict";
+  var ACCESS = {
+    public:     { label:'PUBLIC',     color:'#7fb069' },
+    members:    { label:'MEMBERS',    color:'#e0a541' },
+    restricted: { label:'RESTRICTED', color:'#c4553b' }
+  };
+  var DISTRICTS = [
+    { idx:'01', name:'Contribution Registry', glow:'#9fc6e8', access:'public',
+      lead:'Vellum · ancient tortoise — Keeper of memory, with apprentice Tally · magpie',
+      essence:'The district that remembers — every contribution honored, linked, never lost.',
+      feature:'Hall of Contributors · the ledger',
+      walkIn:"The quietest hall: no benches, no arguing — only long dim aisles and the soft endless ticking of brass-and-glass memory-machines, always turning. The smallest mouse's smallest correction turns its own small wheel, faithfully, long after the mouse is gone.",
+      makes:"Remembering itself — and since Book I, made as a chain: each keeper their own honored record, linked to the one before and the one after, so the many are kept as many, none blurred, none lost. The chain guards its own truth, and now keeps itself.",
+      secret:"The restored chain runs back past the founding — one faint link older than the laboratory itself. Who was keeping and passing on contribution before there was a lab?" },
+    { idx:'02', name:'Historical Archives', glow:'#e0a85a', access:'public',
+      lead:'Maddox · pack rat — Head of Archives',
+      essence:'The deep memory of what it was like — the doubts and the courage behind the record.',
+      feature:'Documentation · research journals',
+      walkIn:"Warm, dim, close — a honeycomb of reading-cells worn into stone, shelves sagging with the patient weight of years, the dry-sweet smell of a great deal of old paper. Floating archive-lifts drift overhead, carrying journals to readers.",
+      makes:'They preserve and interpret — cross-reading old journals to recover lost context, teaching the lab to hear its own past correctly: that "too many to name" was a bow, not a blank.',
+      secret:'Maddox keeps one cell locked: journals from the abandoned sectors that "aren’t ready to be read yet."' },
+    { idx:'03', name:'Innovation Workshop', glow:'#f08a3c', access:'public',
+      lead:'Juniper "June" Ringtail · raccoon — Master Tinkerer',
+      essence:'Where ideas become prototypes — loud, messy, joyful. Home of the Wall of Noble Failures.',
+      feature:'Experiments · engineering blueprints',
+      walkIn:'Sparks, scaffolding, the smell of hot metal and sawdust, the clang-whirr-"aha!" rhythm of making. An assistant-bot misreads a blueprint and politely builds a chair upside down. A working prototype earns a small festival.',
+      makes:'Everything’s first form: the motion-woken lamps, the drone prototypes, the early chain-machines. Failures are pinned with honor on the Wall — because failure is how the next thing works.',
+      secret:'June keeps a locked drawer of "ideas too dangerous to finish yet."' },
+    { idx:'04', name:'Chain Foundry', glow:'#f2a23e', access:'members',
+      lead:'Master Castor · beaver — Chief Engineer of the Foundries',
+      essence:'Where the lab forges its trust-machines — the chain-of-trust, shown as craft, never a lecture.',
+      feature:'Live blockchain visualization',
+      walkIn:'Heat and rhythm. A great forge-reactor at the center pulses like a slow heart, throwing molten gold up the walls; the teams move in time to it. Order under pressure — every link tested, every join proven.',
+      makes:'The chain as physical, dependable infrastructure: each contribution-record forged into a link that holds the one before and is held by the one after, so the whole guards its own truth. You watch it being made.',
+      secret:"Castor has noticed the chain repairing itself when a link is damaged. He hasn't told anyone. He's not sure he built that." },
+    { idx:'05', name:'Sentinel Hall', glow:'#d76a4a', access:'members',
+      lead:'Commander Sasha · meerkat — Keeper of the Watch',
+      essence:'The Watch — posted sentinels who guard the city and sound the alarm before trouble arrives.',
+      feature:'Status · the watch',
+      walkIn:'High galleries and clear sightlines, watchers posted at every approach, ears turned toward the dark. When all is well, a low steady all-clear hums through the hall; when it isn’t, every head snaps up at once.',
+      makes:"They keep the city safe — watching the approaches, testing the gatehouses' identity-tokens, sounding the alarm before trouble arrives. Vigilance practiced as a civic art.",
+      secret:"Sasha logs every false alarm. Lately a few weren't false — and weren't on any threat she recognizes." },
+    { idx:'06', name:'Robotics Division', glow:'#5fc8a8', access:'public',
+      lead:'Pip Sprocket · rat — Master of Mechanisms',
+      essence:'Where the machines come alive — miners, drones, and the well-meaning assistant-bots.',
+      feature:'Robotics showcase · meet-the-bots',
+      walkIn:'Whirring, clicking, the skitter of small mechanisms and the deep thrum of large ones. Mechanical mining squirrels file out through glowing crystal tunnels; journal-drones cross overhead; an assistant-bot earnestly creates a small, polite disaster.',
+      makes:'They refine the Workshop’s rough prototypes into reliable working machines — the miners, the drones, the assistants that fetch and sort and try to help. Half the craft is listening to what a machine is doing wrong.',
+      secret:'One old assistant-bot, "First," predates Pip’s records and occasionally says things no one programmed. Pip insists it’s a glitch — and checks on it every night.' },
+    { idx:'07', name:'The Commons & Bakery', glow:'#e8c06a', access:'public',
+      lead:'Mrs. Bramwell · hedgehog — Keeper of the Table',
+      essence:'The heart of the table — warm bread, warm company, the whole city’s gathering place.',
+      feature:'Community · the commons',
+      walkIn:'The smell reaches you three levels up: bread, butter, something sweet. Long worn tables, mismatched chairs, every species elbow to elbow. Gruff-sweet Mrs. Bramwell remembers exactly how everyone takes their tea.',
+      makes:'They feed the city and seat it together — the one hall where rank dissolves and a department head shares a bench with a first-day apprentice. The table, it turns out, is the real infrastructure.',
+      secret:"Mrs. Bramwell keeps one chair empty at the long table. She won't say for whom." },
+    { idx:'08', name:'AI Center', glow:'#5aa8c8', access:'members',
+      lead:'Professor Inkwell · octopus — Steward of the Minds',
+      essence:'The calm hall of thinking machines — and the home of the assistant that guides you.',
+      feature:'The AI assistant room',
+      walkIn:'Cool, dim, and quiet — a hall of softly glowing minds, like lamps that are considering something. Inkwell’s glass water-chamber casts rippling light across the walls. It hums and ponders where other districts clatter and forge.',
+      makes:'They tend the lab’s reasoning helpers — the machines that sort the Registry, route the drones, and gently help you find what you’re looking for. Inkwell’s rule: a thinking machine should make you more curious, not less needed.',
+      secret:'Inkwell suspects the chain and her minds are starting to "talk" in a pattern she didn’t design. She is watching, fascinated and a little awed.' },
+    { idx:'09', name:'Educational Academy', glow:'#e8b96a', access:'public',
+      lead:'Madam Oona · elephant — Keeper of Patience',
+      essence:'Where the young are taught and the old keep learning — the lab’s promise that no one is ever finished.',
+      feature:'Tutorials · learn · onboarding',
+      walkIn:'Warm classrooms carved in tiers of stone, full of light and chalk-dust and the particular happy noise of minds clicking on. Children of a dozen species learn beside grey-muzzled department heads brushing up on a new craft.',
+      makes:'They make the next generation able to contribute more than this one. Teaching is hands-on — you learn the Registry by walking its rows — and they run the gentle first descent for every newcomer.',
+      secret:"The Academy's oldest classroom has a lesson carved into its wall in a script no current teacher can read." },
+    { idx:'10', name:'Codeworks — Loom Hall', glow:'#bcd86a', access:'members',
+      lead:'Mistress Aran · spider — Master Weaver',
+      essence:'Where the lab weaves its software — repositories as living looms you can read top to bottom.',
+      feature:'The GitHub room · repositories',
+      walkIn:'A tall hall of great looms, each threading glowing logic into bright moving fabric — commits landing as new woven rows, branches splitting into separate weaves and rejoining, the whole history of a system hanging as a tapestry.',
+      makes:'They weave and maintain the lab’s software. Every project is a loom; every contributor adds rows; the tapestry remembers who wove what — threaded straight into the Contribution Registry.',
+      secret:'Aran has found her tapestries self-repairing dropped threads — the same thing Castor saw in the chain and Inkwell saw in the minds. None of them have compared notes.' },
+    { idx:'11', name:'Version History Museum', glow:'#9aa8c0', access:'public',
+      lead:'Curator Burrows · mole — Keeper of the Story',
+      essence:'Where the lab’s whole story is kept — by the keeper who once feared being forgotten.',
+      feature:'Version history · the changelog',
+      walkIn:'A spiralling gallery you walk backward through time, each alcove a version of the lab that was — older walls, older tools, older names. Burrows tends it half in the dark, the way moles prefer, and knows every turn by heart.',
+      makes:'They keep the lab’s version history — not merely what changed, but who each change made the lab into. Burrows feared being forgotten once; now he makes certain no one else is.',
+      secret:'The earliest alcove is still unfinished — Burrows is recovering versions of the lab from before the records begin.' }
+  ];
+  var TICKER = [
+    'A prototype worked on the third try — a small festival is erupting on the Workshop floor.',
+    'Bramble has convened four collaborations before midmorning, and lost her breakfast twice.',
+    'A new contributor’s star kindled in the Registry tonight.',
+    'Castor tested a join by ear and pronounced it sound.',
+    'An assistant-bot misread a blueprint and politely built a chair upside down.',
+    'The never-dark lamp burns on, as it has since before anyone living can remember.',
+    'Mining squirrels brought back crystal from a seam that isn’t on any map.',
+    'Madam Oona answered a question with a story; the student is still thinking.'
+  ];
+  var QSTAT = { open:{label:'OPEN',color:'#e0a541'}, answered:{label:'ANSWERED · RESOLVED',color:'#7fb069'} };
+  var QUESTIONS = [
+    { text:'Why does the central lamp never go out? Asking sincerely.', who:'a first-day apprentice', status:'open' },
+    { text:'Has anyone mapped the sealed gallery off the seventh balcony? The criers won’t call its name.', who:'the bridge-keepers', status:'open' },
+    { text:'My loom dropped a thread overnight — and re-knit it itself. Is this... normal?', who:'Aran · Codeworks', status:'open' },
+    { text:'Noble failure to share: the upside-down chair, and exactly what I learned from it.', who:'an assistant-bot', status:'answered', answer:'Pinned to the Wall with honor. This is how the next thing works.' },
+    { text:'Need a beaver to check a load-bearing tolerance — non-urgent.', who:'the Foundry floor', status:'answered', answer:'Castor is on his way. Bring snacks; this takes a while.' },
+    { text:'Looking for an otter who studies currents.', who:'a confused engineer', status:'answered', answer:'Bramble already dragged you across the Hall. You’re welcome.' }
+  ];
+
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function el(html){ var t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstChild; }
+
+  // seeded RNG to match the design's deterministic light field
+  function makeRnd(seed){ return function(){ seed=(seed*9301+49297)%233280; return seed/233280; }; }
+
+  // ---- hero lights ----
+  (function(){
+    var rnd=makeRnd(1337), out=[];
+    for(var row=0; row<6; row++){
+      var top=49+row*8.2, count=7+row*3;
+      for(var i=0;i<count;i++){
+        var left=((i+rnd()*0.85)/count)*100;
+        var size=+(1+rnd()*(1.4+row*0.5)).toFixed(1);
+        out.push({left:left.toFixed(1)+'%', top:top.toFixed(1)+'%', size:size, glow:+(size*2.6).toFixed(1), op:+(0.32+rnd()*0.6).toFixed(2), tw:+(3+rnd()*4).toFixed(1), delay:+(rnd()*6).toFixed(1)});
+      }
+    }
+    var c=document.getElementById('lights');
+    out.forEach(function(g){
+      c.appendChild(el('<span style="position:absolute; left:'+g.left+'; top:'+g.top+'; width:'+g.size+'px; height:'+g.size+'px; border-radius:50%; background:rgba(249,216,152,1); opacity:'+g.op+'; box-shadow:0 0 '+g.glow+'px rgba(246,196,112,.9); animation:twinkle '+g.tw+'s ease-in-out '+g.delay+'s infinite;"></span>'));
+    });
+  })();
+
+  // ---- motes ----
+  (function(){
+    var rnd=makeRnd(88), c=document.getElementById('motes');
+    for(var i=0;i<16;i++){
+      var l=(rnd()*100).toFixed(1)+'%', s=+(1.4+rnd()*2.4).toFixed(1), d=+(11+rnd()*12).toFixed(1), delay=+(rnd()*14).toFixed(1);
+      c.appendChild(el('<span style="position:absolute; left:'+l+'; bottom:-12px; width:'+s+'px; height:'+s+'px; border-radius:50%; background:rgba(250,222,160,.85); box-shadow:0 0 6px rgba(245,200,120,.85); animation:moteRise '+d+'s linear '+delay+'s infinite;"></span>'));
+    }
+  })();
+
+  // ---- ticker (doubled for seamless loop) ----
+  (function(){
+    var c=document.getElementById('ticker');
+    TICKER.concat(TICKER).forEach(function(t){
+      c.appendChild(el('<span style="font-family:\'IBM Plex Mono\',monospace; font-size:12.5px; letter-spacing:.04em; color:rgba(205,184,148,.92); padding:0 22px;">'+t+'</span>'));
+      c.appendChild(el('<span style="color:rgba(240,200,126,.7); font-size:11px;">&#10022;</span>'));
+    });
+  })();
+
+  // ---- districts ----
+  (function(){
+    var c=document.getElementById('districts');
+    DISTRICTS.forEach(function(d){
+      var a=ACCESS[d.access];
+      var card=el(
+        '<div class="dcard" role="button" tabindex="0" style="--glow:'+d.glow+'; position:relative; overflow:hidden; cursor:pointer; padding:24px 24px 22px; background:linear-gradient(180deg, rgba(28,23,17,.78), rgba(17,14,10,.84)); border:1px solid rgba(210,170,110,.16); border-radius:4px;">'+
+          '<div style="position:absolute; top:-46px; right:-46px; width:168px; height:168px; border-radius:50%; background:radial-gradient(circle, var(--glow), transparent 70%); opacity:.14; filter:blur(4px); pointer-events:none;"></div>'+
+          '<div style="position:absolute; left:0; top:0; height:2px; width:56px; background:var(--glow); opacity:.75;"></div>'+
+          '<div style="position:relative; display:flex; justify-content:space-between; align-items:center; font-family:\'IBM Plex Mono\',monospace; font-size:11px; letter-spacing:.16em; margin-bottom:20px;">'+
+            '<span style="color:rgba(220,190,140,.5);">'+d.idx+'</span>'+
+            '<span style="display:inline-flex; align-items:center; gap:7px; color:rgba(220,200,170,.72);"><span style="width:7px; height:7px; border-radius:50%; background:'+a.color+'; box-shadow:0 0 8px '+a.color+';"></span>'+a.label+'</span>'+
+          '</div>'+
+          '<h3 style="position:relative; margin:0 0 9px; font-family:\'Cormorant Garamond\',serif; font-weight:600; font-size:30px; line-height:1.04; color:#f4e7d0;">'+esc(d.name)+'</h3>'+
+          '<div style="position:relative; font-style:italic; font-size:13.5px; line-height:1.4; color:rgba(202,184,150,.74); margin-bottom:15px;">'+esc(d.lead)+'</div>'+
+          '<p style="position:relative; margin:0 0 22px; font-size:15px; line-height:1.55; color:rgba(228,215,191,.9);">'+esc(d.essence)+'</p>'+
+          '<div style="position:relative; display:flex; justify-content:space-between; align-items:center; gap:10px;">'+
+            '<span style="font-family:\'IBM Plex Mono\',monospace; font-size:11px; letter-spacing:.05em; color:var(--glow);">'+esc(d.feature)+'</span>'+
+            '<span style="font-family:\'IBM Plex Mono\',monospace; font-size:11px; letter-spacing:.12em; color:rgba(220,200,170,.45);">enter &#8594;</span>'+
+          '</div>'+
+        '</div>'
+      );
+      card.addEventListener('click', function(){ openDrawer(d); });
+      card.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openDrawer(d);} });
+      c.appendChild(card);
+    });
+  })();
+
+  // ---- questions ----
+  (function(){
+    var c=document.getElementById('questions');
+    QUESTIONS.forEach(function(q){
+      var st=QSTAT[q.status];
+      var ans=q.answer ? '<div style="margin-top:14px; padding-left:14px; border-left:2px solid rgba(225,165,65,.5); font-style:italic; font-size:14px; line-height:1.5; color:rgba(205,188,156,.85);">&#8627; '+q.answer+'</div>' : '';
+      c.appendChild(el(
+        '<div style="position:relative; padding:22px 24px; background:rgba(22,18,13,.6); border:1px solid rgba(210,170,110,.13); border-radius:4px;">'+
+          '<div style="display:flex; justify-content:space-between; gap:12px; font-family:\'IBM Plex Mono\',monospace; font-size:11px; letter-spacing:.13em; margin-bottom:13px;">'+
+            '<span style="display:inline-flex; align-items:center; gap:7px; color:'+st.color+';"><span style="width:6px; height:6px; border-radius:50%; background:'+st.color+'; box-shadow:0 0 7px '+st.color+';"></span>'+st.label+'</span>'+
+            '<span style="color:rgba(200,182,150,.55); letter-spacing:.03em; text-align:right;">'+q.who+'</span>'+
+          '</div>'+
+          '<p style="margin:0; font-size:16px; line-height:1.5; color:#ece0c8;">'+q.text+'</p>'+ans+
+        '</div>'
+      ));
+    });
+  })();
+
+  // ---- district drawer ----
+  var mount=document.getElementById('drawer-mount');
+  function closeDrawer(){ mount.innerHTML=''; document.body.style.overflow=''; }
+  function openDrawer(d){
+    var a=ACCESS[d.access];
+    var overlay=el('<div style="position:fixed; inset:0; z-index:50; background:rgba(6,5,4,.66); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); animation:bgFade .3s ease;"></div>');
+    var panel=el(
+      '<div style="--glow:'+d.glow+'; position:absolute; top:0; right:0; height:100%; width:min(548px, 93vw); overflow-y:auto; background:linear-gradient(180deg,#15110c,#0c0907); border-left:1px solid color-mix(in srgb, var(--glow) 50%, rgba(210,170,110,.2)); box-shadow:-34px 0 90px -36px var(--glow); padding:46px 44px 64px; animation:drawerIn .44s cubic-bezier(.2,.72,.2,1);">'+
+        '<div style="position:absolute; left:0; top:0; width:100%; height:3px; background:var(--glow); opacity:.85;"></div>'+
+        '<button class="xbtn" aria-label="Close" style="position:absolute; top:22px; right:24px; width:38px; height:38px; display:flex; align-items:center; justify-content:center; border-radius:50%; border:1px solid rgba(210,170,110,.25); background:rgba(20,16,11,.6); color:#e6d4b2; font-size:20px; line-height:1; cursor:pointer;">&#215;</button>'+
+        '<div style="display:flex; align-items:center; gap:14px; font-family:\'IBM Plex Mono\',monospace; font-size:11px; letter-spacing:.18em; margin-bottom:22px;">'+
+          '<span style="color:rgba(220,190,140,.55);">GALLERY '+d.idx+'</span>'+
+          '<span style="display:inline-flex; align-items:center; gap:7px; color:rgba(220,200,170,.78);"><span style="width:7px; height:7px; border-radius:50%; background:'+a.color+'; box-shadow:0 0 8px '+a.color+';"></span>'+a.label+'</span>'+
+        '</div>'+
+        '<div class="slot" style="height:150px; margin-bottom:26px;">char/env render for '+esc(d.name)+'</div>'+
+        '<h2 style="margin:0 0 12px; font-family:\'Cormorant Garamond\',serif; font-weight:600; font-size:clamp(38px,7vw,52px); line-height:1; color:#f5e8d1;">'+esc(d.name)+'</h2>'+
+        '<div style="font-style:italic; font-size:15px; line-height:1.5; color:var(--glow); margin-bottom:30px;">'+esc(d.lead)+'</div>'+
+        '<div style="margin-bottom:28px;"><div style="font-family:\'IBM Plex Mono\',monospace; font-size:10.5px; letter-spacing:.24em; color:rgba(220,190,140,.6); margin-bottom:11px;">WALK IN</div><p style="margin:0; font-size:16.5px; line-height:1.7; color:rgba(231,219,196,.92);">'+esc(d.walkIn)+'</p></div>'+
+        '<div style="margin-bottom:28px;"><div style="font-family:\'IBM Plex Mono\',monospace; font-size:10.5px; letter-spacing:.24em; color:rgba(220,190,140,.6); margin-bottom:11px;">WHAT THEY MAKE</div><p style="margin:0; font-size:16.5px; line-height:1.7; color:rgba(231,219,196,.92);">'+esc(d.makes)+'</p></div>'+
+        '<div style="margin-bottom:30px; padding:18px 20px; background:color-mix(in srgb, var(--glow) 7%, rgba(16,12,8,.6)); border:1px solid color-mix(in srgb, var(--glow) 22%, transparent); border-radius:4px;"><div style="font-family:\'IBM Plex Mono\',monospace; font-size:10px; letter-spacing:.24em; color:var(--glow); margin-bottom:10px;">&#9670; OPEN MYSTERY</div><p style="margin:0; font-family:\'Cormorant Garamond\',serif; font-style:italic; font-size:18px; line-height:1.6; color:rgba(220,202,168,.9);">'+esc(d.secret)+'</p></div>'+
+        '<div style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding-top:22px; border-top:1px solid rgba(210,170,110,.16);"><div><div style="font-family:\'IBM Plex Mono\',monospace; font-size:9.5px; letter-spacing:.2em; color:rgba(200,182,150,.5); margin-bottom:5px;">BECOMES THE FEATURE</div><div style="font-family:\'IBM Plex Mono\',monospace; font-size:13px; letter-spacing:.03em; color:var(--glow);">'+esc(d.feature)+'</div></div><div style="font-family:\'IBM Plex Mono\',monospace; font-size:10px; letter-spacing:.18em; color:rgba(200,182,150,.4);">ESC &middot; CLOSE</div></div>'+
+      '</div>'
+    );
+    panel.addEventListener('click', function(e){ e.stopPropagation(); });
+    panel.querySelector('.xbtn').addEventListener('click', closeDrawer);
+    overlay.addEventListener('click', closeDrawer);
+    overlay.appendChild(panel);
+    mount.innerHTML='';
+    mount.appendChild(overlay);
+    document.body.style.overflow='hidden';
+  }
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeDrawer(); });
+
+  // ---- parallax ----
+  var root=document.getElementById('root'), raf=null;
+  window.addEventListener('scroll', function(){
+    if(raf) return;
+    raf=requestAnimationFrame(function(){
+      raf=null;
+      var y=window.scrollY||window.pageYOffset||0;
+      if(y>window.innerHeight*1.2) return;
+      root.querySelectorAll('[data-parallax]').forEach(function(elm){
+        var s=parseFloat(elm.getAttribute('data-parallax'))||0;
+        elm.style.transform='translate3d(0,'+(y*s).toFixed(1)+'px,0)';
+      });
+    });
+  }, {passive:true});
+})();
+</script>
+</body>
+</html>
