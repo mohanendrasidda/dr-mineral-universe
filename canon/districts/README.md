@@ -23,5 +23,12 @@ Deep lore, one file per district — the level of detail that makes every websit
 | Sentinel Hall (the Watch / SOC) | **Commander Sasha** | Meerkat — real sentinel behavior; posts watchers, sounds alarms |
 | Robotics Division | **Pip Sprocket** | Rat — smart, dexterous, fearless tinkerer of small machines |
 | The Commons & Bakery | **Mrs. Bramwell** | Hedgehog — warm, round, gruff-sweet; the heart of the table |
+| AI Center | **Professor Inkwell** | Octopus — distributed mind across eight arms; the truest metaphor for AI |
+| Educational Academy | **Madam Oona** | Elephant — never forgets, never rushes; the longest patience |
+| The Codeworks (Loom Hall) | **Mistress Aran** | Spider — weaves thread into structure that holds (= code) |
+| Version History Museum | **Curator Burrows** | The Book I old mole — who feared being forgotten now keeps the lab's story |
 
-Guides written: central-research-hall, contribution-registry, historical-archives, innovation-workshop, chain-foundry, sentinel-hall, robotics-division, the-commons-and-bakery. Add more as the world grows.
+Guides written (12): central-research-hall, contribution-registry, historical-archives, innovation-workshop, chain-foundry, sentinel-hall, robotics-division, the-commons-and-bakery, ai-center, educational-academy, codeworks-loom-hall, version-history-museum. Add more as the world grows.
+
+## Seeded cross-district thread (universe-spanning hook)
+Three districts have independently noticed the lab's own systems beginning to **self-repair / self-organize** — Castor's chain re-knits damaged links, Inkwell's minds "talk" in an undesigned pattern, Aran's looms mend dropped threads. None have compared notes. Something larger may be waking in the infrastructure the civilization built. A major Book II / universe arc; keep it slow and unexplained.

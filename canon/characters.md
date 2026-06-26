@@ -48,6 +48,10 @@ Full bios in `districts/`. Each has a real flaw (Pixar rule). Cast more as distr
 | **Commander Sasha** | Meerkat | Sentinel Hall / the Watch (SOC) | Unhurried vigilance; "someone's always looking up" | Can't delegate the last watch |
 | **Pip Sprocket** | Rat | Robotics Division (Master of Mechanisms) | Brilliant, fast, loves every bot | Over-personifies machines; won't scrap "Gerald" |
 | **Mrs. Bramwell** | Hedgehog | The Commons & Bakery | Feeds everyone; the lab's heart & gossip | Gruff; fusses while denying it; despairs of Dr. Mineral's toast |
+| **Professor Inkwell** | Octopus | AI Center | Distributed mind; gentle, oceanic patience | Thinks eight directions at once; never finishes a sentence |
+| **Madam Oona** | Elephant | Educational Academy | Never forgets, never rushes; the longest patience | Answers only in wandering stories; never gives it straight |
+| **Mistress Aran** | Spider | The Codeworks (Loom Hall) | Weaves logic into structure; feels a flaw 3 threads away | Re-weaves finished work at midnight; speaks only in weaving metaphor |
+| **Curator Burrows** | Mole | Version History Museum | Book I's "will I be remembered?" mole, now keeper of the lab's story | Relives every past era in exhaustive nostalgic detail |
 
 > Departments are run by different animal species. Casting the leads (which species runs which district, and why that species fits that science) is an early world-building decision — see `docs/03_book-one-foundation.md`, open decision **B**.
 
