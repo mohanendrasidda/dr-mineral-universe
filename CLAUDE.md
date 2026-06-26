@@ -17,6 +17,22 @@ The build home for **The Dr. Mineral Universe**, an original transmedia IP by Mo
 
 **Canon source of truth:** `docs/01_universe-bible-v1.md` (the soul) **as refocused by** `docs/10_product-direction.md` (v3 — authoritative). `docs/06_universe-bible-v2.md` is superseded where it conflicts (the multi-tech spread).
 
+## Current state — CONTINUE HERE (no need to re-explain)
+**The product:** the public face of the **UNL cybersecurity cohort's Lab Reward Coin** — a blockchain reward system that pays out for genuine security work (bugs/audits/writeups), Sybil-resistant, real sink, not a financial security; Web3 stack (Solidity/OpenZeppelin/Foundry/viem/wagmi). Spec: `docs/11_reward-system-spec.md`. Source deck: `~/Downloads/Web2-to-Web3-Building-dApps.pptx`. The **lab + coin + team** are the hero; **Dr. Mineral** is the under-the-hood keeper + a free-roaming site mascot.
+
+**Built so far:**
+- `site/index.html` — v3 landing: hero = the coin mission; "What we're building" = the core loop (Mine→Forge→Ledger→Vault→Watch) + the four must-haves; "The Architects" = the real team; Dr. Mineral demoted to an "under the hood" band.
+- `site/world/index.html` — **the 3D world (Three.js) = the actual product.** Phase 0→1. **Must run over http** (textures): `python3 -m http.server 8011` from repo root → `http://127.0.0.1:8011/site/world/index.html`.
+- `site/squirrel.js` + `site/sprites/` — free-roaming Dr. Mineral (perch / leap / peek-a-boo), on the landing + district pages.
+- `assets/keyed/` (keyed chars: drmineral, tally, vellum), `assets/environments/` (scene renders), `teaser/` (Remotion teaser).
+- **Archived / not active under v3:** `site/index.lanternhold-v2.html`, `site/districts/` + the 11-district atlas, `docs/06_universe-bible-v2.md`. Kept in git, off-theme now.
+
+**The team (from the cohort deck — CONSENT-GATED, not public yet):** Raul Ochoa (Vision & exec sponsor, UNL·SOC), Sean McNear (ERC-20 core), Sean Stara (governance & tests), Jacob Andrewson (redemption & reviews), Mohanendra Siddha = Sidd (Lead & instructor; SOC/SIEM, consensus research). Names/photos go public only with each person's consent + the sponsor's written consent.
+
+**Next priorities:** (1) improve the 3D world a lot (bloom, richer cavern, multiple animated workers, click-to-focus zones, the chain visibly growing). (2) Team → animal avatars roaming the world. (3) Coin specifics + bounty/reward winners = future, not yet built.
+
+**Asset pipeline:** 2D art via Nano Banana/Gemini; key with `uvx --from "rembg[cpu,cli]" rembg i in out`; crop watermarks with PIL via `uv run --with pillow`. True 3D character models still need an image-to-3D pipeline (Meshy/Luma/Tripo) — future; billboard sprites bridge for now.
+
 ## Layout
 ```
 CLAUDE.md                  ← you are here
@@ -52,4 +68,4 @@ Many `assets/raw/` renders wrap the squirrel in a literal chain (a blockchain pu
 - Still Sidd's IP — just no longer firewalled from his own venture. (The old "keep separate from UNL/cohort" rule and the influence-tactics exclusion are retired here; if any real *third-party/institutional* IP shows up, flag it.)
 
 ## Conventions
-Commit by individual contributor; descriptive messages; canon changes flagged in the message. `site/index.html` is currently the cohort token page — re-skin to canon (drop chain/token framing, lead with Dr. Mineral + discovery) before it represents the universe.
+Commit with descriptive messages; flag canon changes in the message. The site runs over local http (`python3 -m http.server 8011` from repo root) — the 3D world needs it for textures.
