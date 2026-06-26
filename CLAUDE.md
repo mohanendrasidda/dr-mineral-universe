@@ -5,17 +5,17 @@ Repo memory for Claude Code. Read `docs/` for full detail; this is the always-on
 ## What this repo is
 The build home for **The Dr. Mineral Universe**, an original transmedia IP by Mohanendra Siddha (Sidd): a **living universe** — an underground research *civilization* — that surfaces as an interactive website, animations, books, and education. Creative and canon-led — NOT a strategy/business repo.
 
-## ⭐ North star (v2 — the product is the world, not the book)
-Build **a world that keeps happening,** not a story that happens. Decisions serve the *universe*, not a single plot.
-- **The laboratory is a co-protagonist** — a bustling civilization (districts, daily life, society, festivals, engineering), not a backdrop. Aim: as unforgettable as Hogwarts / Pandora / Coruscant.
-- **Every district maps to a website feature** — explore a real place, not a menu. See `canon/district-atlas.md`.
-- **The lab evolves with versions** — every software release is a *physical expansion* (new wings, cranes, scaffolding). "TODAY IN THE LAB" is the content model; visitors return because the world grew. See `canon/growth-and-versions.md`.
-- **The campus squirrels are the hidden civilization** (Sidd's original inspiration) — every campus squirrel is secretly a lab member with a role; **many** entrances, each to a different district. See `canon/the-squirrel-network.md`.
-- **A research civilization that invents technology** — prototypes, failures, debugging, the joy of making. **Blockchain is ONE invention among many** (AI, robotics, distributed systems, cybersecurity, energy), emerging naturally. Audience includes students, developers, researchers, security/blockchain people. See `canon/technology-and-engineering.md`.
-- **Pixar rule: emotion + humor.** Dr. Mineral has real flaws and the lab has comedy; the funny beats make the emotional ones land. See his flaw sheet in `canon/characters.md`.
-- **The novel is one artifact, not the universe.** Book I (`book-one/`) is "a first thread," kept for its voice but subordinate to the world.
+## ⭐ North star (v3 — a living 3D blockchain-mining world)
+**Authoritative. Supersedes v2's "many inventions" spread (deliberate canon change).** Full detail: `docs/10_product-direction.md`.
+- **Blockchain/mining is the WHOLE point — the only technology.** Not one of many. The lab is a **blockchain-mining civilization**; everything serves the chain. (v2's AI/robotics/SOC/education spread is retired.)
+- **The core loop (the only districts):** **Mines** (squirrels mine crystal "blocks") → **Foundry** (forge blocks onto the chain) → **Ledger** (record every contribution; the chain of trust) → **Vault** (treasury of mined value) → **Watch** (secure the chain). That's the world.
+- **The product is a TRUE 3D explorable world** (Three.js) — Clash-of-Clans-style: characters are **always mining, hauling, forging, working**; the world perpetually *does something*; you move through it and interact. The scrolling site is just the skin; the **3D world is the product.** Lives in `site/world/`.
+- **Dr. Mineral + the lab are the story/brand** — the warm, charming face on the blockchain world. The novel (`book-one/`) is one subtle artifact; the world is overtly blockchain.
+- **Pixar emotion + humor** stays; warm characters with flaws.
 
-**Canon source of truth:** `docs/01_universe-bible-v1.md` **as evolved by** `docs/06_universe-bible-v2.md` (the living-universe expansion — a *deliberate* canon change, esp. the broadened mission). v2 wins on conflict.
+**Retired from v3:** "blockchain invisible," "blockchain one of many," the broad multi-tech district atlas, the campus-feature mapping. The off-theme districts (AI Center, Sentinel Hall, Codeworks, Academy, Commons, Archives, Version Museum) are **archived**, not active. Firewall + personal-IP rules still hold.
+
+**Canon source of truth:** `docs/01_universe-bible-v1.md` (the soul) **as refocused by** `docs/10_product-direction.md` (v3 — authoritative). `docs/06_universe-bible-v2.md` is superseded where it conflicts (the multi-tech spread).
 
 ## Layout
 ```
