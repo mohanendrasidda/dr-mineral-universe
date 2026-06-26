@@ -3,46 +3,43 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Chain — Dr. Mineral's living world (Phase 0)</title>
+<title>The Lab — Dr. Mineral's living blockchain world</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=IBM+Plex+Mono:wght@400;500&family=Cormorant+Garamond:ital@0;1&family=Spectral&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box} html,body{margin:0;height:100%;background:#0a0807;overflow:hidden;font-family:'Spectral',serif;color:#efe3cf}
+  *{box-sizing:border-box} html,body{margin:0;height:100%;background:#070504;overflow:hidden;font-family:'Spectral',serif;color:#efe3cf}
   #app{position:fixed;inset:0}
-  .label{position:absolute;transform:translate(-50%,-100%);pointer-events:none;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;
-    color:#f3e6cf;background:rgba(12,9,7,.55);border:1px solid var(--c,rgba(210,170,110,.4));border-radius:999px;padding:5px 12px;white-space:nowrap;
-    box-shadow:0 0 16px -4px var(--c,#0000);backdrop-filter:blur(4px);transition:opacity .2s}
-  .label b{color:var(--c,#f0c87e)}
-  .label small{display:block;color:rgba(214,199,170,.65);letter-spacing:.1em;font-size:9px;margin-top:1px}
-  #hud{position:fixed;top:20px;left:22px;z-index:5;pointer-events:none}
-  #hud .kick{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.34em;color:rgba(238,196,126,.8)}
-  #hud h1{margin:6px 0 0;font-family:'Cinzel',serif;font-weight:700;font-size:clamp(22px,3vw,34px);color:#f6e9d0;letter-spacing:.04em;text-shadow:0 0 30px rgba(245,196,107,.4)}
-  #hud .sub{margin-top:6px;font-style:italic;color:rgba(214,199,170,.7);font-size:14px}
-  #ctr{position:fixed;top:22px;right:24px;z-index:5;text-align:right;font-family:'IBM Plex Mono',monospace}
+  .mono{font-family:'IBM Plex Mono',monospace}
+  #hud{position:fixed;top:18px;left:20px;z-index:5;pointer-events:none}
+  #hud .kick{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.32em;color:rgba(238,196,126,.8)}
+  #hud h1{margin:6px 0 0;font-family:'Cinzel',serif;font-weight:700;font-size:clamp(20px,2.6vw,30px);color:#f6e9d0;letter-spacing:.04em;text-shadow:0 0 30px rgba(245,196,107,.4)}
+  #hud .sub{margin-top:5px;font-style:italic;color:rgba(214,199,170,.7);font-size:13px}
+  #ctr{position:fixed;top:20px;right:22px;z-index:5;text-align:right;font-family:'IBM Plex Mono',monospace;pointer-events:none}
   #ctr .lab{font-size:10px;letter-spacing:.24em;color:rgba(238,196,126,.75)}
-  #ctr .n{font-size:34px;color:#f6c878;text-shadow:0 0 22px rgba(246,196,112,.6);line-height:1}
-  #ctr .sub{font-size:10px;letter-spacing:.14em;color:rgba(200,182,150,.6);margin-top:3px}
-  #hint{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:5;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:rgba(214,190,150,.55)}
-  #tag{position:fixed;bottom:16px;right:18px;z-index:5;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:rgba(200,182,150,.4)}
-  #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9;background:#0a0807;color:#f0c87e;font-family:'IBM Plex Mono',monospace;letter-spacing:.2em;font-size:12px}
+  #ctr .n{font-size:32px;color:#f6c878;text-shadow:0 0 22px rgba(246,196,112,.6);line-height:1}
+  #ctr .s2{font-size:10px;letter-spacing:.14em;color:rgba(200,182,150,.6);margin-top:3px}
+  #hint{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:5;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:rgba(214,190,150,.55);pointer-events:none}
+  #panel{position:fixed;left:50%;bottom:54px;transform:translateX(-50%) translateY(20px);z-index:6;width:min(520px,92vw);
+    background:rgba(14,10,7,.82);backdrop-filter:blur(8px);border:1px solid var(--c,rgba(210,170,110,.4));border-radius:12px;padding:22px 26px;
+    box-shadow:0 20px 60px -20px #000,0 0 30px -10px var(--c);opacity:0;pointer-events:none;transition:opacity .35s, transform .35s}
+  #panel.on{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+  #panel .step{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.24em;color:var(--c,#f0c87e)}
+  #panel h2{margin:8px 0 2px;font-family:'Cormorant Garamond',serif;font-weight:600;font-size:30px;color:#f5e8d1}
+  #panel .mean{margin-top:10px;font-size:15.5px;line-height:1.6;color:rgba(228,215,191,.92)}
+  #panel .x{position:absolute;top:12px;right:14px;cursor:pointer;color:rgba(220,200,170,.6);font-size:18px;font-family:'IBM Plex Mono',monospace}
+  #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9;background:#070504;color:#f0c87e;font-family:'IBM Plex Mono',monospace;letter-spacing:.2em;font-size:12px;text-align:center;padding:20px}
+  a.back{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:5;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:rgba(214,190,150,.6);text-decoration:none}
+  a.back:hover{color:#f6c878}
 </style>
 </head>
 <body>
-<div id="loading">DESCENDING INTO THE CHAIN…</div>
+<div id="loading">WAKING THE LAB…</div>
 <div id="app"></div>
-<div id="labels"></div>
-<div id="hud">
-  <div class="kick">THE DR. MINERAL UNIVERSE</div>
-  <h1>THE CHAIN</h1>
-  <div class="sub">a living blockchain-mining world &middot; Phase&nbsp;0</div>
-</div>
-<div id="ctr">
-  <div class="lab">BLOCKS MINED</div>
-  <div class="n" id="blocks">0</div>
-  <div class="sub" id="chainlen">CHAIN LENGTH 0</div>
-</div>
-<div id="hint">DRAG TO ORBIT &middot; SCROLL TO ZOOM &middot; THE WORLD IS WORKING</div>
-<div id="tag">PHASE 0 PROTOTYPE &middot; BILLBOARD SPRITES STAND IN FOR 3D MODELS</div>
+<a class="back" href="../index.html">&#8592; BACK TO THE LANDING</a>
+<div id="hud"><div class="kick">THE UNIVERSITY OF NEBRASKA LAB</div><h1>THE LIVING CHAIN</h1><div class="sub">click a zone &middot; the lab is always working</div></div>
+<div id="ctr"><div class="lab">BLOCKS FORGED</div><div class="n" id="blocks">0</div><div class="s2" id="chainlen">CHAIN 0</div></div>
+<div id="hint">DRAG TO ORBIT &middot; SCROLL TO ZOOM &middot; CLICK A GLOWING ZONE</div>
+<div id="panel"><span class="x" id="panelx">&#215;</span><div class="step" id="pstep"></div><h2 id="ptitle"></h2><div class="mean" id="pmean"></div></div>
 
 <script type="importmap">
 { "imports": {
@@ -53,217 +50,176 @@
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-const app = document.getElementById('app');
-const W = () => window.innerWidth, H = () => window.innerHeight;
+window.addEventListener('error', e=>{ const l=document.getElementById('loading'); if(l){ l.style.display='flex'; l.textContent='⚠ '+(e.message||'error'); } });
 
-const renderer = new THREE.WebGLRenderer({ antialias:true });
-renderer.setSize(W(), H()); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-app.appendChild(renderer.domElement);
+const W=()=>innerWidth, H=()=>innerHeight;
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(W(),H()); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.12;
+document.getElementById('app').appendChild(renderer.domElement);
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0a0807);
-scene.fog = new THREE.FogExp2(0x0b0907, 0.030);
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x070504); scene.fog=new THREE.FogExp2(0x0a0705,0.020);
+const camera=new THREE.PerspectiveCamera(46,W()/H(),0.1,300); camera.position.set(16,13,19);
+const controls=new OrbitControls(camera,renderer.domElement); controls.target.set(0,1.4,0);
+controls.enableDamping=true; controls.dampingFactor=0.06; controls.minDistance=8; controls.maxDistance=42; controls.maxPolarAngle=Math.PI*0.485;
+controls.autoRotate=true; controls.autoRotateSpeed=0.3;
 
-const camera = new THREE.PerspectiveCamera(48, W()/H(), 0.1, 200);
-camera.position.set(13, 10, 15);
-
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 1.2, 0);
-controls.enableDamping = true; controls.dampingFactor = 0.06;
-controls.minDistance = 7; controls.maxDistance = 34;
-controls.maxPolarAngle = Math.PI * 0.49;
-controls.autoRotate = true; controls.autoRotateSpeed = 0.35;
+const composer=new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene,camera));
+const bloom=new UnrealBloomPass(new THREE.Vector2(W(),H()),0.95,0.62,0.74);
+composer.addPass(bloom);
 
 // ---------- lighting ----------
-scene.add(new THREE.HemisphereLight(0x4a3a2a, 0x070504, 0.55));
-const amber = new THREE.DirectionalLight(0xffd28a, 0.5); amber.position.set(6,12,4); scene.add(amber);
+scene.add(new THREE.HemisphereLight(0x4a3a2a,0x060403,0.5));
+const key=new THREE.DirectionalLight(0xffd28a,0.45); key.position.set(8,16,6); scene.add(key);
 
-// ---------- ground (cavern floor) ----------
-const floor = new THREE.Mesh(
-  new THREE.CircleGeometry(20, 64),
-  new THREE.MeshStandardMaterial({ color:0x231a13, roughness:1, metalness:0 })
-);
-floor.rotation.x = -Math.PI/2; scene.add(floor);
-// a darker rim ring
-const rim = new THREE.Mesh(new THREE.RingGeometry(19.4, 20, 64),
-  new THREE.MeshBasicMaterial({ color:0x0c0907, side:THREE.DoubleSide }));
-rim.rotation.x = -Math.PI/2; rim.position.y = 0.01; scene.add(rim);
+// ---------- cavern shell ----------
+const floor=new THREE.Mesh(new THREE.CircleGeometry(24,72),new THREE.MeshStandardMaterial({color:0x241a12,roughness:1}));
+floor.rotation.x=-Math.PI/2; scene.add(floor);
+const wall=new THREE.Mesh(new THREE.CylinderGeometry(24,26,30,48,1,true),new THREE.MeshStandardMaterial({color:0x140d09,roughness:1,side:THREE.BackSide}));
+wall.position.y=13; scene.add(wall);
+// scattered rock pillars for depth
+for(let i=0;i<10;i++){const a=i/10*6.28; const r=20+Math.sin(i)*1.5; const h=6+Math.random()*8;
+  const m=new THREE.Mesh(new THREE.ConeGeometry(1.6+Math.random(),h,6),new THREE.MeshStandardMaterial({color:0x16100b,roughness:1}));
+  m.position.set(Math.cos(a)*r,h/2,Math.sin(a)*r); m.rotation.y=Math.random()*3; scene.add(m);}
 
 // ---------- zones ----------
-const ZONES = [
-  { key:'mines',   name:'THE MINES',   sub:'mining · proof of work', pos:new THREE.Vector3(-8,0,4),  c:0xb98cff },
-  { key:'foundry', name:'THE FOUNDRY', sub:'forge the block',        pos:new THREE.Vector3(0,0,7),   c:0xf2902e },
-  { key:'ledger',  name:'THE LEDGER',  sub:'the chain of trust',     pos:new THREE.Vector3(8,0,4),   c:0x9fc6e8 },
-  { key:'vault',   name:'THE VAULT',   sub:'treasury of value',      pos:new THREE.Vector3(0,0,-8),  c:0x6fd0ff },
-  { key:'watch',   name:'THE WATCH',   sub:'secure the chain',       pos:new THREE.Vector3(8,0,-4),  c:0xe2603a },
+const R=9.2;
+const ZONES=[
+ {key:'mines',  name:'The Mines',  step:'01 · MINE',   c:0xb98cff, mean:'Where the work happens — finding bugs, running audits, writing it up. Real security work is the lab’s mining.'},
+ {key:'foundry',name:'The Foundry',step:'02 · FORGE',  c:0xf2902e, mean:'Verified work is forged into a reward token and welded onto the chain — a permanent, public record.'},
+ {key:'ledger', name:'The Ledger', step:'03 · RECORD', c:0x9fc6e8, mean:'Every contribution recorded on-chain, forever. Where reward & bug-bounty winners are honored.'},
+ {key:'vault',  name:'The Vault',  step:'04 · SINK',   c:0x6fd0ff, mean:'Mined value is kept here — and the sink the institution controls, so the coin stays healthy.'},
+ {key:'watch',  name:'The Watch',  step:'05 · GUARD',  c:0xe2603a, mean:'Slither, Echidna, monitoring. A security-led cohort’s home-field edge: the chain is guarded.'},
 ];
-const labelEl = {};
-const labelBox = document.getElementById('labels');
+ZONES.forEach((z,i)=>{ const a=Math.PI/2 - i*(2*Math.PI/5); z.pos=new THREE.Vector3(Math.cos(a)*R,0,Math.sin(a)*R); });
+const Z=k=>ZONES.find(z=>z.key===k);
+
+// glowing loop paths between consecutive zones
+for(let i=0;i<ZONES.length;i++){ const a=ZONES[i].pos, b=ZONES[(i+1)%ZONES.length].pos;
+  const mid=a.clone().add(b).multiplyScalar(0.5); const len=a.distanceTo(b);
+  const strip=new THREE.Mesh(new THREE.BoxGeometry(len,0.06,0.5),new THREE.MeshStandardMaterial({color:0x7a5a2a,emissive:0xc8902e,emissiveIntensity:.5,roughness:.6}));
+  strip.position.set(mid.x,0.05,mid.z); strip.rotation.y=-Math.atan2(b.z-a.z,b.x-a.x); scene.add(strip); }
+
+// zone platforms + lights + props
+const picker=[];
 ZONES.forEach(z=>{
-  // platform
-  const plat = new THREE.Mesh(
-    new THREE.CylinderGeometry(2.4,2.7,0.5,32),
-    new THREE.MeshStandardMaterial({ color:0x2c2118, roughness:.9 })
-  );
-  plat.position.copy(z.pos); plat.position.y = 0.25; scene.add(plat);
-  // glow light
-  const pl = new THREE.PointLight(z.c, 14, 16, 2); pl.position.copy(z.pos); pl.position.y = 2.4; scene.add(pl);
-  z.light = pl;
-  // HTML label
-  const d = document.createElement('div'); d.className='label';
-  d.style.setProperty('--c', '#'+z.c.toString(16).padStart(6,'0'));
-  d.innerHTML = `<b>${z.name}</b><small>${z.sub}</small>`;
-  labelBox.appendChild(d); labelEl[z.key] = d;
+  const plat=new THREE.Mesh(new THREE.CylinderGeometry(2.5,2.8,0.5,40),new THREE.MeshStandardMaterial({color:0x2c2118,roughness:.9}));
+  plat.position.copy(z.pos); plat.position.y=0.25; scene.add(plat);
+  plat.userData.zone=z; picker.push(plat);
+  const pl=new THREE.PointLight(z.c,16,18,2); pl.position.copy(z.pos); pl.position.y=2.6; scene.add(pl); z.light=pl;
 });
-const Z = k => ZONES.find(z=>z.key===k);
+const cMat=c=>new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:1.0,roughness:.3,metalness:.2});
+function octo(p,c,h,y){const m=new THREE.Mesh(new THREE.OctahedronGeometry(h,0),cMat(c)); m.position.set(p.x,(y||h*0.9),p.z); scene.add(m); return m;}
+// Mines: crystal cluster
+const mp=Z('mines').pos; const mineCrys=[]; for(let i=0;i<7;i++){const a=i/7*6.28; mineCrys.push(octo(new THREE.Vector3(mp.x+Math.cos(a)*1.5,0,mp.z+Math.sin(a)*1.5),0xb98cff,0.4+Math.random()*0.5));}
+// Foundry: forge ring + light
+const fp=Z('foundry').pos; const forge=new THREE.Mesh(new THREE.TorusGeometry(1.3,0.34,16,40),new THREE.MeshStandardMaterial({color:0xff8a2a,emissive:0xff7a18,emissiveIntensity:1.5,roughness:.4})); forge.position.set(fp.x,1.3,fp.z); forge.rotation.x=Math.PI/2; scene.add(forge);
+const forgeLight=new THREE.PointLight(0xff8a2a,26,16,2); forgeLight.position.set(fp.x,1.7,fp.z); scene.add(forgeLight);
+// Ledger: pillar + star (chain grows toward here)
+const lp=Z('ledger').pos; const pillar=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,4.2,12),cMat(0x9fc6e8)); pillar.position.set(lp.x,2.1,lp.z); scene.add(pillar);
+const star=new THREE.Mesh(new THREE.IcosahedronGeometry(0.42,0),new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xbfe0ff,emissiveIntensity:1.8})); star.position.set(lp.x,4.5,lp.z); scene.add(star);
+// Vault: pedestal + blue gem
+const vp=Z('vault').pos; const ped=new THREE.Mesh(new THREE.CylinderGeometry(0.7,0.95,1,16),new THREE.MeshStandardMaterial({color:0x2a2118,roughness:.9})); ped.position.set(vp.x,0.75,vp.z); scene.add(ped); const seed=octo(vp,0x6fd0ff,0.7,1.8);
+// Watch: eye
+const wp=Z('watch').pos; const eye=new THREE.Mesh(new THREE.TorusGeometry(0.95,0.16,12,32),cMat(0xe2603a)); eye.position.set(wp.x,1.9,wp.z); scene.add(eye); const pupil=new THREE.Mesh(new THREE.SphereGeometry(0.34,16,16),new THREE.MeshStandardMaterial({color:0xffcaa0,emissive:0xff9a60,emissiveIntensity:1.3})); pupil.position.set(wp.x,1.9,wp.z); scene.add(pupil);
 
-// zone props ----------------------------------------------------
-function crystal(x,z,col,h){
-  const m = new THREE.Mesh(new THREE.OctahedronGeometry(h,0),
-    new THREE.MeshStandardMaterial({ color:col, emissive:col, emissiveIntensity:.9, roughness:.3, metalness:.2 }));
-  m.position.set(x, h*0.9, z); m.rotation.y=Math.random()*3; scene.add(m); return m;
-}
-// Mines: a cluster of crystals
-const mp = Z('mines').pos;
-for(let i=0;i<6;i++){ const a=i/6*6.28; crystal(mp.x+Math.cos(a)*1.3, mp.z+Math.sin(a)*1.3, 0xb98cff, 0.5+Math.random()*0.5); }
-crystal(mp.x, mp.z, 0xd9b3ff, 1.0);
-// Foundry: glowing forge ring
-const fp = Z('foundry').pos;
-const forge = new THREE.Mesh(new THREE.TorusGeometry(1.3,0.34,16,40),
-  new THREE.MeshStandardMaterial({ color:0xff8a2a, emissive:0xff7a18, emissiveIntensity:1.4, roughness:.4 }));
-forge.position.set(fp.x,1.3,fp.z); forge.rotation.x=Math.PI/2; scene.add(forge);
-const forgeLight = new THREE.PointLight(0xff8a2a, 22, 14, 2); forgeLight.position.set(fp.x,1.6,fp.z); scene.add(forgeLight);
-// Ledger: tall glowing pillar + star
-const lp = Z('ledger').pos;
-const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,4,12),
-  new THREE.MeshStandardMaterial({ color:0x9fc6e8, emissive:0x6fa8d8, emissiveIntensity:.8 }));
-pillar.position.set(lp.x,2,lp.z); scene.add(pillar);
-const star = new THREE.Mesh(new THREE.IcosahedronGeometry(0.4,0),
-  new THREE.MeshStandardMaterial({ color:0xffffff, emissive:0xbfe0ff, emissiveIntensity:1.6 }));
-star.position.set(lp.x,4.3,lp.z); scene.add(star);
-// Vault: blue crystal on pedestal
-const vp = Z('vault').pos;
-const ped = new THREE.Mesh(new THREE.CylinderGeometry(0.7,0.9,1,16), new THREE.MeshStandardMaterial({color:0x2a2118,roughness:.9}));
-ped.position.set(vp.x,0.75,vp.z); scene.add(ped);
-const seed = crystal(vp.x,vp.z,0x6fd0ff,0.7); seed.position.y=1.7;
-// Watch: vertical eye-ring
-const wp = Z('watch').pos;
-const eye = new THREE.Mesh(new THREE.TorusGeometry(0.9,0.16,12,32),
-  new THREE.MeshStandardMaterial({color:0xe2603a,emissive:0xe2603a,emissiveIntensity:1}));
-eye.position.set(wp.x,1.8,wp.z); scene.add(eye);
-const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.32,16,16),
-  new THREE.MeshStandardMaterial({color:0xffcaa0,emissive:0xff9a60,emissiveIntensity:1.2}));
-pupil.position.set(wp.x,1.8,wp.z); scene.add(pupil);
+// ---------- billboard sprites ----------
+const texLoader=new THREE.TextureLoader();
+const URLS={
+  hero:'../../assets/keyed/char-drmineral-hero-v1.png',
+  tally:'../../assets/keyed/char-tally-v1.png',
+  vellum:'../../assets/keyed/char-vellum-v1.png',
+  walk:'../sprites/walk-a.png',
+};
+let loaded=0; function ready(){ if(++loaded>=2){ const l=document.getElementById('loading'); if(l&&l.textContent==='WAKING THE LAB…')l.style.display='none'; } }
+function sprite(url,h){ const tex=texLoader.load(url,()=>ready()); tex.colorSpace=THREE.SRGBColorSpace;
+  const m=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
+  const s=new THREE.Sprite(m); s.scale.set(h,h,1); s.userData.h=h; scene.add(s); return s; }
+function flip(s,left){ const m=s.material.map; if(m){ m.repeat.x=left?-1:1; m.offset.x=left?1:0; } }
+function setY(s,y){ s.position.y=s.userData.h/2+y; }
 
-// ---------- the growing CHAIN (Foundry -> Ledger) ----------
-const chainGroup = new THREE.Group(); scene.add(chainGroup);
-const chainMat = new THREE.MeshStandardMaterial({ color:0xf6c878, emissive:0xe0a23a, emissiveIntensity:1.1, metalness:.6, roughness:.3 });
-const CHAIN_MAX = 16;
-function addLink(){
-  if(chainGroup.children.length >= CHAIN_MAX) return;
-  const i = chainGroup.children.length;
-  const t = i/(CHAIN_MAX-1);
-  const p = new THREE.Vector3().lerpVectors(fp, lp, t*0.95);
-  const link = new THREE.Mesh(new THREE.TorusGeometry(0.34,0.12,10,20), chainMat);
-  link.position.set(p.x, 1.0, p.z);
-  link.rotation.x = Math.PI/2; link.rotation.z = (i%2)*Math.PI/2;
-  link.scale.setScalar(0.01); link.userData.born = clock.getElapsedTime();
-  chainGroup.add(link);
-  updateHud();
-}
+// keepers
+const drM=sprite(URLS.hero,3.4); drM.position.set(0,0,0); setY(drM,0.05);
+const tally=sprite(URLS.tally,2.0); tally.position.set(lp.x+1.6,0,lp.z+0.4); setY(tally,0);
+const vellum=sprite(URLS.vellum,1.9); vellum.position.set(vp.x+1.6,0,vp.z+0.2); setY(vellum,0);
+// miners at the mines (bob)
+const miners=[]; for(let i=0;i<3;i++){ const s=sprite(URLS.walk,1.8); const a=i/3*6.28; s.position.set(mp.x+Math.cos(a)*1.8,0,mp.z+Math.sin(a)*1.8); s.userData.phase=Math.random()*6; miners.push(s); }
+// haulers loop Mine -> Foundry carrying a crystal, then back
+const haulers=[]; for(let i=0;i<3;i++){ const s=sprite(URLS.walk,1.8); s.userData.t=i*0.66; haulers.push({s, crystal: octo(mp,0xd9b3ff,0.26,1.1), prev:0}); }
 
-// ---------- billboard character sprites ----------
-function makeSprite(url, h){
-  const mat = new THREE.SpriteMaterial({ transparent:true, depthWrite:false });
-  const sp = new THREE.Sprite(mat); sp.scale.set(h*0.5, h, 1);
-  new THREE.TextureLoader().load(url, tex=>{
-    tex.colorSpace = THREE.SRGBColorSpace; mat.map = tex; mat.needsUpdate = true;
-    sp.scale.set(h * (tex.image.width/tex.image.height), h, 1);
-  });
-  sp.userData.h = h; scene.add(sp); return sp;
-}
-const HERO = '../../assets/keyed/char-drmineral-hero-v1.png';
-const MINER = '../../assets/keyed/char-tally-v1.png';
-const drM = makeSprite(HERO, 3.4); drM.position.set(0, 1.7, 0);     // overseeing at center
-const miner = makeSprite(MINER, 2.2);                                // works the loop
-// the crystal the miner hauls
-const haul = new THREE.Mesh(new THREE.OctahedronGeometry(0.32,0),
-  new THREE.MeshStandardMaterial({color:0xd9b3ff,emissive:0xb98cff,emissiveIntensity:1}));
-haul.visible = false; scene.add(haul);
+// ---------- the growing chain (Foundry -> Ledger) ----------
+const chain=new THREE.Group(); scene.add(chain);
+const chainMat=new THREE.MeshStandardMaterial({color:0xf6c878,emissive:0xe0a23a,emissiveIntensity:1.2,metalness:.6,roughness:.3});
+const flyers=[]; // blocks traveling forge->ledger
+let blocks=0; const CAP=22;
+function forgeBlock(){ blocks++; document.getElementById('blocks').textContent=blocks;
+  const cube=new THREE.Mesh(new THREE.TorusGeometry(0.32,0.12,10,20),chainMat); cube.rotation.x=Math.PI/2; cube.position.set(fp.x,1.1,fp.z); scene.add(cube);
+  flyers.push({m:cube,t:0}); }
+function landBlock(cube){ if(chain.children.length>=CAP){ scene.remove(cube); document.getElementById('chainlen').textContent='CHAIN '+chain.children.length; return; }
+  const i=chain.children.length, t=i/(CAP-1); const p=new THREE.Vector3().lerpVectors(fp,lp,t*0.92);
+  cube.position.set(p.x,1.0,p.z); cube.rotation.z=(i%2)*Math.PI/2; chain.add(cube); document.getElementById('chainlen').textContent='CHAIN '+chain.children.length; }
 
-// ---------- HUD ----------
-let blocks = 0;
-function updateHud(){
-  document.getElementById('blocks').textContent = blocks;
-  document.getElementById('chainlen').textContent = 'CHAIN LENGTH ' + chainGroup.children.length;
-}
+// ---------- dust motes ----------
+const dustN=160, dpos=new Float32Array(dustN*3);
+for(let i=0;i<dustN;i++){ dpos[i*3]=(Math.random()-0.5)*44; dpos[i*3+1]=Math.random()*16; dpos[i*3+2]=(Math.random()-0.5)*44; }
+const dust=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',new THREE.BufferAttribute(dpos,3)),
+  new THREE.PointsMaterial({color:0xf6c878,size:0.07,transparent:true,opacity:0.55,depthWrite:false}));
+scene.add(dust);
 
-// project a 3D point to screen px
-const v = new THREE.Vector3();
-function place(el, world, yOff){
-  v.copy(world); v.y += yOff; v.project(camera);
-  const behind = v.z > 1;
-  el.style.opacity = behind ? 0 : 1;
-  el.style.left = ((v.x*0.5+0.5)*W()) + 'px';
-  el.style.top  = ((-v.y*0.5+0.5)*H()) + 'px';
-}
+// ---------- click to focus ----------
+const ray=new THREE.Raycaster(), mouse=new THREE.Vector2(); let focus=null, downXY=null;
+const panel=document.getElementById('panel');
+function openZone(z){ focus=z; panel.style.setProperty('--c','#'+z.c.toString(16).padStart(6,'0'));
+  document.getElementById('pstep').textContent=z.step; document.getElementById('ptitle').textContent=z.name; document.getElementById('pmean').textContent=z.mean;
+  panel.classList.add('on'); controls.autoRotate=false; }
+function closeZone(){ focus=null; panel.classList.remove('on'); controls.autoRotate=true; }
+document.getElementById('panelx').addEventListener('click',closeZone);
+renderer.domElement.addEventListener('pointerdown',e=>{ downXY=[e.clientX,e.clientY]; });
+renderer.domElement.addEventListener('pointerup',e=>{ if(!downXY)return; const moved=Math.hypot(e.clientX-downXY[0],e.clientY-downXY[1]); downXY=null; if(moved>6)return;
+  mouse.x=(e.clientX/W())*2-1; mouse.y=-(e.clientY/H())*2+1; ray.setFromCamera(mouse,camera);
+  const hit=ray.intersectObjects(picker)[0]; if(hit&&hit.object.userData.zone) openZone(hit.object.userData.zone); else closeZone(); });
 
-// ---------- mining loop ----------
-const clock = new THREE.Clock();
-let phase = 0, prevSeg = 0;
-addLink(); // seed the genesis link
-
-function animate(){
-  const dt = Math.min(clock.getDelta(), 0.05);
-  const t = clock.getElapsedTime();
-
-  // miner walks mine -> foundry -> mine
-  phase += dt * 0.32;
-  const seg = phase % 2;
-  const carrying = seg < 1;
-  const from = carrying ? mp : fp, to = carrying ? fp : mp;
-  const f = carrying ? seg : seg-1;
-  miner.position.lerpVectors(from, to, f);
-  miner.position.y = miner.userData.h/2 + Math.sin(t*3)*0.05;
-  // arrival at foundry => forge a block
-  if(prevSeg < 1 && seg >= 1){ blocks++; addLink(); }
-  prevSeg = seg;
-  // haul crystal while carrying
-  haul.visible = carrying;
-  haul.position.set(miner.position.x+0.5, 1.1+Math.sin(t*3)*0.05, miner.position.z);
-  haul.rotation.y += dt*2;
-
-  // Dr. Mineral gentle bob
-  drM.position.y = drM.userData.h/2 + 0.05 + Math.sin(t*1.5)*0.05;
-
-  // animated props
-  forge.rotation.z += dt*0.6; forgeLight.intensity = 18 + Math.sin(t*4)*6;
-  star.rotation.y += dt*1.2; star.position.y = 4.3 + Math.sin(t*2)*0.15;
-  seed.rotation.y += dt*0.8; eye.rotation.z += dt*0.5;
-  ZONES.forEach((z,i)=> z.light.intensity = 12 + Math.sin(t*2 + i)*3 );
-  // chain links pop in + shimmer
-  chainGroup.children.forEach((lnk)=>{
-    const age = t - lnk.userData.born;
-    const s = Math.min(1, age*4); lnk.scale.setScalar(0.4 + s*0.6*0.9 + 0.36);
-    lnk.material; // shared
-  });
-
+// ---------- loop ----------
+const clock=new THREE.Clock();
+function lerpV(a,b,t){ return a.clone().lerp(b,t); }
+function loop(){
+  requestAnimationFrame(loop);
+  const dt=Math.min(0.05,clock.getDelta()), t=clock.getElapsedTime();
+  // keepers bob
+  setY(drM,0.05+Math.sin(t*1.4)*0.06); setY(tally,Math.sin(t*2+1)*0.05);
+  // miners bob + occasional dig
+  miners.forEach((s,i)=>{ const ph=s.userData.phase; setY(s,Math.abs(Math.sin(t*3+ph))*0.18); flip(s,Math.sin(t*0.6+i)<0); });
+  // haulers Mine->Foundry->Mine
+  haulers.forEach(h=>{ h.s.userData.t+=dt*0.22; const seg=h.s.userData.t%2; const carry=seg<1;
+    const from=carry?mp:fp, to=carry?fp:mp, f=carry?seg:seg-1;
+    h.s.position.x=from.x+(to.x-from.x)*f; h.s.position.z=from.z+(to.z-from.z)*f; setY(h.s,Math.abs(Math.sin(t*6))*0.07);
+    flip(h.s,(to.x-from.x)<0);
+    h.crystal.visible=carry; h.crystal.position.set(h.s.position.x+0.5,1.1,h.s.position.z); h.crystal.rotation.y+=dt*2;
+    if(h.prev<1&&seg>=1) forgeBlock(); h.prev=seg; });
+  // flying blocks forge->ledger
+  for(let i=flyers.length-1;i>=0;i--){ const fl=flyers[i]; fl.t+=dt*0.9; const p=lerpV(fp,lp,Math.min(1,fl.t)); fl.m.position.set(p.x,1.0+Math.sin(fl.t*3)*0.5*(1-fl.t),p.z); fl.m.rotation.y+=dt*3;
+    if(fl.t>=1){ landBlock(fl.m); flyers.splice(i,1); } }
+  // props
+  forge.rotation.z+=dt*0.6; forgeLight.intensity=22+Math.sin(t*4)*7; star.rotation.y+=dt*1.2; star.position.y=4.5+Math.sin(t*2)*0.16;
+  seed.rotation.y+=dt*0.8; eye.rotation.z+=dt*0.5; mineCrys.forEach((c,i)=>c.rotation.y+=dt*(0.3+i*0.04));
+  ZONES.forEach((z,i)=>z.light.intensity=14+Math.sin(t*2+i)*3);
+  chain.children.forEach((l,i)=>l.material&&(l.rotation.y+=dt*0.4));
+  // dust drift
+  const dp=dust.geometry.attributes.position.array; for(let i=0;i<dustN;i++){ dp[i*3+1]+=dt*0.25; if(dp[i*3+1]>16)dp[i*3+1]=0; } dust.geometry.attributes.position.needsUpdate=true; dust.rotation.y+=dt*0.01;
+  // focus camera
+  if(focus){ controls.target.lerp(new THREE.Vector3(focus.pos.x*0.6,1.4,focus.pos.z*0.6),0.05);
+    const want=new THREE.Vector3(focus.pos.x*1.5,6,focus.pos.z*1.5+8); camera.position.lerp(want,0.04); }
   controls.update();
-  renderer.render(scene, camera);
-
-  // labels
-  ZONES.forEach(z => place(labelEl[z.key], z.pos, 3.2));
-  requestAnimationFrame(animate);
+  composer.render();
 }
-
-addEventListener('resize', ()=>{ camera.aspect=W()/H(); camera.updateProjectionMatrix(); renderer.setSize(W(),H()); });
-
-// hide loader once the hero texture is in (or after a beat)
-setTimeout(()=>{ document.getElementById('loading').style.display='none'; }, 600);
-updateHud();
-animate();
+addEventListener('resize',()=>{ camera.aspect=W()/H(); camera.updateProjectionMatrix(); renderer.setSize(W(),H()); composer.setSize(W(),H()); });
+setTimeout(()=>{ const l=document.getElementById('loading'); if(l&&l.textContent==='WAKING THE LAB…')l.style.display='none'; }, 2500);
+loop();
 </script>
 </body>
 </html>
