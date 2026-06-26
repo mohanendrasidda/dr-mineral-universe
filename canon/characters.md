@@ -34,6 +34,21 @@ He was becoming *too perfect* — wise, calm, always right. Canon now: he is a b
 ## The lab's comedy ensemble (seed as needed)
 Autonomous assistant-bots that get confused; apprentices who cause cheerful chaos; a gatehouse-keeper who takes the rules *very* seriously; the bakery crew; a famous researcher who can't find anything. Daily-life comedy lives in `daily-life-and-culture.md`.
 
+## District leads — the civilization's ensemble (v2; species fit to science)
+Full bios in `districts/`. Each has a real flaw (Pixar rule). Cast more as districts open.
+
+| Lead | Species | District | Defining trait | Flaw / running gag |
+|---|---|---|---|---|
+| **Bramble** | Prairie dog | Central Research Hall (Convener) | Connector; knows everyone, matches minds | Compulsive eavesdropper-matchmaker; abandons lunch to introduce strangers |
+| **Vellum** | Tortoise | Contribution Registry (Keeper) | Patient memory; "only one link" | So slow the conversation ends first |
+| **Tally** | Magpie | Contribution Registry (apprentice, co-lead) | Says the true thing; the chain insight | Talks faster than she thinks; re-shelved records by color |
+| **Maddox** | Pack rat | Historical Archives (Head) | Keeps everything; surface agent by the library | Cannot throw anything away; narrates his own searches |
+| **June Ringtail** | Raccoon | Innovation Workshop (Master Tinkerer) | Dexterous, fearless, joyful maker | Starts six projects per idea; controlled fires with Dr. Mineral |
+| **Master Castor** | Beaver | Chain Foundry (Chief Engineer) | Builds infrastructure that holds; hates hype | Rebuilds working machines to make them simpler; no short answers |
+| **Commander Sasha** | Meerkat | Sentinel Hall / the Watch (SOC) | Unhurried vigilance; "someone's always looking up" | Can't delegate the last watch |
+| **Pip Sprocket** | Rat | Robotics Division (Master of Mechanisms) | Brilliant, fast, loves every bot | Over-personifies machines; won't scrap "Gerald" |
+| **Mrs. Bramwell** | Hedgehog | The Commons & Bakery | Feeds everyone; the lab's heart & gossip | Gruff; fusses while denying it; despairs of Dr. Mineral's toast |
+
 > Departments are run by different animal species. Casting the leads (which species runs which district, and why that species fits that science) is an early world-building decision — see `docs/03_book-one-foundation.md`, open decision **B**.
 
 ## Casting rules
