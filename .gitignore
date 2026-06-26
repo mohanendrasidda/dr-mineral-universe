@@ -1,0 +1,21 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+
+# Node / tooling (for future site build)
+node_modules/
+dist/
+.cache/
+*.log
+
+# Local env
+.env
+.env.local
+
+# Asset working scratch (keep raw/ and keyed/ tracked; ignore tmp exports)
+assets/tmp/
+*.psd
