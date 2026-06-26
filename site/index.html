@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Dr. Mineral Lab — a blockchain world</title>
+<title>The Lab Reward Coin — University of Nebraska cybersecurity lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -20,78 +20,89 @@
   .cta.ghost{background:transparent; color:#f3e6cf; border:1px solid rgba(210,170,110,.4); box-shadow:none;}
   .chip{display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; color:rgba(214,199,170,.85); border:1px solid rgba(210,170,110,.25); border-radius:999px; padding:7px 14px;}
   .dot{width:7px;height:7px;border-radius:50%;background:#7fb069;box-shadow:0 0 8px #7fb069}
+  .card{padding:24px 22px; background:rgba(20,16,11,.55); border:1px solid rgba(210,170,110,.16); border-radius:10px;}
 </style>
 </head>
 <body>
 
-<!-- ============ HERO ============ -->
+<!-- ============ HERO : THE LAB & THE MISSION ============ -->
 <section style="position:relative; min-height:100vh; display:flex; align-items:center; overflow:hidden;">
-  <img src="../assets/environments/env-central-cavern.png" alt="The lab's central cavern" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.7;">
-  <div style="position:absolute; inset:0; background:radial-gradient(120% 80% at 50% 8%, rgba(245,196,107,.14), transparent 50%), linear-gradient(180deg, rgba(10,8,7,.42) 0%, rgba(10,8,7,.55) 50%, rgba(8,6,5,.96) 100%);"></div>
+  <img src="../assets/environments/env-central-cavern.png" alt="The lab" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.62;">
+  <div style="position:absolute; inset:0; background:radial-gradient(120% 80% at 50% 8%, rgba(245,196,107,.12), transparent 50%), linear-gradient(180deg, rgba(10,8,7,.5) 0%, rgba(10,8,7,.62) 50%, rgba(8,6,5,.96) 100%);"></div>
   <div style="position:relative; max-width:1080px; margin:0 auto; padding:90px 24px; text-align:center;">
-    <div class="kick">THE DR. MINERAL LAB &nbsp;·&nbsp; A BLOCKCHAIN WORLD</div>
-    <h1 style="margin:22px 0 0; font-family:'Cinzel',serif; font-weight:800; font-size:clamp(40px,8vw,96px); line-height:.96; color:#f6e9d0; text-shadow:0 0 50px rgba(245,196,107,.4);">DR. MINERAL</h1>
-    <p style="margin:24px auto 0; max-width:680px; font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:500; font-size:clamp(20px,2.5vw,29px); line-height:1.45; color:#dcc9a8;">An ordinary campus squirrel runs a hidden underground lab — a living blockchain world where every contribution is mined, forged onto the chain, and honored forever.</p>
-    <p style="margin:18px 0 0; color:#e8c06a; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:23px;">&ldquo;I don't collect treasure. I collect discoveries.&rdquo;</p>
-    <div style="margin-top:40px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+    <div class="kick">UNIVERSITY OF NEBRASKA &nbsp;·&nbsp; SECURITY-LED CYBERSECURITY LAB</div>
+    <h1 style="margin:22px 0 0; font-family:'Cinzel',serif; font-weight:800; font-size:clamp(36px,6.6vw,82px); line-height:1.02; color:#f6e9d0; text-shadow:0 0 50px rgba(245,196,107,.35);">A COIN FOR REAL<br>SECURITY WORK</h1>
+    <p style="margin:26px auto 0; max-width:700px; font-size:clamp(17px,2vw,21px); line-height:1.6; color:rgba(228,215,191,.92);">We're building a blockchain reward system &mdash; the <b style="color:#f0d9aa;font-weight:500;">University of Nebraska coin</b> &mdash; that pays out for genuine security work: the bugs you find, the audits you write, the protocols you harden. Recorded on-chain, honored forever.</p>
+    <p style="margin:16px 0 0; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:20px; color:rgba(214,199,170,.8);">A living lab, kept under the hood by a curious squirrel named Dr. Mineral.</p>
+    <div style="margin-top:38px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
       <a class="cta" href="world/index.html">ENTER THE LIVING LAB &#8594;</a>
-      <a class="cta ghost" href="#building">SEE WHAT WE'RE BUILDING</a>
+      <a class="cta ghost" href="#how">HOW THE REWARDS WORK</a>
     </div>
-    <div style="margin-top:26px;"><span class="chip"><span class="dot"></span>THE WORLD IS WORKING RIGHT NOW</span></div>
-  </div>
-</section>
-
-<!-- ============ THE STORY ============ -->
-<section style="padding:104px 24px; background:linear-gradient(180deg,#0b0907,#0a0807);">
-  <div style="max-width:1040px; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; gap:54px; justify-content:center;">
-    <div style="position:relative; flex:0 0 300px; max-width:300px; text-align:center;">
-      <div style="position:absolute; inset:0; background:radial-gradient(58% 52% at 50% 44%, rgba(231,183,101,.2), transparent 70%);"></div>
-      <img src="../assets/keyed/char-drmineral-hero-v1.png" alt="Dr. Mineral" style="position:relative; width:100%; filter:drop-shadow(0 24px 50px rgba(0,0,0,.6));">
-    </div>
-    <div style="flex:1 1 380px; min-width:300px;">
-      <div class="kick">THE STORY</div>
-      <h2 style="margin:14px 0 18px; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:clamp(30px,4vw,48px); color:#f3e6cf;">A squirrel, a lab, and a chain that remembers everyone</h2>
-      <p style="margin:0 0 16px; font-size:17px; line-height:1.75; color:rgba(228,215,191,.9); max-width:560px;">Above ground, Dr. Mineral is just a squirrel collecting acorns, and nobody looks twice. Below it, he founded a hidden laboratory built on one promise: that every contribution — every small good thing anyone does — is recorded, kept, and honored, so no one is ever forgotten.</p>
-      <p style="margin:0; font-size:17px; line-height:1.75; color:rgba(228,215,191,.9); max-width:560px;">The lab keeps that promise with a chain: a living ledger no single keeper holds, that guards its own truth. The squirrels mine it, forge it, and protect it — and the work never ends, because no one is ever finished learning.</p>
-    </div>
+    <div style="margin-top:26px;"><span class="chip"><span class="dot"></span>BUILT BY THE UNL SECURITY COHORT</span></div>
   </div>
 </section>
 
 <!-- ============ WHAT WE'RE BUILDING ============ -->
-<section id="building" style="padding:100px 24px; background:#080605;">
+<section id="how" style="padding:104px 24px; background:linear-gradient(180deg,#0b0907,#080605);">
   <div style="max-width:1000px; margin:0 auto; text-align:center;">
-    <div class="kick">WHAT WE'RE BUILDING RIGHT NOW</div>
-    <h2 style="margin:16px auto 14px; max-width:760px; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:clamp(28px,4vw,46px); color:#f3e6cf;">Beneath the story, this is a real blockchain lab</h2>
-    <p style="margin:0 auto; max-width:660px; font-size:17px; line-height:1.7; color:rgba(214,199,170,.85);">We're building a <b style="color:#f0d9aa; font-weight:500;">blockchain reward system</b> — mining coins and tokens that reward real contribution: shipping code, finding bugs, advancing the work. Every contribution is recorded on the chain and honored, the same way the lab honors its own. The world you can explore <i>is</i> what we're building, made visible.</p>
+    <div class="kick">WHAT WE'RE BUILDING</div>
+    <h2 style="margin:16px auto 14px; max-width:780px; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:clamp(28px,4vw,46px); color:#f3e6cf;">A reward system that pays for the work that keeps us safe</h2>
+    <p style="margin:0 auto; max-width:680px; font-size:17px; line-height:1.7; color:rgba(214,199,170,.85);">A token is just a ledger of who contributed what. Ours rewards real security work and resists being gamed &mdash; an integrity machine for a university lab.</p>
 
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:14px; margin:48px auto 0; max-width:920px;">
-      <!-- the core loop -->
-      <div style="padding:20px 16px; background:rgba(22,18,13,.6); border:1px solid rgba(185,140,255,.3); border-radius:8px;"><div class="mono" style="font-size:10px; letter-spacing:.18em; color:#b98cff;">01 · MINE</div><div style="margin-top:8px; font-family:'Cormorant Garamond',serif; font-size:21px; color:#f4e7d0;">The Mines</div><div style="margin-top:6px; font-size:13.5px; color:rgba(214,199,170,.75);">Contribution is mined into blocks.</div></div>
-      <div style="padding:20px 16px; background:rgba(22,18,13,.6); border:1px solid rgba(242,144,46,.3); border-radius:8px;"><div class="mono" style="font-size:10px; letter-spacing:.18em; color:#f2902e;">02 · FORGE</div><div style="margin-top:8px; font-family:'Cormorant Garamond',serif; font-size:21px; color:#f4e7d0;">The Foundry</div><div style="margin-top:6px; font-size:13.5px; color:rgba(214,199,170,.75);">Blocks are forged onto the chain.</div></div>
-      <div style="padding:20px 16px; background:rgba(22,18,13,.6); border:1px solid rgba(159,198,232,.3); border-radius:8px;"><div class="mono" style="font-size:10px; letter-spacing:.18em; color:#9fc6e8;">03 · RECORD</div><div style="margin-top:8px; font-family:'Cormorant Garamond',serif; font-size:21px; color:#f4e7d0;">The Ledger</div><div style="margin-top:6px; font-size:13.5px; color:rgba(214,199,170,.75);">Every contributor honored.</div></div>
-      <div style="padding:20px 16px; background:rgba(22,18,13,.6); border:1px solid rgba(111,208,255,.3); border-radius:8px;"><div class="mono" style="font-size:10px; letter-spacing:.18em; color:#6fd0ff;">04 · KEEP</div><div style="margin-top:8px; font-family:'Cormorant Garamond',serif; font-size:21px; color:#f4e7d0;">The Vault</div><div style="margin-top:6px; font-size:13.5px; color:rgba(214,199,170,.75);">Mined value, kept safe.</div></div>
-      <div style="padding:20px 16px; background:rgba(22,18,13,.6); border:1px solid rgba(226,96,58,.3); border-radius:8px;"><div class="mono" style="font-size:10px; letter-spacing:.18em; color:#e2603a;">05 · GUARD</div><div style="margin-top:8px; font-family:'Cormorant Garamond',serif; font-size:21px; color:#f4e7d0;">The Watch</div><div style="margin-top:6px; font-size:13.5px; color:rgba(214,199,170,.75);">The chain is secured.</div></div>
+    <!-- the core loop, security-themed -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:14px; margin:46px auto 0; max-width:940px;">
+      <div class="card" style="border-color:rgba(185,140,255,.3)"><div class="mono" style="font-size:10px;letter-spacing:.18em;color:#b98cff;">01 · MINE</div><div style="margin-top:8px;font-family:'Cormorant Garamond',serif;font-size:21px;color:#f4e7d0;">The Mines</div><div style="margin-top:6px;font-size:13.5px;color:rgba(214,199,170,.75);">Do the security work &mdash; bugs, audits, writeups.</div></div>
+      <div class="card" style="border-color:rgba(242,144,46,.3)"><div class="mono" style="font-size:10px;letter-spacing:.18em;color:#f2902e;">02 · FORGE</div><div style="margin-top:8px;font-family:'Cormorant Garamond',serif;font-size:21px;color:#f4e7d0;">The Foundry</div><div style="margin-top:6px;font-size:13.5px;color:rgba(214,199,170,.75);">Mint the reward, forge it onto the chain.</div></div>
+      <div class="card" style="border-color:rgba(159,198,232,.3)"><div class="mono" style="font-size:10px;letter-spacing:.18em;color:#9fc6e8;">03 · RECORD</div><div style="margin-top:8px;font-family:'Cormorant Garamond',serif;font-size:21px;color:#f4e7d0;">The Ledger</div><div style="margin-top:6px;font-size:13.5px;color:rgba(214,199,170,.75);">Who earned what, on-chain forever.</div></div>
+      <div class="card" style="border-color:rgba(111,208,255,.3)"><div class="mono" style="font-size:10px;letter-spacing:.18em;color:#6fd0ff;">04 · SINK</div><div style="margin-top:8px;font-family:'Cormorant Garamond',serif;font-size:21px;color:#f4e7d0;">The Vault</div><div style="margin-top:6px;font-size:13.5px;color:rgba(214,199,170,.75);">Treasury &amp; the sink the lab controls.</div></div>
+      <div class="card" style="border-color:rgba(226,96,58,.3)"><div class="mono" style="font-size:10px;letter-spacing:.18em;color:#e2603a;">05 · GUARD</div><div style="margin-top:8px;font-family:'Cormorant Garamond',serif;font-size:21px;color:#f4e7d0;">The Watch</div><div style="margin-top:6px;font-size:13.5px;color:rgba(214,199,170,.75);">Audited &amp; monitored &mdash; our home-field edge.</div></div>
     </div>
-    <div style="margin-top:44px;"><a class="cta" href="world/index.html">WATCH IT WORK &#8594;</a></div>
+
+    <!-- the must-haves -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:14px; margin:18px auto 0; max-width:940px; text-align:left;">
+      <div class="card"><div class="mono" style="font-size:10px;letter-spacing:.18em;color:rgba(238,196,126,.7);">PRINCIPLE</div><div style="margin-top:8px;font-size:15px;line-height:1.5;color:rgba(228,215,191,.9);">Reward <b style="font-weight:500;color:#f0d9aa;">genuine</b> security work &mdash; not noise.</div></div>
+      <div class="card"><div class="mono" style="font-size:10px;letter-spacing:.18em;color:rgba(238,196,126,.7);">PRINCIPLE</div><div style="margin-top:8px;font-size:15px;line-height:1.5;color:rgba(228,215,191,.9);">Resist gaming, Sybil &amp; collusion.</div></div>
+      <div class="card"><div class="mono" style="font-size:10px;letter-spacing:.18em;color:rgba(238,196,126,.7);">PRINCIPLE</div><div style="margin-top:8px;font-size:15px;line-height:1.5;color:rgba(228,215,191,.9);">A real sink the institution can control.</div></div>
+      <div class="card"><div class="mono" style="font-size:10px;letter-spacing:.18em;color:rgba(238,196,126,.7);">PRINCIPLE</div><div style="margin-top:8px;font-size:15px;line-height:1.5;color:rgba(228,215,191,.9);">Integrity, not secrecy &mdash; and never a financial security.</div></div>
+    </div>
+    <div style="margin-top:40px;"><a class="cta" href="world/index.html">WATCH THE LAB WORK &#8594;</a></div>
   </div>
 </section>
 
-<!-- ============ COMING SOON ============ -->
-<section style="padding:96px 24px; background:linear-gradient(180deg,#0a0807,#0b0907);">
+<!-- ============ THE TEAM ============ -->
+<section id="team" style="padding:100px 24px; background:#0a0807;">
   <div style="max-width:1000px; margin:0 auto; text-align:center;">
-    <div class="kick">COMING TO THE LAB</div>
-    <h2 style="margin:14px auto 8px; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:clamp(26px,3.6vw,42px); color:#f3e6cf;">The people, the wins, the news</h2>
-    <p style="margin:0 auto 44px; max-width:560px; font-size:16px; line-height:1.65; color:rgba(214,199,170,.78);">As the lab grows, it fills with the real work behind it — narrated by Dr. Mineral and his assistant.</p>
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:16px;">
-      <div style="padding:26px 22px; background:rgba(20,16,11,.55); border:1px solid rgba(210,170,110,.16); border-radius:10px; text-align:left;"><div class="mono" style="font-size:10px; letter-spacing:.2em; color:rgba(238,196,126,.7);">SOON</div><h3 style="margin:10px 0 6px; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:24px; color:#f4e7d0;">The Team</h3><p style="margin:0; font-size:14.5px; line-height:1.6; color:rgba(214,199,170,.8);">Every teammate as an animal of the lab, working the chain.</p></div>
-      <div style="padding:26px 22px; background:rgba(20,16,11,.55); border:1px solid rgba(210,170,110,.16); border-radius:10px; text-align:left;"><div class="mono" style="font-size:10px; letter-spacing:.2em; color:rgba(238,196,126,.7);">SOON</div><h3 style="margin:10px 0 6px; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:24px; color:#f4e7d0;">Hall of Contributors</h3><p style="margin:0; font-size:14.5px; line-height:1.6; color:rgba(214,199,170,.8);">Reward & bug-bounty winners, honored in the Ledger.</p></div>
-      <div style="padding:26px 22px; background:rgba(20,16,11,.55); border:1px solid rgba(210,170,110,.16); border-radius:10px; text-align:left;"><div class="mono" style="font-size:10px; letter-spacing:.2em; color:rgba(238,196,126,.7);">SOON</div><h3 style="margin:10px 0 6px; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:24px; color:#f4e7d0;">Releases & News</h3><p style="margin:0; font-size:14.5px; line-height:1.6; color:rgba(214,199,170,.8);">Each release grows the world; Dr. Mineral announces what's next.</p></div>
+    <div class="kick">THE ARCHITECTS</div>
+    <h2 style="margin:14px auto 10px; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:clamp(28px,3.8vw,44px); color:#f3e6cf;">The people building it</h2>
+    <p style="margin:0 auto 44px; max-width:580px; font-size:16px; line-height:1.65; color:rgba(214,199,170,.8);">A security-led cohort designing the coin, writing the contracts, and breaking them on purpose. Soon, each of us will roam the lab as our own animal of the chain.</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:16px;">
+      <div class="card" style="text-align:center;"><div style="width:84px;height:84px;margin:0 auto 14px;border-radius:50%;background:radial-gradient(circle,#2a2118,#15110c);border:1px solid rgba(210,170,110,.25);display:flex;align-items:center;justify-content:center;font-size:30px;">🐿️</div><div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#f4e7d0;">Your name</div><div class="mono" style="font-size:10.5px;letter-spacing:.12em;color:rgba(214,190,150,.7);margin-top:4px;">ROLE · WORKING ON</div></div>
+      <div class="card" style="text-align:center;"><div style="width:84px;height:84px;margin:0 auto 14px;border-radius:50%;background:radial-gradient(circle,#2a2118,#15110c);border:1px solid rgba(210,170,110,.25);display:flex;align-items:center;justify-content:center;font-size:30px;">🦡</div><div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#f4e7d0;">Your name</div><div class="mono" style="font-size:10.5px;letter-spacing:.12em;color:rgba(214,190,150,.7);margin-top:4px;">ROLE · WORKING ON</div></div>
+      <div class="card" style="text-align:center;"><div style="width:84px;height:84px;margin:0 auto 14px;border-radius:50%;background:radial-gradient(circle,#2a2118,#15110c);border:1px solid rgba(210,170,110,.25);display:flex;align-items:center;justify-content:center;font-size:30px;">🦝</div><div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#f4e7d0;">Your name</div><div class="mono" style="font-size:10.5px;letter-spacing:.12em;color:rgba(214,190,150,.7);margin-top:4px;">ROLE · WORKING ON</div></div>
+      <div class="card" style="text-align:center;"><div style="width:84px;height:84px;margin:0 auto 14px;border-radius:50%;background:radial-gradient(circle,#2a2118,#15110c);border:1px solid rgba(210,170,110,.25);display:flex;align-items:center;justify-content:center;font-size:30px;">🦉</div><div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#f4e7d0;">Your name</div><div class="mono" style="font-size:10.5px;letter-spacing:.12em;color:rgba(214,190,150,.7);margin-top:4px;">ROLE · WORKING ON</div></div>
+    </div>
+    <p class="mono" style="margin-top:26px;font-size:11px;letter-spacing:.1em;color:rgba(200,182,150,.5);">PLACEHOLDER &mdash; send the real team and each becomes an avatar working the chain.</p>
+  </div>
+</section>
+
+<!-- ============ UNDER THE HOOD : DR. MINERAL ============ -->
+<section style="padding:96px 24px; background:linear-gradient(180deg,#0a0807,#0b0907);">
+  <div style="max-width:980px; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; gap:46px; justify-content:center;">
+    <div style="position:relative; flex:0 0 220px; max-width:220px; text-align:center;">
+      <div style="position:absolute; inset:0; background:radial-gradient(58% 52% at 50% 44%, rgba(231,183,101,.16), transparent 70%);"></div>
+      <img src="../assets/keyed/char-drmineral-hero-v1.png" alt="Dr. Mineral" style="position:relative; width:100%; filter:drop-shadow(0 18px 38px rgba(0,0,0,.6));">
+    </div>
+    <div style="flex:1 1 360px; min-width:280px;">
+      <div class="kick">UNDER THE HOOD</div>
+      <h3 style="margin:12px 0 14px; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:clamp(24px,3vw,36px); color:#f3e6cf;">Dr. Mineral keeps the lab</h3>
+      <p style="margin:0 0 14px; font-size:16px; line-height:1.7; color:rgba(224,210,182,.88); max-width:540px;">Above ground he's just a campus squirrel; below it, he runs the lab &mdash; the keeper who makes sure every contribution is mined, forged, recorded, and honored, so no one is ever forgotten. He's not the headline. He's the one who keeps the lights on and wanders the place while you explore.</p>
+      <a class="cta ghost" href="world/index.html">MEET HIM IN THE LAB &#8594;</a>
     </div>
   </div>
 </section>
 
 <footer style="border-top:1px solid rgba(210,170,110,.18); padding:46px 24px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.12em; color:rgba(200,182,150,.5);">
-  THE DR. MINERAL LAB &middot; A LIVING BLOCKCHAIN WORLD &middot; THE LAMP IS LIT
+  THE UNIVERSITY OF NEBRASKA LAB REWARD COIN &middot; A LIVING BLOCKCHAIN WORLD &middot; KEPT BY DR. MINERAL
 </footer>
 
 <script src="squirrel.js" defer></script>
