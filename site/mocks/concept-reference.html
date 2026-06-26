@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Dr. Mineral Universe — world concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Spectral:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#0b0d12; --bg2:#11151d; --ink:#eae3d2; --muted:#9aa0ab; --gold:#e7b765; --gold2:#9a6a3a; --green:#7fd1a6; --line:#222936; }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{ background:var(--bg); color:var(--ink); font-family:"Spectral",Georgia,serif; -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,.f{font-family:"Fraunces",serif}
+  .kick{ font-family:"Fraunces"; letter-spacing:.28em; text-transform:uppercase; font-size:.66rem; color:var(--gold); }
+  .wrap{max-width:1080px; margin:0 auto; padding:0 20px}
+  .concept-tag{position:fixed; top:10px; right:10px; z-index:50; background:rgba(231,183,101,.12); border:1px solid var(--gold2); color:var(--gold); font-family:"Fraunces"; font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; padding:5px 10px; border-radius:999px}
+
+  /* SURFACE */
+  .surface{ min-height:96vh; display:flex; flex-direction:column; justify-content:center; position:relative; overflow:hidden;
+    background:radial-gradient(120% 80% at 50% 120%, #1a2230 0%, #0b0d12 60%); text-align:center; }
+  .stars{position:absolute; inset:0; background-image:radial-gradient(1px 1px at 20% 30%, #fff5 0, transparent), radial-gradient(1px 1px at 70% 20%, #fff4 0, transparent), radial-gradient(1px 1px at 40% 70%, #fff3 0, transparent), radial-gradient(1px 1px at 85% 60%, #fff4 0, transparent); opacity:.5}
+  .surface h1{ font-size:clamp(2.2rem,6vw,4.2rem); font-weight:700; margin:.2em 0 .1em; letter-spacing:-.02em}
+  .surface .tag{ color:var(--muted); font-size:1.05rem; max-width:42ch; margin:0 auto 6px}
+  .acorn-line{ color:var(--gold); font-style:italic; margin-bottom:34px}
+  .entrances{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:760px; margin:0 auto}
+  .ent{ cursor:pointer; background:var(--bg2); border:1px solid var(--line); color:var(--ink); border-radius:12px; padding:12px 14px; font-family:"Fraunces"; font-size:.82rem; transition:.18s; display:flex; gap:8px; align-items:center}
+  .ent:hover{ border-color:var(--gold2); transform:translateY(-2px); box-shadow:0 8px 30px #0006}
+  .ent small{display:block; color:var(--muted); font-family:"Spectral"; font-size:.72rem}
+  .scrollcue{margin-top:34px; color:var(--muted); font-size:.8rem; letter-spacing:.1em}
+
+  /* CAVERN */
+  .cavern{ padding:80px 0 30px; background:
+      radial-gradient(80% 50% at 50% 0%, #1c2430 0, transparent 70%),
+      linear-gradient(#0b0d12, #0e1218); text-align:center; border-top:1px solid var(--line)}
+  .cavern h2{font-size:clamp(1.6rem,4vw,2.6rem); margin:.1em 0}
+  .lamps{font-size:1.4rem; letter-spacing:.5em; color:var(--gold); opacity:.8; margin:10px 0 4px}
+  .cavern p{color:var(--muted); max-width:54ch; margin:8px auto 0}
+
+  /* TODAY */
+  .today{ margin:30px auto; max-width:920px; background:var(--bg2); border:1px solid var(--line); border-radius:16px; overflow:hidden}
+  .today .hd{ display:flex; align-items:center; gap:10px; padding:12px 18px; border-bottom:1px solid var(--line)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--green); box-shadow:0 0 10px var(--green)}
+  .today .hd b{font-family:"Fraunces"; letter-spacing:.1em; font-size:.8rem; text-transform:uppercase}
+  .feed{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0}
+  .feed .it{padding:14px 18px; border-right:1px solid var(--line); border-top:1px solid var(--line)}
+  .feed .it .w{color:var(--gold); font-size:.7rem; font-family:"Fraunces"; letter-spacing:.1em; text-transform:uppercase}
+  .feed .it p{margin:4px 0 0; font-size:.92rem}
+
+  /* GROWTH */
+  .growth{max-width:920px; margin:24px auto 10px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center; color:var(--muted)}
+  .growth .vbtns{display:flex; gap:8px}
+  .vbtn{cursor:pointer; background:var(--bg2); border:1px solid var(--line); color:var(--ink); border-radius:999px; padding:7px 16px; font-family:"Fraunces"; font-size:.8rem}
+  .vbtn.on{border-color:var(--gold); color:var(--gold); background:rgba(231,183,101,.08)}
+  .count{font-family:"Fraunces"; color:var(--ink)}
+
+  /* DISTRICTS */
+  .districts{padding:20px 0 90px}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px}
+  .card{background:var(--bg2); border:1px solid var(--line); border-radius:14px; padding:16px; transition:.18s; position:relative}
+  .card:hover{border-color:var(--gold2); transform:translateY(-3px); box-shadow:0 10px 30px #0007}
+  .card.locked{opacity:.38}
+  .card .ico{font-size:1.5rem}
+  .card h3{margin:8px 0 2px; font-size:1.05rem; font-weight:600}
+  .card .verb{font-size:.62rem; letter-spacing:.16em; text-transform:uppercase; color:var(--gold); font-family:"Fraunces"}
+  .card .feat{margin:10px 0 0; font-size:.86rem}
+  .card .feat b{color:var(--ink)}
+  .card .cine{margin:8px 0 0; font-size:.8rem; color:var(--muted); font-style:italic}
+  .acc{position:absolute; top:14px; right:14px; font-size:.62rem; font-family:"Fraunces"; letter-spacing:.08em; padding:3px 8px; border-radius:999px; border:1px solid var(--line)}
+  .a-pub{color:var(--green); border-color:#2c5} .a-mem{color:var(--gold)} .a-res{color:#e58; border-color:#a35}
+  .future{opacity:.5; font-style:italic}
+  footer{border-top:1px solid var(--line); padding:24px 0; color:var(--muted); text-align:center; font-size:.78rem}
+</style></head>
+<body>
+<div class="concept-tag">Concept · not final · no hero art yet</div>
+
+<!-- SURFACE -->
+<section class="surface">
+  <div class="stars"></div>
+  <div class="wrap">
+    <div class="kick">The Dr. Mineral Universe</div>
+    <h1>An ordinary campus.<br>A civilization beneath it.</h1>
+    <p class="tag">Every squirrel you've ever walked past is a member of a hidden research laboratory — a whole world that keeps discovering, building, and growing under your feet.</p>
+    <p class="acorn-line">"I don't collect treasure. I collect discoveries."</p>
+    <div class="kick" style="margin-bottom:12px">Choose a way down — each opens onto a different district</div>
+    <div class="entrances" id="entrances"></div>
+    <div class="scrollcue">▾ or descend into the central cavern</div>
+  </div>
+</section>
+
+<!-- CAVERN -->
+<section class="cavern" id="cavern">
+  <div class="wrap">
+    <div class="kick">First sight</div>
+    <h2>The Central Cavern</h2>
+    <div class="lamps">· · · · · · ·</div>
+    <p>An inverted cathedral-city falling away into warm gold light — galleries, bridges, rivers, a thousand lamps, and a hum you can almost feel. From here you can reach every district of the laboratory.</p>
+
+    <div class="today">
+      <div class="hd"><span class="dot"></span><b>Today in the Lab</b></div>
+      <div class="feed" id="feed"></div>
+    </div>
+
+    <div class="growth">
+      <span class="kick">The lab keeps growing —</span>
+      <div class="vbtns" id="vbtns"></div>
+      <span class="count" id="vcount"></span>
+    </div>
+  </div>
+</section>
+
+<!-- DISTRICTS -->
+<section class="districts"><div class="wrap">
+  <div class="kick" style="text-align:center;display:block;margin-bottom:6px">The District Atlas</div>
+  <h2 class="f" style="text-align:center;margin:.1em 0 6px">Every place is a feature you can explore</h2>
+  <p style="text-align:center;color:var(--muted);max-width:60ch;margin:0 auto 22px">Each district is a living quarter of the civilization — and the website feature it becomes. Greyed-out districts open in later versions.</p>
+  <div class="grid" id="grid"></div>
+</div></section>
+
+<footer>Concept demo of the v2 living-universe direction · drives off <code>canon/district-atlas.md</code> · placeholder icons stand in for future renders/animation</footer>
+
+<script>
+const ENTRANCES = [
+  ["🪨","The old stone wall","→ Central Hall"],
+  ["🌳","Tree roots","→ Innovation Gardens"],
+  ["🌀","Storm drains","→ The Conduits"],
+  ["🔧","Maintenance shaft","→ Foundries"],
+  ["🛗","Hidden elevator","→ Central Hall (express)"],
+  ["🔭","Disused observatory","→ Observatory"],
+  ["⛲","Dry fountain","→ The Commons"],
+  ["🕳️","Old tunnels","→ Abandoned Sectors"],
+];
+const FEED = [
+  ["New wing","Scaffolding goes up on the Hall of Contributors — opening next release."],
+  ["Experiment","A mining-drone prototype worked on the third try. Small festival in the Workshop."],
+  ["Contributor","Three new stars kindled in the Hall of Contributors overnight."],
+  ["Sentinel Hall","All quiet on the Watch. The chain is keeping itself."],
+];
+// openAt: which version the district becomes available
+const DISTRICTS = [
+  ["🏛️","Central Research Hall","live","<b>Home / atrium</b> — hub to everywhere","First sight of the central cavern","pub",1],
+  ["📜","Historical Archives","preserve","<b>Docs library / research journals</b>","Floating archives, honeyed light","pub",1],
+  ["✨","Contribution Registry","preserve","<b>Hall of Contributors / ledger viz</b>","Constellations of past work","pub",1],
+  ["🔨","Innovation Workshop","build","<b>Experiments in progress / blueprints</b>","Scaffolding, sparks, prototype chaos","pub",1],
+  ["🎓","Educational Academy","pass-on","<b>Tutorials / learn / onboarding</b>","Classrooms carved in warm stone","pub",1],
+  ["🤖","Robotics Division","build","Meet-the-bots showcase","Mining squirrels in crystal tunnels","pub",8],
+  ["⛓️","The Foundries (Chain Foundry)","build","<b>Live blockchain visualization</b>","A reactor-forge pulsing like a heart","mem",8],
+  ["🛡️","Sentinel Hall (the Watch)","protect","<b>SOC monitoring room</b>","Wall of watch-screens, patrol drones","res",8],
+  ["🧠","AI Center","build","<b>AI assistant room</b> (your in-world guide)","A hall of soft-glowing minds","mem",8],
+  ["🗺️","Version History Museum","pass-on","<b>Changelog as a walkable museum</b>","Each era a hall; cranes mid-build","pub",8],
+  ["🍞","The Commons & Bakery","live","Community hub","Steam, warm bread, crowded benches","pub",8],
+  ["🏘️","The Neighborhoods","live","Meet-the-lab / community","Warm windows in carved cliffs","pub",25],
+  ["🚇","The Conduits","live","Ride between districts (navigation)","Research trains gliding glowing tunnels","pub",25],
+  ["💠","Energy Core","protect","Power / status","A cathedral of light, a beating heart","res",25],
+  ["🧵","The Codeworks (Loom Hall)","build","<b>GitHub room</b> — repos as looms","Great looms threading glowing logic","mem",25],
+  ["🏚️","Old Quarters / Abandoned Sectors","discover","Explore the ruins (easter eggs)","Dust, dead lamps, century-old machines","res",25],
+];
+const LEADS={
+  "Central Research Hall":"Bramble · prairie dog",
+  "Historical Archives":"Maddox · pack rat",
+  "Contribution Registry":"Vellum · tortoise (+ Tally · magpie)",
+  "Innovation Workshop":"June Ringtail · raccoon",
+  "Educational Academy":"Madam Oona · elephant",
+  "Robotics Division":"Pip Sprocket · rat",
+  "The Foundries (Chain Foundry)":"Master Castor · beaver",
+  "Sentinel Hall (the Watch)":"Cmdr Sasha · meerkat",
+  "AI Center":"Prof. Inkwell · octopus",
+  "Version History Museum":"Curator Burrows · mole",
+  "The Commons & Bakery":"Mrs. Bramwell · hedgehog",
+  "The Codeworks (Loom Hall)":"Mistress Aran · spider",
+};
+const ACC={pub:["a-pub","public"],mem:["a-mem","members"],res:["a-res","restricted"]};
+const VERSIONS=[1,8,25];
+let cur=8;
+
+const $=s=>document.querySelector(s);
+$("#entrances").innerHTML=ENTRANCES.map(e=>`<div class="ent"><span>${e[0]}</span><div style="text-align:left">${e[1]}<small>${e[2]}</small></div></div>`).join("");
+document.querySelectorAll(".ent").forEach(el=>el.onclick=()=>$("#cavern").scrollIntoView({behavior:"smooth"}));
+$("#feed").innerHTML=FEED.map(f=>`<div class="it"><div class="w">${f[0]}</div><p>${f[1]}</p></div>`).join("");
+$("#vbtns").innerHTML=VERSIONS.map(v=>`<span class="vbtn ${v===cur?'on':''}" data-v="${v}">v${v}</span>`).join("");
+
+function render(){
+  const open=DISTRICTS.filter(d=>d[6]<=cur).length;
+  $("#vcount").textContent=`${open} districts open at v${cur}  ·  ${DISTRICTS.length} mapped total`;
+  $("#grid").innerHTML=DISTRICTS.map(d=>{
+    const locked=d[6]>cur, a=ACC[d[5]];
+    return `<div class="card ${locked?'locked':''}">
+      <span class="acc ${a[0]}">${a[1]}</span>
+      <div class="ico">${d[0]}</div>
+      <div class="verb">${d[2]}</div>
+      <h3>${d[1]}</h3>
+      ${LEADS[d[1]]?`<div style="font-size:.72rem;color:var(--green);font-family:'Fraunces';margin-top:2px">🐾 ${LEADS[d[1]]}</div>`:''}
+      <div class="feat">${d[3]}</div>
+      <div class="cine">${d[4]}</div>
+      ${locked?`<div class="future">opens at v${d[6]}</div>`:''}
+    </div>`;
+  }).join("");
+  document.querySelectorAll(".vbtn").forEach(b=>b.classList.toggle("on",+b.dataset.v===cur));
+}
+document.querySelectorAll(".vbtn").forEach(b=>b.onclick=()=>{cur=+b.dataset.v; render();});
+render();
+</script>
+</body></html>
