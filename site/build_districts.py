@@ -202,6 +202,7 @@ PAGE = """<!DOCTYPE html>
 <footer style="border-top:1px solid rgba(210,170,110,.18); padding:40px 24px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.12em; color:rgba(200,182,150,.5);">
  LANTERNHOLD &middot; THE DR. MINERAL UNIVERSE &middot; THE LAMP IS LIT
 </footer>
+<script src="../squirrel.js" defer></script>
 </body></html>
 """
 
