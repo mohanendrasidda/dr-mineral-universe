@@ -46,10 +46,10 @@ This is a visual project; when work needs art that doesn't exist, **stop and ask
 ## ⚠️ The chain is off-canon
 Many `assets/raw/` renders wrap the squirrel in a literal chain (a blockchain pun built for a separate cohort project). That violates "technology is invisible." **Universe assets use the clean acorn poses only**; chained poses are not used here.
 
-## Hard boundaries
-- **Personal IP.** Keep clean of UNL institutional / work-for-hire territory. Don't share a repo/surface/post with cohort/UNL-implementation material.
-- **Firewall.** Never use this fiction to explain, hint at, or illustrate any real UNL reward-system roadmap, governance, payouts, or strategic conclusions. Keep layers separate. Don't annotate lore with "this maps to our real X."
-- Don't import influence-tactics framing (Cialdini/Greene/etc.) — that's a different project.
+## Purpose (v3) — the public face of Sidd's own venture
+**Firewall RETIRED (deliberate owner decision, 2026-06-26).** This is no longer kept separate from the real work: the site is the **public face of Sidd's own blockchain-mining lab/venture** (he owns the IP and the work). Dr. Mineral and his world are the **brand/skin** over a real lab that is building a **blockchain reward system** — mining coins/tokens that reward contribution (shipping code, finding bugs, advancing the work).
+- The site surfaces, in-world: **the team** (each teammate an animal avatar working/mining), **releases/versions** (the world growing), **announcements** (voiced by Dr. Mineral or his assistant), and **reward / bug-bounty winners** (honored in the Ledger / Hall of Contributors), plus **the story** of the lab and Dr. Mineral.
+- Still Sidd's IP — just no longer firewalled from his own venture. (The old "keep separate from UNL/cohort" rule and the influence-tactics exclusion are retired here; if any real *third-party/institutional* IP shows up, flag it.)
 
 ## Conventions
 Commit by individual contributor; descriptive messages; canon changes flagged in the message. `site/index.html` is currently the cohort token page — re-skin to canon (drop chain/token framing, lead with Dr. Mineral + discovery) before it represents the universe.
