@@ -263,6 +263,21 @@ function workstation(x,z,ry){ const g=new THREE.Group();
   g.position.set(x,0,z); g.rotation.y=ry; scene.add(g);
   const sh=groundShadow(2.0); sh.position.set(x,0.05,z); return g; }
 // (workstations are placed after the shadow system is initialized — see below)
+// connections: motes of value flowing along the chain ring between zones
+const moteMat=new THREE.MeshStandardMaterial({color:0xe8c070,emissive:0xc8902e,emissiveIntensity:.7,roughness:.4});
+const moteGeo=new THREE.SphereGeometry(0.07,8,8); const motes=[];
+for(let i=0;i<6;i++){ const m=new THREE.Mesh(moteGeo,moteMat); scene.add(m); motes.push({m,t:Math.random(),seg:i%ZONES.length}); }
+// mine dust drifting at the seam
+const mdN=14, mdPos=new Float32Array(mdN*3), mdV=[];
+for(let i=0;i<mdN;i++){ mdPos[i*3]=mp.x+(Math.random()-0.5)*2; mdPos[i*3+1]=0.4+Math.random()*1.3; mdPos[i*3+2]=mp.z+(Math.random()-0.5)*2; mdV.push(0.08+Math.random()*0.22); }
+const minedust=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',new THREE.BufferAttribute(mdPos,3)), new THREE.PointsMaterial({color:0xc89a5a,size:0.05,transparent:true,opacity:0.3,depthWrite:false}));
+scene.add(minedust);
+// hanging work lamps over the busy zones (emissive glow; bloom does the light, no extra real lights)
+function hangLamp(x,y,z){ const g=new THREE.Group();
+  const cord=new THREE.Mesh(new THREE.CylinderGeometry(0.012,0.012,1.5,5),colMat); cord.position.y=0.75; g.add(cord);
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(0.13,10,10),new THREE.MeshStandardMaterial({color:0x3a2810,emissive:0xffa238,emissiveIntensity:1.3,roughness:1})));
+  g.position.set(x,y,z); scene.add(g); return g; }
+hangLamp(mp.x+1.6,3.2,mp.z-1.6); hangLamp(fp.x-1.3,3.0,fp.z-1.5); hangLamp(lp.x+0.2,3.4,lp.z+1.3);
 // Ledger: a dim warm obelisk where the chain of light gathers
 const lp=Z('ledger').pos; const pillar=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.24,4.4,8),new THREE.MeshStandardMaterial({color:0x241a10,emissive:0x8a6024,emissiveIntensity:.28,roughness:.85})); pillar.position.set(lp.x,2.2,lp.z); scene.add(pillar);
 const star=new THREE.Mesh(new THREE.IcosahedronGeometry(0.36,0),new THREE.MeshStandardMaterial({color:0x4a3a1c,emissive:0xd8b06a,emissiveIntensity:.6,roughness:.6})); star.position.set(lp.x,4.6,lp.z); scene.add(star);
@@ -341,6 +356,11 @@ const haulers=[]; for(let i=0;i<3;i++){ const s=critter(WALK,1.6,{state:'walk',f
 const shadowed=[drM,tally,vellum,...miners,...haulers.map(h=>h.s)];
 const shadows=shadowed.map(s=>groundShadow(s.userData.h*0.85));
 workstation(mp.x+2.8, mp.z+1.2, -0.7); workstation(fp.x-2.4, fp.z+1.8, 0.9);  // grounded benches (shadowTex ready now)
+function crate(x,z,s){ const m=new THREE.Mesh(new THREE.BoxGeometry(s,s,s),stone(0x281c10)); m.position.set(x,s/2,z); m.rotation.y=Math.random()*3; m.castShadow=true; scene.add(m); const sh=groundShadow(s*1.7); sh.position.set(x,0.05,z); return m; }
+crate(mp.x-2.2,mp.z+0.8,0.55); crate(mp.x-2.7,mp.z+1.4,0.45); crate(fp.x+2.1,fp.z-1.0,0.5); crate(lp.x+1.9,lp.z-1.3,0.5);
+const _timber=new THREE.MeshStandardMaterial({color:0x2a1d0e,roughness:.9});
+for(let _i=-1;_i<=1;_i+=2){ const b=new THREE.Mesh(new THREE.BoxGeometry(0.18,2.6,0.18),_timber); b.position.set(mp.x+_i*1.5,1.25,mp.z-1.3); b.rotation.z=_i*0.16; b.castShadow=true; scene.add(b); }
+const _cross=new THREE.Mesh(new THREE.BoxGeometry(3.2,0.18,0.18),_timber); _cross.position.set(mp.x,2.4,mp.z-1.3); scene.add(_cross);
 
 // ---------- the growing chain (Foundry -> Ledger) ----------
 const chain=new THREE.Group(); scene.add(chain);
@@ -522,6 +542,9 @@ function loop(){
   const dp=dust.geometry.attributes.position.array; for(let i=0;i<dustN;i++){ dp[i*3+1]+=dt*0.25; if(dp[i*3+1]>16)dp[i*3+1]=0; } dust.geometry.attributes.position.needsUpdate=true; dust.rotation.y+=dt*0.01;
   // forge embers rising
   const sap=sparks.geometry.attributes.position.array; for(let i=0;i<sparkN;i++){ sap[i*3+1]+=dt*sparkV[i]; if(sap[i*3+1]>3.3){ sap[i*3+1]=0.7; sap[i*3]=fp.x+(Math.random()-0.5)*0.9; sap[i*3+2]=fp.z+(Math.random()-0.5)*0.9; } } sparks.geometry.attributes.position.needsUpdate=true;
+  // connections flowing along the chain ring + mine dust drifting
+  motes.forEach(o=>{ o.t+=dt*0.16; if(o.t>=1){o.t=0;o.seg=(o.seg+1)%ZONES.length;} const a=ZONES[o.seg].pos,b=ZONES[(o.seg+1)%ZONES.length].pos; o.m.position.set(a.x+(b.x-a.x)*o.t,0.35+Math.sin(o.t*Math.PI)*0.3,a.z+(b.z-a.z)*o.t); });
+  const md=minedust.geometry.attributes.position.array; for(let i=0;i<mdN;i++){ md[i*3+1]+=dt*mdV[i]; if(md[i*3+1]>2.2)md[i*3+1]=0.4; } minedust.geometry.attributes.position.needsUpdate=true;
   // keep contact shadows under the characters
   for(let i=0;i<shadowed.length;i++){ shadows[i].position.x=shadowed[i].position.x; shadows[i].position.z=shadowed[i].position.z; }
   // intro cinematic drives the camera; otherwise normal/focus camera + controls
