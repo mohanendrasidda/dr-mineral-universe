@@ -89,6 +89,7 @@
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -436,6 +437,18 @@ const DRAD=13.2, STEP=2*Math.PI/5, drMAngles=ZONES.map((z,i)=>Math.PI/2 - i*STEP
 let drMAng=drMAngles[0], drMDir=1, drMFromAng=drMAngles[0], drMU=0, drMWalking=false, drMWatch=2.5; const drMSpeed=3.0;
 drM.position.set(Math.cos(drMAng)*DRAD,0,Math.sin(drMAng)*DRAD);
 function drMNext(){ drMFromAng=drMAng; drMU=0; drMWalking=true; }
+// --- PATH B PROOF: a real rigged + animated 3D character (CC0 Khronos Fox) driven by Dr. Mineral's patrol ---
+// proves the pipeline: GLTFLoader + skeletal walk/idle + real turning to face travel direction + retexture to our gloom.
+let fox=null, foxMix=null, foxWalk=null, foxIdle=null; const foxPrev=new THREE.Vector3(); const FOX_YAW=Math.PI; // flip by ±PI/2 or 0 if it faces wrong
+new GLTFLoader().load('../../assets/models/fox.glb', g=>{
+  fox=g.scene; const box=new THREE.Box3().setFromObject(fox); const s=2.4/(box.max.y-box.min.y); fox.scale.setScalar(s);
+  fox.traverse(o=>{ if(o.isMesh){ o.castShadow=true; if(o.material){ o.material.metalness=0; o.material.roughness=1; if(o.material.color) o.material.color.multiplyScalar(0.9); } } });
+  foxMix=new THREE.AnimationMixer(fox); const byName={}; g.animations.forEach(c=>byName[c.name]=c);
+  foxWalk=foxMix.clipAction(byName['Walk']||g.animations[1]||g.animations[0]);
+  foxIdle=foxMix.clipAction(byName['Survey']||g.animations[0]);
+  foxWalk.play(); foxIdle.play();
+  drM.visible=false; fox.position.copy(drM.position); scene.add(fox);
+}, undefined, e=>console.warn('fox load failed', e));
 
 // ---------- click to focus ----------
 const ray=new THREE.Raycaster(), mouse=new THREE.Vector2(); let camFocus=null, downXY=null;
@@ -534,6 +547,11 @@ function loop(){
     else { drMWatch-=dt; drM.userData.state='idle'; drM.userData.facing=(drM.position.x>0?-1:1); // inspect the district, facing inward
       if(drMWatch<=0) drMNext(); } }
   tickCritter(drM,dt,t);
+  if(fox){ foxMix.update(dt); fox.position.set(drM.position.x,0,drM.position.z);
+    const vx=drM.position.x-foxPrev.x, vz=drM.position.z-foxPrev.z;
+    if(Math.hypot(vx,vz)>0.0008) fox.rotation.y=Math.atan2(vx,vz)+FOX_YAW; // turn to face where it walks — real 3D turning
+    foxPrev.copy(drM.position);
+    const w=drM.userData.state==='walk'?1:0; foxWalk.setEffectiveWeight(w); foxIdle.setEffectiveWeight(1-w); }
   orb.position.set(drM.position.x+0.85,1.85+Math.sin(t*2.4)*0.16,drM.position.z+0.3); orb.rotation.y=Math.sin(t*1.1)*0.4; orbSh.position.set(orb.position.x,0.05,orb.position.z);
   // token minting: a coin struck every couple of seconds, Foundry -> Vault
   coinTimer-=dt; if(coinTimer<=0){ coinTimer=2.2+Math.random()*1.6; mintCoin(); }
