@@ -340,21 +340,21 @@ renderer.domElement.addEventListener('pointerup',e=>{ if(!downXY)return; const m
 
 // ---------- intro cinematic: sky -> down the shaft -> into the hall -> fast sweep -> dive into the Mines ----------
 const Vc=(x,y,z)=>new THREE.Vector3(x,y,z);
-const CINE={active:false,t:0,dur:11.2,frames:[
-  {t:0.0,  p:Vc(0,74,0.3),            l:Vc(0,0,5)},      // high in the shaft of daylight, looking down (the way in)
-  {t:2.2,  p:Vc(1,30,3),              l:Vc(0,4,9)},      // plunging down the shaft into the cavern mouth
-  {t:4.0,  p:Vc(3,15,22),             l:Vc(0,1.5,2)},    // burst into the hall — wide reveal of the well + colonnades
-  {t:5.6,  p:Vc(-21,10,12),           l:Vc(0,1,1)},      // fast sweep around the central well
-  {t:7.0,  p:Vc(-15,7,-15),           l:Vc(0,1,2)},      // continue the sweep behind the galleries
-  {t:8.4,  p:Vc(8,6,-5),              l:Vc(mp.x,1.2,mp.z)}, // come around to face the Mines
-  {t:9.8,  p:Vc(mp.x*0.4,4.2,mp.z+7), l:Vc(mp.x,1.2,mp.z)}, // dive in toward the glowing seam
-  {t:11.2, p:Vc(3,5,17),              l:Vc(0,1.4,5)},    // settle where mining happens, hand over the controls
-]};
+const CINE={active:false,t:0,dur:17.0,caps:true};
+// smooth spline: shaft descent -> burst in -> pull WAY back (whole lab) -> slow orbit of the premises -> spiral into the Mines
+const _pts=[ Vc(0,72,1), Vc(1,34,5), Vc(5,16,22), Vc(14,29,42), Vc(-30,25,32), Vc(-46,21,-6), Vc(-16,24,-44), Vc(24,22,-35), Vc(40,18,18), Vc(13,9,21), Vc(3.5,5,16) ];
+const _looks=[ Vc(0,0,6), Vc(0,5,11), Vc(0,2,2), Vc(0,4,0), Vc(0,2,0), Vc(0,2,0), Vc(0,2,0), Vc(0,2,0), Vc(0,2,0), Vc(0,1.6,7), Vc(0,1.3,9.2) ];
+const _fog=[ 0.05, 0.045, 0.028, 0.012, 0.011, 0.011, 0.011, 0.012, 0.018, 0.03, 0.04 ];
+const _posCurve=new THREE.CatmullRomCurve3(_pts,false,'catmullrom',0.4);
+const _lookCurve=new THREE.CatmullRomCurve3(_looks,false,'catmullrom',0.4);
 const _cp=new THREE.Vector3(),_cl=new THREE.Vector3();
-function runCine(tt){ const F=CINE.frames; if(tt>=CINE.dur){ endCine(); return; }
-  let i=0; while(i<F.length-1 && tt>=F[i+1].t) i++; const a=F[i], b=F[i+1]||a;
-  let u=(tt-a.t)/Math.max(0.001,b.t-a.t); u=Math.max(0,Math.min(1,u)); const s=u*u*(3-2*u);
-  _cp.copy(a.p).lerp(b.p,s); _cl.copy(a.l).lerp(b.l,s); camera.position.copy(_cp); camera.lookAt(_cl); updateCaption(tt); }
+function runCine(tt){ if(tt>=CINE.dur){ endCine(); return; }
+  let u=Math.max(0,Math.min(1,tt/CINE.dur));
+  const e=u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;   // ease-in-out: no jerk at start or stop
+  _posCurve.getPoint(e,_cp); _lookCurve.getPoint(e,_cl); camera.position.copy(_cp); camera.lookAt(_cl);
+  const fi=e*(_fog.length-1), fa=Math.floor(fi), fb=Math.min(_fog.length-1,fa+1);
+  if(scene.fog) scene.fog.density=_fog[fa]+(_fog[fb]-_fog[fa])*(fi-fa);   // thin fog for the wide/orbit, restore moody by the settle
+  updateCaption(tt); }
 const captions=[
   {at:0.3,t:'The University of Nebraska.'},
   {at:2.4,t:'Above ground — an ordinary campus.'},
@@ -367,20 +367,27 @@ function updateCaption(tt){ if(CINE.caps===false)return; let c=''; for(const k o
   if(c!==capCur){ capCur=c; if(capEl){ capEl.style.opacity=0; setTimeout(()=>{capEl.textContent=c; capEl.style.opacity=c?1:0;},170);} } }
 function startCine(caps){ CINE.active=true; CINE.t=0; CINE.caps=(caps!==false); controls.enabled=false; controls.autoRotate=false; document.body.classList.add('cine');
   setTimeout(()=>{ const l=document.getElementById('loading'); if(l)l.style.display='none'; },900); }
-function endCine(){ CINE.active=false; controls.target.set(0,1.4,5); controls.enabled=true; controls.autoRotate=true; document.body.classList.remove('cine'); if(capEl)capEl.style.opacity=0; fadeAudio(document.getElementById('intro-audio'),0,2500,true); }
+function endCine(){ CINE.active=false; controls.target.set(0,1.4,5); controls.enabled=true; controls.autoRotate=true; document.body.classList.remove('cine'); if(capEl)capEl.style.opacity=0; if(scene.fog)scene.fog.density=0.04; fadeAudio(document.getElementById('intro-audio'),0,2500,true); }
 function fadeAudio(el,to,ms,stop){ if(!el)return; const from=el.volume||0,t0=performance.now();
   (function step(now){ const k=Math.min(1,(now-t0)/ms); el.volume=Math.max(0,Math.min(1,from+(to-from)*k)); if(k<1)requestAnimationFrame(step); else if(stop){try{el.pause();}catch(e){}} })(performance.now()); }
 function startScore(){ const a=document.getElementById('intro-audio'); if(!a)return; a.src='../../assets/audio/intro-score.mp3'; a.volume=0; const p=a.play(); if(p&&p.then)p.then(()=>fadeAudio(a,0.8,1600)).catch(()=>{}); else fadeAudio(a,0.8,1600); }
-function skipCine(){ const f=CINE.frames[CINE.frames.length-1]; camera.position.copy(f.p); camera.lookAt(f.l); endCine(); }
+function skipCine(){ camera.position.copy(_pts[_pts.length-1]); camera.lookAt(_looks[_looks.length-1]); endCine(); }
 // video intro (campus flyover -> descent) if present, else the in-engine 3D dive
-function finishVideoIntro(){ const vid=document.getElementById('intro-video'), f=CINE.frames[CINE.frames.length-1];
-  camera.position.copy(f.p); camera.lookAt(f.l);
+function finishVideoIntro(){ const vid=document.getElementById('intro-video');
+  camera.position.copy(_pts[_pts.length-1]); camera.lookAt(_looks[_looks.length-1]);
   if(vid){ vid.style.opacity=0; try{vid.pause();}catch(e){} }
   setTimeout(()=>{ if(vid)vid.style.display='none'; document.body.classList.remove('introvid'); endCine(); },800); }
-function startVideoIntro(src){ const vid=document.getElementById('intro-video'), splash=document.getElementById('intro-splash'), go=document.getElementById('intro-go');
+function startVideoIntro(src){ const vid=document.getElementById('intro-video'), splash=document.getElementById('intro-splash');
   document.body.classList.add('introvid'); const l=document.getElementById('loading'); if(l)l.style.display='none';
-  if(go)go.addEventListener('click',()=>{ if(splash)splash.style.display='none'; vid.src=src; vid.muted=false; vid.style.opacity=1; const pr=vid.play(); if(pr&&pr.catch)pr.catch(()=>{vid.muted=true;vid.play();}); startScore(); });
-  if(vid)vid.addEventListener('ended',videoToWorld); }
+  if(splash)splash.style.display='none';
+  if(vid)vid.addEventListener('ended',videoToWorld);
+  const begin=()=>{ if(splash)splash.style.display='none'; if(vid){ vid.muted=false; vid.style.opacity=1; vid.play().catch(()=>{}); } startScore(); };
+  // autoplay with sound straight away (continuing the click from the landing); only fall back to a tap if blocked
+  if(vid){ vid.src=src; vid.muted=false; vid.style.opacity=1;
+    const pr=vid.play();
+    if(pr&&pr.then) pr.then(()=>startScore()).catch(()=>{ if(splash)splash.style.display='flex'; document.addEventListener('pointerdown',begin,{once:true}); });
+    else startScore();
+  } }
 function videoToWorld(){ startCine(false); const vid=document.getElementById('intro-video');
   if(vid){ vid.style.opacity=0; setTimeout(()=>{ vid.style.display='none'; document.body.classList.remove('introvid'); },1200); } }
 function unifiedSkip(){ if(document.body.classList.contains('introvid'))finishVideoIntro(); else skipCine(); }
