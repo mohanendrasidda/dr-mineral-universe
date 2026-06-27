@@ -436,40 +436,49 @@ function mintCoin(){ const m=new THREE.Mesh(coinGeo,coinMat); m.position.set(fp.
 // Dr. Mineral patrols a CIRCLE around the whole district ring — radius clears every platform (≤12) and the central
 // well (6.5), so he goes AROUND each district, never onto/through one. Pauses to inspect; sometimes reverses.
 const DRAD=13.2, STEP=2*Math.PI/5, drMAngles=ZONES.map((z,i)=>Math.PI/2 - i*STEP);
-let drMAng=drMAngles[0], drMDir=1, drMFromAng=drMAngles[0], drMU=0, drMWalking=false, drMWatch=2.5; const drMSpeed=3.0;
+let drMAng=drMAngles[0], drMDir=1, drMFromAng=drMAngles[0], drMU=0, drMWalking=false, drMWatch=2.5; let drMSpeed=2.0;
 drM.position.set(Math.cos(drMAng)*DRAD,0,Math.sin(drMAng)*DRAD);
 function drMNext(){ drMFromAng=drMAng; drMU=0; drMWalking=true; }
 // --- PATH B PROOF: a real rigged + animated 3D character (CC0 Khronos Fox) driven by Dr. Mineral's patrol ---
 // proves the pipeline: GLTFLoader + skeletal walk/idle + real turning to face travel direction + retexture to our gloom.
 let fox=null, foxMix=null, foxWalk=null, foxIdle=null, foxHeadX=0, foxHeadZ=1; const FOX_YAW=0; // Mixamo faces +Z → no offset (was backward at PI)
-const drMKey=new THREE.PointLight(0xffcaa0,16,15,2.0); scene.add(drMKey); let camHeadX=0, camHeadZ=1; // soft warm ground-pool around him + a smoothed camera heading
+const drMKey=new THREE.PointLight(0xffe2b4,95,28,2.0); scene.add(drMKey); let camHeadX=0, camHeadZ=1; // STRONG warm hero key-light (world-space, follows him) + smoothed camera heading
 // strip horizontal root drift from a clip so the body stays pinned to the patrol (keeps the vertical bob)
 function inPlace(clip){ clip.tracks.forEach(t=>{ if(t.name.endsWith('.position')){ const v=t.values; for(let i=0;i<v.length;i+=3){ v[i]=v[0]; v[i+2]=v[2]; } } }); return clip; }
-// voxel colour transfer: paint the colourless Mixamo mesh from the original vertex-coloured InstantMesh GLB
-function recolorMesh(mesh, srcPos, srcCol){ const G=40, grid=new Float32Array(G*G*G*3), cnt=new Uint32Array(G*G*G), id=(x,y,z)=>(x*G+y)*G+z;
-  let mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9]; const N=srcPos.count;
-  for(let i=0;i<N;i++){const x=srcPos.getX(i),y=srcPos.getY(i),z=srcPos.getZ(i); if(x<mn[0])mn[0]=x;if(y<mn[1])mn[1]=y;if(z<mn[2])mn[2]=z; if(x>mx[0])mx[0]=x;if(y>mx[1])mx[1]=y;if(z>mx[2])mx[2]=z;}
-  const ss=Math.max(mx[0]-mn[0],mx[1]-mn[1],mx[2]-mn[2])||1, vx=(v,m)=>Math.min(G-1,Math.max(0,Math.floor((v-m)/ss*G)));
-  for(let i=0;i<N;i++){const gi=id(vx(srcPos.getX(i),mn[0]),vx(srcPos.getY(i),mn[1]),vx(srcPos.getZ(i),mn[2])); grid[gi*3]+=srcCol.getX(i);grid[gi*3+1]+=srcCol.getY(i);grid[gi*3+2]+=srcCol.getZ(i);cnt[gi]++;}
-  const tp=mesh.geometry.attributes.position, M=tp.count; let tmn=[1e9,1e9,1e9],tmx=[-1e9,-1e9,-1e9];
-  for(let i=0;i<M;i++){const x=tp.getX(i),y=tp.getY(i),z=tp.getZ(i); if(x<tmn[0])tmn[0]=x;if(y<tmn[1])tmn[1]=y;if(z<tmn[2])tmn[2]=z; if(x>tmx[0])tmx[0]=x;if(y>tmx[1])tmx[1]=y;if(z>tmx[2])tmx[2]=z;}
-  const ts=Math.max(tmx[0]-tmn[0],tmx[1]-tmn[1],tmx[2]-tmn[2])||1, tvx=(v,m)=>Math.min(G-1,Math.max(0,Math.floor((v-m)/ts*G)));
-  const col=new Float32Array(M*3), near=(gx,gy,gz)=>{ for(let r=0;r<8;r++)for(let dx=-r;dx<=r;dx++)for(let dy=-r;dy<=r;dy++)for(let dz=-r;dz<=r;dz++){const x=gx+dx,y=gy+dy,z=gz+dz; if(x<0||y<0||z<0||x>=G||y>=G||z>=G)continue; const gi=id(x,y,z); if(cnt[gi])return[grid[gi*3]/cnt[gi],grid[gi*3+1]/cnt[gi],grid[gi*3+2]/cnt[gi]];} return [0.55,0.45,0.35];};
-  for(let i=0;i<M;i++){const c=near(tvx(tp.getX(i),tmn[0]),tvx(tp.getY(i),tmn[1]),tvx(tp.getZ(i),tmn[2])); const B=0.74; col[i*3]=Math.min(1,c[0]*1.28+0.05)*B; col[i*3+1]=Math.min(1,c[1]*0.9)*B; col[i*3+2]=c[2]*0.5*B;} // warm toward russet, then pre-dim to sit in the gloom
-  mesh.geometry.setAttribute('color', new THREE.BufferAttribute(col,3));
-  mesh.material = new THREE.MeshBasicMaterial({ vertexColors:true, fog:true }); // UNLIT + pre-dimmed: a deterministic warm figure — can't go black, won't glow, independent of fragile scene lights
+// re-weight stray Mixamo-rig vertices (the diagonal "spike") onto a good neighbour, judged from a real walk pose
+function fixSpike(skin, mixer, action, root){
+  try{
+    if(!skin||!skin.skeleton||!skin.applyBoneTransform) return;
+    action.play(); mixer.update(0.35); root.updateMatrixWorld(true); skin.skeleton.update(); // pose mid-stride so the spike actually shows
+    const pos=skin.geometry.attributes.position, n=pos.count, v=new THREE.Vector3(), dp=new Float32Array(n*3);
+    for(let i=0;i<n;i++){ v.fromBufferAttribute(pos,i); skin.applyBoneTransform(i,v); dp[i*3]=v.x;dp[i*3+1]=v.y;dp[i*3+2]=v.z; }
+    let cx=0,cy=0,cz=0; for(let i=0;i<n;i++){cx+=dp[i*3];cy+=dp[i*3+1];cz+=dp[i*3+2];} cx/=n;cy/=n;cz/=n;
+    const dd=new Float32Array(n); for(let i=0;i<n;i++) dd[i]=Math.hypot(dp[i*3]-cx,dp[i*3+1]-cy,dp[i*3+2]-cz);
+    const lim=[...dd].sort((a,b)=>a-b)[Math.floor(n*0.99)]*2.4; // only the egregious spike, never the tail/ears
+    const si=skin.geometry.attributes.skinIndex, sw=skin.geometry.attributes.skinWeight, good=[];
+    for(let i=0;i<n;i++) if(dd[i]<=lim) good.push(i);
+    let fixed=0;
+    for(let i=0;i<n;i++) if(dd[i]>lim){ const bx=pos.getX(i),by=pos.getY(i),bz=pos.getZ(i); let best=-1,bd=1e18;
+      for(let k=0;k<good.length;k+=5){ const j=good[k], d=(pos.getX(j)-bx)**2+(pos.getY(j)-by)**2+(pos.getZ(j)-bz)**2; if(d<bd){bd=d;best=j;} }
+      if(best>=0){ si.setXYZW(i,si.getX(best),si.getY(best),si.getZ(best),si.getW(best)); sw.setXYZW(i,sw.getX(best),sw.getY(best),sw.getZ(best),sw.getW(best)); fixed++; } }
+    if(fixed){ si.needsUpdate=true; sw.needsUpdate=true; console.log('spike: re-weighted',fixed,'vert(s)'); }
+    mixer.setTime(0);
+  }catch(e){ console.warn('fixSpike skipped', e); }
 }
 const _fbx=new FBXLoader();
 _fbx.load('../../assets/models/drmineral-walk.fbx', m=>{
-  fox=m; const box=new THREE.Box3().setFromObject(m); const sc0=3.4/((box.max.y-box.min.y)||1); m.scale.setScalar(sc0);
-  let skin=null; m.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; if(!skin)skin=o; o.material=new THREE.MeshBasicMaterial({color:0x6e4a2a,fog:true}); } }); // warm unlit until recolour lands
-  if(skin){ const pp=skin.geometry.attributes.position, nn=pp.count; let cx=0,cy=0,cz=0; for(let i=0;i<nn;i++){cx+=pp.getX(i);cy+=pp.getY(i);cz+=pp.getZ(i);} cx/=nn;cy/=nn;cz/=nn; // clamp stray Mixamo-rig vertices (the diagonal spike) into the body
-    const ds=new Float32Array(nn); for(let i=0;i<nn;i++) ds[i]=Math.hypot(pp.getX(i)-cx,pp.getY(i)-cy,pp.getZ(i)-cz); const lim=[...ds].sort((a,b)=>a-b)[Math.floor(nn*0.99)]*1.8; let fx=0; for(let i=0;i<nn;i++) if(ds[i]>lim){ pp.setXYZ(i,cx,cy,cz); fx++; } if(fx){ pp.needsUpdate=true; console.log('clamped',fx,'stray vert(s)'); } }
-  foxMix=new THREE.AnimationMixer(m);
-  if(m.animations[0]){ foxWalk=foxMix.clipAction(inPlace(m.animations[0])); foxWalk.play(); }
+  fox=m;
+  let skin=null; m.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; if(!skin)skin=o;
+    o.material=new THREE.MeshStandardMaterial({color:0x9c5026, roughness:0.82, metalness:0, emissive:0x3a1d0b, emissiveIntensity:0.18, fog:true}); } }); // flat russet, LIT — takes the key-light + casts a shadow; emissive floor so never pure black
+  foxMix=new THREE.AnimationMixer(m); const wclip=m.animations[0];
+  // measure the walk's natural ground speed (root displacement) BEFORE stripping it, to kill foot-slide
+  let gs=0; if(wclip){ const hip=wclip.tracks.find(t=>/hips?\.position$/i.test(t.name))||wclip.tracks.find(t=>t.name.endsWith('.position')); if(hip){ const u=hip.values,L=u.length; gs=Math.hypot(u[L-3]-u[0],u[L-1]-u[2])/(wclip.duration||1); } }
+  foxWalk=foxMix.clipAction(wclip);
+  fixSpike(skin, foxMix, foxWalk, m); // BEFORE scaling + before stripping root
+  const box=new THREE.Box3().setFromObject(m); const sc0=3.4/((box.max.y-box.min.y)||1); m.scale.setScalar(sc0); gs*=sc0;
+  inPlace(wclip); foxWalk.play();
+  if(gs>0.25){ drMSpeed=Math.min(3.0,Math.max(1.2,gs)); foxWalk.timeScale=drMSpeed/gs; } else { drMSpeed=1.7; foxWalk.timeScale=1.05; } // sync stride speed to movement → feet stick
   _fbx.load('../../assets/models/drmineral-idle.fbx', mi=>{ if(mi.animations[0]){ foxIdle=foxMix.clipAction(inPlace(mi.animations[0])); foxIdle.play(); } }, undefined, e=>console.warn('idle fbx', e));
-  new GLTFLoader().load('../../assets/models/drmineral_raw.glb', g=>{ let src=null; g.scene.traverse(o=>{ if(o.isMesh)src=o; }); const ca=src&&src.geometry.attributes.color;
-    if(skin&&src&&ca) recolorMesh(skin, src.geometry.attributes.position, ca); else console.warn('recolor: missing src colors'); }, undefined, e=>console.warn('recolor src', e));
   drM.visible=false; m.position.copy(drM.position); scene.add(m);
 }, undefined, e=>console.warn('drM walk fbx load failed', e));
 
@@ -605,8 +614,8 @@ function loop(){
     if(camFocus){ controls.target.lerp(new THREE.Vector3(camFocus.x*0.6,1.4,camFocus.z*0.6),0.05);
       const want=new THREE.Vector3(camFocus.x*1.5,6,camFocus.z*1.5+8); camera.position.lerp(want,0.04); }
     else if(camMode==='follow'){ const p=drM.position; // CINEMATIC follow: hero shown WITHIN his world — high, back, smoothed, rule-of-thirds
-      camHeadX+=(foxHeadX-camHeadX)*0.03; camHeadZ+=(foxHeadZ-camHeadZ)*0.03; // glide the camera heading so turns ease (no snap)
-      const back=drMWalking?13:11, up=drMWalking?7.6:6.8, ahead=drMWalking?6:4;
+      camHeadX+=(foxHeadX-camHeadX)*0.03; camHeadZ+=(foxHeadZ-camHeadZ)*0.03; const _hl=Math.hypot(camHeadX,camHeadZ)||1; camHeadX/=_hl; camHeadZ/=_hl; // glide + NORMALISE so a heading reversal never collapses the camera overhead
+      const back=drMWalking?13:11.5, up=drMWalking?6:5.4, ahead=drMWalking?6:4;
       _fpos.set(p.x-camHeadX*back, up, p.z-camHeadZ*back); camera.position.lerp(_fpos,0.028);
       _ftar.set(p.x+camHeadX*ahead, 2.4, p.z+camHeadZ*ahead); controls.target.lerp(_ftar,0.03); } // look ahead+up → he sits low-third with the lab beyond
     else if(!dragging && performance.now()-idleAt>7000){ camMode='follow'; } // drift back to Dr. Mineral after idle
