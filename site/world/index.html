@@ -457,12 +457,12 @@ function recolorMesh(mesh, srcPos, srcCol){ const G=40, grid=new Float32Array(G*
   const col=new Float32Array(M*3), near=(gx,gy,gz)=>{ for(let r=0;r<8;r++)for(let dx=-r;dx<=r;dx++)for(let dy=-r;dy<=r;dy++)for(let dz=-r;dz<=r;dz++){const x=gx+dx,y=gy+dy,z=gz+dz; if(x<0||y<0||z<0||x>=G||y>=G||z>=G)continue; const gi=id(x,y,z); if(cnt[gi])return[grid[gi*3]/cnt[gi],grid[gi*3+1]/cnt[gi],grid[gi*3+2]/cnt[gi]];} return [0.55,0.45,0.35];};
   for(let i=0;i<M;i++){const c=near(tvx(tp.getX(i),tmn[0]),tvx(tp.getY(i),tmn[1]),tvx(tp.getZ(i),tmn[2])); col[i*3]=c[0];col[i*3+1]=c[1];col[i*3+2]=c[2];}
   mesh.geometry.setAttribute('color', new THREE.BufferAttribute(col,3));
-  const mats=Array.isArray(mesh.material)?mesh.material:[mesh.material]; mats.forEach(mm=>{ if(mm){ mm.vertexColors=true; if(mm.color)mm.color.setScalar(1); if('map' in mm) mm.map=null; mm.needsUpdate=true; } });
+  mesh.material = new THREE.MeshBasicMaterial({ vertexColors:true, fog:true }); // UNLIT so his fur always reads in the dark cave (no more black silhouette)
 }
 const _fbx=new FBXLoader();
 _fbx.load('../../assets/models/drmineral-walk.fbx', m=>{
-  fox=m; const box=new THREE.Box3().setFromObject(m); const sc0=2.4/((box.max.y-box.min.y)||1); m.scale.setScalar(sc0);
-  let skin=null; m.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; if(!skin)skin=o; } });
+  fox=m; const box=new THREE.Box3().setFromObject(m); const sc0=3.4/((box.max.y-box.min.y)||1); m.scale.setScalar(sc0);
+  let skin=null; m.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; if(!skin)skin=o; if(o.material) o.material=new THREE.MeshBasicMaterial({color:0xc89a6e,fog:true}); } }); // visible warm flat until recolour lands
   foxMix=new THREE.AnimationMixer(m);
   if(m.animations[0]){ foxWalk=foxMix.clipAction(inPlace(m.animations[0])); foxWalk.play(); }
   _fbx.load('../../assets/models/drmineral-idle.fbx', mi=>{ if(mi.animations[0]){ foxIdle=foxMix.clipAction(inPlace(mi.animations[0])); foxIdle.play(); } }, undefined, e=>console.warn('idle fbx', e));
@@ -602,10 +602,10 @@ function loop(){
   else {
     if(camFocus){ controls.target.lerp(new THREE.Vector3(camFocus.x*0.6,1.4,camFocus.z*0.6),0.05);
       const want=new THREE.Vector3(camFocus.x*1.5,6,camFocus.z*1.5+8); camera.position.lerp(want,0.04); }
-    else if(camMode==='follow'){ const p=drM.position; // THIRD-PERSON CHASE: sit BEHIND the fox along its heading and look where it looks
-      const back=drMWalking?8.0:6.5, up=drMWalking?4.4:3.7, ahead=drMWalking?6.0:3.5;
+    else if(camMode==='follow'){ const p=drM.position; // THIRD-PERSON CHASE: behind him, framed ON him with the path ahead
+      const back=drMWalking?8.5:7.0, up=drMWalking?4.6:4.0, ahead=drMWalking?3.0:1.8;
       _fpos.set(p.x-foxHeadX*back, up, p.z-foxHeadZ*back); camera.position.lerp(_fpos,0.06);
-      _ftar.set(p.x+foxHeadX*ahead, 1.5, p.z+foxHeadZ*ahead); controls.target.lerp(_ftar,0.06); }
+      _ftar.set(p.x+foxHeadX*ahead, 2.0, p.z+foxHeadZ*ahead); controls.target.lerp(_ftar,0.06); }
     else if(!dragging && performance.now()-idleAt>7000){ camMode='follow'; } // drift back to Dr. Mineral after idle
     controls.update();
   }
