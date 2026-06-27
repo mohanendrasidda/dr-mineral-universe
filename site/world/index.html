@@ -342,16 +342,18 @@ renderer.domElement.addEventListener('pointerup',e=>{ if(!downXY)return; const m
 const Vc=(x,y,z)=>new THREE.Vector3(x,y,z);
 const CINE={active:false,t:0,dur:17.0,caps:true};
 // smooth spline: shaft descent -> burst in -> pull WAY back (whole lab) -> slow orbit of the premises -> spiral into the Mines
-const _pts=[ Vc(0,72,1), Vc(1,34,5), Vc(5,16,22), Vc(14,29,42), Vc(-30,25,32), Vc(-46,21,-6), Vc(-16,24,-44), Vc(24,22,-35), Vc(40,18,18), Vc(13,9,21), Vc(3.5,5,16) ];
-const _looks=[ Vc(0,0,6), Vc(0,5,11), Vc(0,2,2), Vc(0,4,0), Vc(0,2,0), Vc(0,2,0), Vc(0,2,0), Vc(0,2,0), Vc(0,2,0), Vc(0,1.6,7), Vc(0,1.3,9.2) ];
+const _pts=[ Vc(0,72,1), Vc(1,34,5), Vc(5,16,22), Vc(12,26,37), Vc(-26,23,29), Vc(-39,20,-5), Vc(-14,23,-38), Vc(21,21,-31), Vc(35,17,16), Vc(12,9,21), Vc(3.5,5,16) ];
+const _looks=[ Vc(0,0,6), Vc(0,5,11), Vc(0,2,2), Vc(0,3.5,0), Vc(0,2,0.01), Vc(0,2,-0.01), Vc(0,2,0.02), Vc(0,2,-0.02), Vc(0,2,0), Vc(0,1.6,7), Vc(0,1.3,9.2) ];
 const _fog=[ 0.05, 0.045, 0.028, 0.012, 0.011, 0.011, 0.011, 0.012, 0.018, 0.03, 0.04 ];
-const _posCurve=new THREE.CatmullRomCurve3(_pts,false,'catmullrom',0.4);
-const _lookCurve=new THREE.CatmullRomCurve3(_looks,false,'catmullrom',0.4);
+const _posCurve=new THREE.CatmullRomCurve3(_pts,false,'catmullrom',0.35);
+const _lookCurve=new THREE.CatmullRomCurve3(_looks,false,'catmullrom',0.35);
 const _cp=new THREE.Vector3(),_cl=new THREE.Vector3();
 function runCine(tt){ if(tt>=CINE.dur){ endCine(); return; }
   let u=Math.max(0,Math.min(1,tt/CINE.dur));
-  const e=u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;   // ease-in-out: no jerk at start or stop
-  _posCurve.getPoint(e,_cp); _lookCurve.getPoint(e,_cl); camera.position.copy(_cp); camera.lookAt(_cl);
+  const e=u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;   // ease-in-out (no jerk at start/stop)
+  _posCurve.getPointAt(e,_cp);                  // ARC-LENGTH param -> constant speed = smooth, no surging
+  _lookCurve.getPoint(e,_cl);
+  camera.position.copy(_cp); camera.lookAt(_cl);
   const fi=e*(_fog.length-1), fa=Math.floor(fi), fb=Math.min(_fog.length-1,fa+1);
   if(scene.fog) scene.fog.density=_fog[fa]+(_fog[fb]-_fog[fa])*(fi-fa);   // thin fog for the wide/orbit, restore moody by the settle
   updateCaption(tt); }
@@ -370,7 +372,7 @@ function startCine(caps){ CINE.active=true; CINE.t=0; CINE.caps=(caps!==false); 
 function endCine(){ CINE.active=false; controls.target.set(0,1.4,5); controls.enabled=true; controls.autoRotate=true; document.body.classList.remove('cine'); if(capEl)capEl.style.opacity=0; if(scene.fog)scene.fog.density=0.04; fadeAudio(document.getElementById('intro-audio'),0,2500,true); }
 function fadeAudio(el,to,ms,stop){ if(!el)return; const from=el.volume||0,t0=performance.now();
   (function step(now){ const k=Math.min(1,(now-t0)/ms); el.volume=Math.max(0,Math.min(1,from+(to-from)*k)); if(k<1)requestAnimationFrame(step); else if(stop){try{el.pause();}catch(e){}} })(performance.now()); }
-function startScore(){ const a=document.getElementById('intro-audio'); if(!a)return; a.src='../../assets/audio/intro-score.mp3'; a.volume=0; const p=a.play(); if(p&&p.then)p.then(()=>fadeAudio(a,0.8,1600)).catch(()=>{}); else fadeAudio(a,0.8,1600); }
+function startScore(){ const a=document.getElementById('intro-audio'); if(!a)return; a.src='../../assets/audio/intro-score.mp3'; a.volume=0; const p=a.play(); if(p&&p.then)p.then(()=>fadeAudio(a,0.5,1800)).catch(()=>{}); else fadeAudio(a,0.5,1800); }  // calm under the campus
 function skipCine(){ camera.position.copy(_pts[_pts.length-1]); camera.lookAt(_looks[_looks.length-1]); endCine(); }
 // video intro (campus flyover -> descent) if present, else the in-engine 3D dive
 function finishVideoIntro(){ const vid=document.getElementById('intro-video');
@@ -388,7 +390,8 @@ function startVideoIntro(src){ const vid=document.getElementById('intro-video'),
     if(pr&&pr.then) pr.then(()=>startScore()).catch(()=>{ if(splash)splash.style.display='flex'; document.addEventListener('pointerdown',begin,{once:true}); });
     else startScore();
   } }
-function videoToWorld(){ startCine(false); const vid=document.getElementById('intro-video');
+function videoToWorld(){ startCine(false); fadeAudio(document.getElementById('intro-audio'),0.92,3200); // swell as the descent into the lab begins
+  const vid=document.getElementById('intro-video');
   if(vid){ vid.style.opacity=0; setTimeout(()=>{ vid.style.display='none'; document.body.classList.remove('introvid'); },1200); } }
 function unifiedSkip(){ if(document.body.classList.contains('introvid'))finishVideoIntro(); else skipCine(); }
 const _sk=document.getElementById('cine-skip'); if(_sk)_sk.addEventListener('click',unifiedSkip);
