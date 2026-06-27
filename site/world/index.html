@@ -28,8 +28,8 @@
   #panel .step{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.24em;color:var(--c,#f0c87e)}
   #panel h2{margin:8px 0 2px;font-family:'Cormorant Garamond',serif;font-weight:600;font-size:30px;color:#f5e8d1}
   #panel .mean{margin-top:10px;font-size:15.5px;line-height:1.6;color:rgba(228,215,191,.92);white-space:pre-line}
-  #panel.scroll{background:linear-gradient(180deg,rgba(26,20,11,.92),rgba(18,14,8,.93));border-color:rgba(120,200,255,.42)}
-  #panel.scroll .step{color:#8ad0ff}
+  #panel.scroll{background:linear-gradient(180deg,rgba(28,21,11,.93),rgba(18,14,8,.94));border-color:rgba(210,170,110,.5)}
+  #panel.scroll .step{color:#e6c886}
   #panel .x{position:absolute;top:12px;right:14px;cursor:pointer;color:rgba(220,200,170,.6);font-size:18px;font-family:'IBM Plex Mono',monospace}
   #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9;background:#070504;color:#f0c87e;font-family:'IBM Plex Mono',monospace;letter-spacing:.2em;font-size:12px;text-align:center;padding:20px}
   a.back{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:5;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:rgba(214,190,150,.6);text-decoration:none}
@@ -241,15 +241,15 @@ const mp=Z('mines').pos;
 const rockMat=stone(0x46341e); applyStone(rockMat,2.5,2.5,0x42321e);
 const mineMound=new THREE.Mesh(new THREE.ConeGeometry(2.3,1.7,7),rockMat); mineMound.position.set(mp.x,0.85,mp.z); mineMound.rotation.y=0.4; mineMound.castShadow=true; scene.add(mineMound);
 function rockGeo(r){ const g=new THREE.IcosahedronGeometry(r,1); const p=g.attributes.position; for(let k=0;k<p.count;k++){ const f=0.74+Math.random()*0.46; p.setXYZ(k,p.getX(k)*f,p.getY(k)*f,p.getZ(k)*f);} g.computeVertexNormals(); return g; }
-const seamMat=new THREE.MeshStandardMaterial({color:0x6a4a22,emissive:0xe09636,emissiveIntensity:1.05,roughness:.55,metalness:0});
+const seamMat=new THREE.MeshStandardMaterial({color:0x4a3418,roughness:.92,metalness:0}); applyStone(seamMat,3,3,0x46341e); seamMat.emissive=new THREE.Color(0x5e340e); seamMat.emissiveIntensity=0.3;
 const mineCrys=[]; for(let i=0;i<6;i++){const a=i/6*3.2-0.8; const m=new THREE.Mesh(rockGeo(0.26+Math.random()*0.26),seamMat); m.position.set(mp.x+Math.cos(a)*0.95,1.0+Math.sin(i*1.7)*0.28,mp.z+Math.sin(a)*0.95); m.rotation.set(i,i*2,0); m.castShadow=true; scene.add(m); mineCrys.push(m);}
 // real-geometry rock chunks breaking up the smooth primitives
 for(let i=0;i<4;i++){const a=Math.random()*6.28,d=2.4+Math.random()*1.6; const r=new THREE.Mesh(rockGeo(0.5+Math.random()*0.55),rockMat); r.position.set(mp.x+Math.cos(a)*d,0.4,mp.z+Math.sin(a)*d); r.rotation.set(Math.random()*3,Math.random()*3,0); r.castShadow=true; scene.add(r);}
 // Foundry: a dark stone basin with a low ember that breathes and lights stone from below
 const fp=Z('foundry').pos;
 const forgeBasin=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.8,1.2,18),stone(0x17110b)); forgeBasin.position.set(fp.x,0.6,fp.z); forgeBasin.castShadow=true; scene.add(forgeBasin);
-const ember=new THREE.Mesh(new THREE.SphereGeometry(1.0,20,16),new THREE.MeshStandardMaterial({color:0x1e0e05,emissive:0x7a3a10,emissiveIntensity:.42,roughness:1})); ember.position.set(fp.x,1.0,fp.z); ember.scale.y=0.42; scene.add(ember);
-const forgeLight=new THREE.PointLight(0xdc7826,6,11,2.4); forgeLight.position.set(fp.x,0.9,fp.z); scene.add(forgeLight);
+const ember=new THREE.Mesh(new THREE.SphereGeometry(1.0,20,16),new THREE.MeshStandardMaterial({color:0x170a03,emissive:0x5a2a08,emissiveIntensity:.3,roughness:1})); ember.position.set(fp.x,0.95,fp.z); ember.scale.set(0.9,0.38,0.9); scene.add(ember);
+const forgeLight=new THREE.PointLight(0xc06820,4.5,10,2.4); forgeLight.position.set(fp.x,0.85,fp.z); scene.add(forgeLight);
 // Ledger: a dim warm obelisk where the chain of light gathers
 const lp=Z('ledger').pos; const pillar=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.24,4.4,8),new THREE.MeshStandardMaterial({color:0x241a10,emissive:0x8a6024,emissiveIntensity:.28,roughness:.85})); pillar.position.set(lp.x,2.2,lp.z); scene.add(pillar);
 const star=new THREE.Mesh(new THREE.IcosahedronGeometry(0.36,0),new THREE.MeshStandardMaterial({color:0x4a3a1c,emissive:0xd8b06a,emissiveIntensity:.6,roughness:.6})); star.position.set(lp.x,4.6,lp.z); scene.add(star);
@@ -310,7 +310,7 @@ const shadows=shadowed.map(s=>groundShadow(s.userData.h*0.85));
 
 // ---------- the growing chain (Foundry -> Ledger) ----------
 const chain=new THREE.Group(); scene.add(chain);
-const chainMat=new THREE.MeshStandardMaterial({color:0xe6b86a,emissive:0xa8761f,emissiveIntensity:.16,metalness:1.0,roughness:.28,envMapIntensity:1.2});
+const chainMat=new THREE.MeshStandardMaterial({color:0xe6b86a,emissive:0xa8761f,emissiveIntensity:.1,metalness:1.0,roughness:.3,envMapIntensity:1.2});
 const flyers=[]; // blocks traveling forge->ledger
 let blocks=0; const CAP=22;
 function forgeBlock(){ blocks++; document.getElementById('blocks').textContent=blocks;
@@ -328,36 +328,37 @@ const dust=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',n
 scene.add(dust);
 
 // ---------- living lab: notice board · keeper's scroll · token minting ----------
-// the notice board the lab posts its roadmap on
-function boardTex(){ const c=document.createElement('canvas'); c.width=512; c.height=384; const x=c.getContext('2d');
-  x.fillStyle='#16100a'; x.fillRect(0,0,512,384); x.strokeStyle='#c8902e'; x.lineWidth=4; x.strokeRect(14,14,484,356);
-  x.textAlign='center'; x.fillStyle='#f0c87e'; x.font='bold 30px Georgia'; x.fillText('LAB NOTICE', 256, 58);
-  x.fillStyle='#a88a5a'; x.font='13px monospace'; x.fillText('THE CHAIN  ·  WEEKLY', 256, 82);
-  x.textAlign='left'; x.fillStyle='#e6c886'; x.font='17px Georgia'; x.fillText('THIS WEEK', 46, 138);
-  x.fillStyle='#cbb892'; x.font='15px Georgia'; x.fillText('Forging the blockchain core.', 46, 164);
-  x.fillStyle='#e6c886'; x.font='17px Georgia'; x.fillText('NEXT 2 WEEKS', 46, 212);
-  x.fillStyle='#cbb892'; x.font='15px Georgia'; x.fillText('·  v1 tokenomics ecosystem', 46, 238); x.fillText('·  test-token dApp on testnet', 46, 264);
-  x.textAlign='center'; x.fillStyle='#7a6648'; x.font='12px monospace'; x.fillText('releases & bounty winners posted here', 256, 342);
+// the lab's notice — an aged stone tablet inscribed with the current work (carved, grounded, on-palette, readable)
+function noticeTex(){ const c=document.createElement('canvas'); c.width=512; c.height=640; const x=c.getContext('2d');
+  x.clearRect(0,0,512,640); x.textAlign='center';
+  x.fillStyle='#e7c486'; x.font='600 36px Georgia'; x.fillText('THE WORK', 256, 72);
+  x.strokeStyle='rgba(200,144,46,.55)'; x.lineWidth=2; x.beginPath(); x.moveTo(150,94); x.lineTo(362,94); x.stroke();
+  x.fillStyle='#dcc596'; x.font='italic 24px Georgia'; x.fillText('this cycle', 256, 152);
+  x.fillStyle='#c8b288'; x.font='20px Georgia'; x.fillText('the blockchain core', 256, 190); x.fillText('is being forged.', 256, 218);
+  x.fillStyle='#dcc596'; x.font='italic 24px Georgia'; x.fillText('soon', 256, 306);
+  x.fillStyle='#c8b288'; x.font='20px Georgia'; x.fillText('the first tokenomics —', 256, 344); x.fillText('a test-token dApp', 256, 372); x.fillText('on the testnet.', 256, 400);
+  x.fillStyle='rgba(170,138,90,.75)'; x.font='14px monospace'; x.fillText('the lab posts its releases here', 256, 520); x.fillText('and honours its contributors', 256, 546);
   const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=maxAniso; return t; }
-const _btex=boardTex();
-const boardGroup=new THREE.Group();
-const _bp1=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,3.4,8),colMat); _bp1.position.set(-1.85,1.7,0);
-const _bp2=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,3.4,8),colMat); _bp2.position.set(1.85,1.7,0);
-const boardPanel=new THREE.Mesh(new THREE.PlaneGeometry(3.6,2.7),new THREE.MeshStandardMaterial({map:_btex,emissive:0xffd9a0,emissiveMap:_btex,emissiveIntensity:.35,roughness:.85,side:THREE.DoubleSide}));
-boardPanel.position.set(0,2.5,0);
-const boardLight=new THREE.PointLight(0xffba66,3.2,8,2.2); boardLight.position.set(0,3.6,1.4);
-boardGroup.add(_bp1,_bp2,boardPanel,boardLight);
-const _bx=lp.x*1.18,_bz=lp.z*1.18; boardGroup.position.set(_bx,0,_bz); boardGroup.rotation.y=Math.atan2(-_bx,-_bz); scene.add(boardGroup);
-boardPanel.userData.panel={step:'LAB NOTICE · THE CHAIN',title:'This week & next',c:0xe6c886,pos:boardGroup.position,
-  mean:'THIS WEEK — forging the blockchain core.\n\nNEXT 2 WEEKS — the first version of the tokenomics ecosystem, and the test-token dApp goes live on testnet.\n\nEvery release, version, and reward / bounty winner is posted here.'};
-// the keeper's assistant — a small hovering orb that carries his notes
-const orb=new THREE.Mesh(new THREE.IcosahedronGeometry(0.15,1),new THREE.MeshStandardMaterial({color:0x0e2a38,emissive:0x36c2ff,emissiveIntensity:1.5,roughness:.3,metalness:.5}));
-orb.add(new THREE.PointLight(0x49ccff,1.1,4,2)); scene.add(orb);
-drM.userData.panel={step:'THE KEEPER',title:'Dr. Mineral',c:0x8ad0ff,scroll:true,
+const noticeGroup=new THREE.Group();
+const _nbase=new THREE.Mesh(new THREE.BoxGeometry(2.6,0.5,0.95),rockMat); _nbase.position.y=0.25; _nbase.castShadow=true;
+const _nslab=new THREE.Mesh(new THREE.BoxGeometry(2.4,3.0,0.34),rockMat); _nslab.position.set(0,1.95,0.04); _nslab.rotation.x=-0.06; _nslab.castShadow=true;
+const _ntex=noticeTex();
+const _ninscr=new THREE.Mesh(new THREE.PlaneGeometry(2.05,2.6),new THREE.MeshStandardMaterial({map:_ntex,transparent:true,emissive:0xffc890,emissiveMap:_ntex,emissiveIntensity:.45,roughness:.9}));
+_ninscr.position.set(0,1.95,0.235); _ninscr.rotation.x=-0.06;
+const _nlight=new THREE.PointLight(0xffb262,2.2,6,2.4); _nlight.position.set(0,3.3,1.3);
+noticeGroup.add(_nbase,_nslab,_ninscr,_nlight);
+noticeGroup.position.set(-5,0,7); noticeGroup.rotation.y=0.73; scene.add(noticeGroup);
+const _nsh=groundShadow(3.0); _nsh.position.set(-5,0.05,7);
+_ninscr.userData.panel={step:'THE LAB · THE WORK',title:'What the lab is building',c:0xe6c886,pos:noticeGroup.position,
+  mean:'THIS CYCLE — the blockchain core is being forged.\n\nSOON — the first version of the tokenomics ecosystem, and a test-token dApp on the testnet.\n\nHere the lab posts its releases and honours its contributors.'};
+// the keeper's assistant — a small dim warm wisp that drifts beside him (a lantern, not a sci-fi drone)
+const orb=new THREE.Mesh(new THREE.IcosahedronGeometry(0.12,1),new THREE.MeshStandardMaterial({color:0x2a1d0c,emissive:0xffa23a,emissiveIntensity:0.85,roughness:.6,metalness:0}));
+orb.add(new THREE.PointLight(0xffa848,0.6,3.2,2.2)); scene.add(orb);
+drM.userData.panel={step:'THE KEEPER',title:'Dr. Mineral',c:0xd8b06a,scroll:true,
   mean:'Above ground, an ordinary campus squirrel. Below it, the keeper of this lab — he sees that every contribution is mined, forged onto the chain, and remembered, so no one is ever forgotten.\n\nDIRECTIVE, this cycle — harden the chain core. Miners to the seam. Foundry, keep forging.'};
 // token minting — coins struck at the Foundry, carried to the Vault
-const coins=[]; const coinMat=new THREE.MeshStandardMaterial({color:0xf2c75a,emissive:0xb8801f,emissiveIntensity:.55,metalness:1,roughness:.3});
-const coinGeo=new THREE.CylinderGeometry(0.17,0.17,0.05,18); let coinTimer=1.5;
+const coins=[]; const coinMat=new THREE.MeshStandardMaterial({color:0xd9a850,emissive:0x8a5e16,emissiveIntensity:.22,metalness:1,roughness:.35});
+const coinGeo=new THREE.CylinderGeometry(0.12,0.12,0.04,16); let coinTimer=1.5;
 function mintCoin(){ const m=new THREE.Mesh(coinGeo,coinMat); m.position.set(fp.x,1.5,fp.z); scene.add(m); coins.push({m,t:0}); }
 // keeper patrol — Dr. Mineral walks a slow round of the lab, overseeing
 const drMPath=[ new THREE.Vector3(7.2,0,-4.6), Z('mines').pos.clone().multiplyScalar(0.82), Z('foundry').pos.clone().multiplyScalar(0.82), Z('ledger').pos.clone().multiplyScalar(0.82) ];
@@ -375,7 +376,7 @@ document.getElementById('panelx').addEventListener('click',closeZone);
 renderer.domElement.addEventListener('pointerdown',e=>{ downXY=[e.clientX,e.clientY]; });
 renderer.domElement.addEventListener('pointerup',e=>{ if(!downXY)return; const moved=Math.hypot(e.clientX-downXY[0],e.clientY-downXY[1]); downXY=null; if(moved>6)return;
   mouse.x=(e.clientX/W())*2-1; mouse.y=-(e.clientY/H())*2+1; ray.setFromCamera(mouse,camera);
-  const hit=ray.intersectObjects([...picker,boardPanel,drM])[0];
+  const hit=ray.intersectObjects([...picker,_ninscr,drM])[0];
   if(hit&&hit.object.userData.zone) openZone(hit.object.userData.zone);
   else if(hit&&hit.object.userData.panel){ const pp=hit.object.userData.panel; openPanel(Object.assign({},pp,{pos:hit.object===drM?drM.position:(pp.pos||null)})); }
   else closeZone(); });
@@ -472,7 +473,7 @@ function loop(){
   for(let i=flyers.length-1;i>=0;i--){ const fl=flyers[i]; fl.t+=dt*0.9; const p=lerpV(fp,lp,Math.min(1,fl.t)); fl.m.position.set(p.x,1.0+Math.sin(fl.t*3)*0.5*(1-fl.t),p.z); fl.m.rotation.y+=dt*3;
     if(fl.t>=1){ landBlock(fl.m); flyers.splice(i,1); } }
   // props
-  forgeLight.intensity=4.0+Math.sin(t*1.5)*1.3; ember.material.emissiveIntensity=0.45+Math.sin(t*1.5)*0.15; star.rotation.y+=dt*0.5; star.position.y=4.6+Math.sin(t*1.1)*0.1;
+  forgeLight.intensity=3.2+Math.sin(t*1.5)*1.0; ember.material.emissiveIntensity=0.28+Math.sin(t*1.5)*0.1; star.rotation.y+=dt*0.5; star.position.y=4.6+Math.sin(t*1.1)*0.1;
   seed.rotation.y+=dt*0.25; eye.rotation.z+=dt*0.18; mineCrys.forEach((c,i)=>c.rotation.y+=dt*(0.1+i*0.02));
   ZONES.forEach((z,i)=>z.light.intensity=4+Math.sin(t*1.0+i)*1.1);
   chain.children.forEach((l,i)=>l.material&&(l.rotation.y+=dt*0.4));
