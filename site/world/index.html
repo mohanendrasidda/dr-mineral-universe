@@ -262,8 +262,7 @@ function workstation(x,z,ry){ const g=new THREE.Group();
   const crate=new THREE.Mesh(new THREE.BoxGeometry(0.55,0.55,0.55),stone(0x241a10)); crate.position.set(0.85,0.28,0.25); crate.castShadow=true; g.add(crate);
   g.position.set(x,0,z); g.rotation.y=ry; scene.add(g);
   const sh=groundShadow(2.0); sh.position.set(x,0.05,z); return g; }
-workstation(mp.x+2.8, mp.z+1.2, -0.7);  // near the Mines
-workstation(fp.x-2.4, fp.z+1.8, 0.9);   // near the Foundry
+// (workstations are placed after the shadow system is initialized — see below)
 // Ledger: a dim warm obelisk where the chain of light gathers
 const lp=Z('ledger').pos; const pillar=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.24,4.4,8),new THREE.MeshStandardMaterial({color:0x241a10,emissive:0x8a6024,emissiveIntensity:.28,roughness:.85})); pillar.position.set(lp.x,2.2,lp.z); scene.add(pillar);
 const star=new THREE.Mesh(new THREE.IcosahedronGeometry(0.36,0),new THREE.MeshStandardMaterial({color:0x4a3a1c,emissive:0xd8b06a,emissiveIntensity:.6,roughness:.6})); star.position.set(lp.x,4.6,lp.z); scene.add(star);
@@ -341,6 +340,7 @@ const haulers=[]; for(let i=0;i<3;i++){ const s=critter(WALK,1.6,{state:'walk',f
 // contact shadows under every character
 const shadowed=[drM,tally,vellum,...miners,...haulers.map(h=>h.s)];
 const shadows=shadowed.map(s=>groundShadow(s.userData.h*0.85));
+workstation(mp.x+2.8, mp.z+1.2, -0.7); workstation(fp.x-2.4, fp.z+1.8, 0.9);  // grounded benches (shadowTex ready now)
 
 // ---------- the growing chain (Foundry -> Ledger) ----------
 const chain=new THREE.Group(); scene.add(chain);
