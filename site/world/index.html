@@ -80,12 +80,12 @@ controls.autoRotate=true; controls.autoRotateSpeed=0.09;
 
 const composer=new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene,camera));
-const bloom=new UnrealBloomPass(new THREE.Vector2(W(),H()),0.65,0.35,0.82);
+const bloom=new UnrealBloomPass(new THREE.Vector2(W(),H()),0.42,0.32,0.92);
 composer.addPass(bloom);
 
 // ---------- lighting (dark cave; the shaft is the drama) ----------
 scene.add(new THREE.HemisphereLight(0x3a2c18,0x0a0604,0.3));
-const shaftLight=new THREE.SpotLight(0xfff0d0,80,70,Math.PI*0.14,0.55,1.3);
+const shaftLight=new THREE.SpotLight(0xffe6b4,40,66,Math.PI*0.15,0.6,1.4);
 shaftLight.position.set(0,32,0); shaftLight.target.position.set(0,0,0); scene.add(shaftLight); scene.add(shaftLight.target);
 shaftLight.castShadow=true; shaftLight.shadow.mapSize.set(2048,2048); shaftLight.shadow.camera.near=4; shaftLight.shadow.camera.far=64; shaftLight.shadow.bias=-0.0006; shaftLight.shadow.radius=4;
 
@@ -100,7 +100,7 @@ const wall=new THREE.Mesh(new THREE.CylinderGeometry(28,32,50,64,1,true),stone(0
 const dome=new THREE.Mesh(new THREE.SphereGeometry(30,44,24,0,Math.PI*2,0,Math.PI*0.5),stone(0x080503)); dome.material.side=THREE.BackSide; dome.position.y=13; scene.add(dome);
 // the shaft of discovered daylight
 const shaftCone=new THREE.Mesh(new THREE.ConeGeometry(6.5,36,64,1,true),new THREE.MeshBasicMaterial({color:0xffe2a8,transparent:true,opacity:0.038,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending})); shaftCone.position.set(0,18,0); scene.add(shaftCone);
-const pool=new THREE.Mesh(new THREE.CircleGeometry(4.6,44),new THREE.MeshBasicMaterial({color:0xffe2a8,transparent:true,opacity:0.085,depthWrite:false,blending:THREE.AdditiveBlending})); pool.rotation.x=-Math.PI/2; pool.position.y=0.06; scene.add(pool);
+const pool=new THREE.Mesh(new THREE.CircleGeometry(4.6,44),new THREE.MeshBasicMaterial({color:0xffe2a8,transparent:true,opacity:0.05,depthWrite:false,blending:THREE.AdditiveBlending})); pool.rotation.x=-Math.PI/2; pool.position.y=0.06; scene.add(pool);
 // a field of tiny warm lanterns buried in the depth (glow via bloom; no debris crystals)
 const colMat=stone(0x1a1209);
 const lanternMat=new THREE.MeshStandardMaterial({color:0x3a2810,emissive:0xffa238,emissiveIntensity:1.2,roughness:1});
@@ -110,24 +110,30 @@ function lantern(x,y,z,s,light){ const m=new THREE.Mesh(new THREE.SphereGeometry
   if(light && realLights<MAX_LIGHTS){ const L=new THREE.PointLight(0xffa848,2.8,15,2.2); L.position.set(x,y,z); scene.add(L); realLights++; } return m; }
 
 // tier upon tier of carved colonnaded galleries (instanced) rising into the dark — columns + entablature + balustrade
-const colGeo=new THREE.CylinderGeometry(0.3,0.34,3.4,8);
+const colGeo=new THREE.CylinderGeometry(0.4,0.48,2.2,8);
+const archGeo=new THREE.TorusGeometry(1.4,0.22,5,14,Math.PI); // half-ring arch
 const balGeo=new THREE.CylinderGeometry(0.07,0.07,0.66,6);
-const tiers=[{ry:2.4,rad:25,cols:26,off:0},{ry:6.8,rad:23.4,cols:24,off:0.5},{ry:11.0,rad:21.6,cols:22,off:0},{ry:15.0,rad:19.6,cols:20,off:0.5},{ry:18.8,rad:17.4,cols:18,off:0}];
-let totalCols=0,totalBal=0; tiers.forEach(t=>{ totalCols+=t.cols; totalBal+=t.cols*4; });
+const tiers=[{ry:2.4,rad:25},{ry:6.7,rad:23.2},{ry:10.8,rad:21.4},{ry:14.7,rad:19.4},{ry:18.4,rad:17.2}];
+tiers.forEach(t=>{ t.cols=Math.round(2*Math.PI*(t.rad-0.3)/2.8); });
+let totalCols=0,totalBal=0,totalArch=0; tiers.forEach(t=>{ totalCols+=t.cols; totalBal+=t.cols*3; totalArch+=t.cols; });
 const colInst=new THREE.InstancedMesh(colGeo,colMat,totalCols);
+const archInst=new THREE.InstancedMesh(archGeo,colMat,totalArch);
 const balInst=new THREE.InstancedMesh(balGeo,colMat,totalBal);
-const dum=new THREE.Object3D(); let ci=0,bi=0;
-tiers.forEach(t=>{
+const dum=new THREE.Object3D(); let ci=0,ai=0,bi=0;
+tiers.forEach(t=>{ const cr=t.rad-0.3;
+  // dark recessed back-wall so the openings between columns read as deep silhouette
+  const back=new THREE.Mesh(new THREE.CylinderGeometry(t.rad+0.5,t.rad+0.5,4.6,48,1,true),stone(0x090503)); back.material.side=THREE.BackSide; back.position.y=t.ry+2.1; scene.add(back);
   const ledge=new THREE.Mesh(new THREE.CylinderGeometry(t.rad+0.5,t.rad+0.9,0.7,48,1,true),colMat); ledge.material.side=THREE.DoubleSide; ledge.position.y=t.ry; scene.add(ledge);
-  const band=new THREE.Mesh(new THREE.CylinderGeometry(t.rad-0.15,t.rad-0.15,0.6,48,1,true),colMat); band.material.side=THREE.DoubleSide; band.position.y=t.ry+3.7; scene.add(band);
+  const band=new THREE.Mesh(new THREE.CylinderGeometry(t.rad+0.25,t.rad+0.05,0.7,48,1,true),colMat); band.material.side=THREE.DoubleSide; band.position.y=t.ry+4.0; scene.add(band);
   const rail=new THREE.Mesh(new THREE.TorusGeometry(t.rad+0.5,0.09,6,64),colMat); rail.rotation.x=Math.PI/2; rail.position.y=t.ry+0.82; scene.add(rail);
-  for(let i=0;i<t.cols;i++){ const a=(i+t.off)/t.cols*6.283, cr=t.rad-0.3;
-    dum.position.set(Math.cos(a)*cr,t.ry+1.9,Math.sin(a)*cr); dum.rotation.set(0,0,0); dum.updateMatrix(); colInst.setMatrixAt(ci++,dum.matrix);
-    for(let b=0;b<4;b++){ const ba=((i+t.off)+(b+0.5)/4)/t.cols*6.283, br=t.rad+0.5; dum.position.set(Math.cos(ba)*br,t.ry+0.48,Math.sin(ba)*br); dum.updateMatrix(); balInst.setMatrixAt(bi++,dum.matrix); }
-    if(i%2===0) lantern(Math.cos(a+0.12)*(t.rad-1.0),t.ry+1.0,Math.sin(a+0.12)*(t.rad-1.0),0.15,(i%6===0));
+  for(let i=0;i<t.cols;i++){ const a=i/t.cols*6.283;
+    dum.position.set(Math.cos(a)*cr,t.ry+1.3,Math.sin(a)*cr); dum.rotation.set(0,0,0); dum.scale.set(1,1,1); dum.updateMatrix(); colInst.setMatrixAt(ci++,dum.matrix);
+    const am=(i+0.5)/t.cols*6.283; dum.position.set(Math.cos(am)*cr,t.ry+2.4,Math.sin(am)*cr); dum.scale.set(1,1,1); dum.lookAt(0,t.ry+2.4,0); dum.updateMatrix(); archInst.setMatrixAt(ai++,dum.matrix);
+    for(let b=0;b<3;b++){ const ba=(i+(b+0.5)/3)/t.cols*6.283, brd=t.rad+0.5; dum.position.set(Math.cos(ba)*brd,t.ry+0.48,Math.sin(ba)*brd); dum.rotation.set(0,0,0); dum.scale.set(1,1,1); dum.updateMatrix(); balInst.setMatrixAt(bi++,dum.matrix); }
+    if(i%4===0) lantern(Math.cos(a+0.05)*(cr-0.9),t.ry+1.4,Math.sin(a+0.05)*(cr-0.9),0.14,(i%16===0));
   }
 });
-colInst.instanceMatrix.needsUpdate=true; balInst.instanceMatrix.needsUpdate=true; scene.add(colInst); scene.add(balInst);
+colInst.instanceMatrix.needsUpdate=true; archInst.instanceMatrix.needsUpdate=true; balInst.instanceMatrix.needsUpdate=true; scene.add(colInst,archInst,balInst);
 // a couple of bridges between the lower tiers — break the perfect circle
 [0.6,3.7].forEach(a=>{ const r0=tiers[0].rad,r1=tiers[1].rad; const x0=Math.cos(a)*r0,z0=Math.sin(a)*r0,x1=Math.cos(a)*r1,z1=Math.sin(a)*r1;
   const br=new THREE.Mesh(new THREE.BoxGeometry(Math.hypot(x1-x0,z1-z0),0.4,1.6),colMat); br.position.set((x0+x1)/2,(tiers[0].ry+tiers[1].ry)/2,(z0+z1)/2); br.rotation.y=-Math.atan2(z1-z0,x1-x0); scene.add(br); });
@@ -166,8 +172,11 @@ function octo(p,c,h,y){const m=new THREE.Mesh(new THREE.OctahedronGeometry(h,0),
 // Mines: a dull crystal seam in a dark rock mound (heavy, dim — not candy gems)
 const mp=Z('mines').pos;
 const mineMound=new THREE.Mesh(new THREE.ConeGeometry(2.3,1.7,7),stone(0x140d08)); mineMound.position.set(mp.x,0.85,mp.z); mineMound.rotation.y=0.4; mineMound.castShadow=true; scene.add(mineMound);
-const seamMat=new THREE.MeshStandardMaterial({color:0x5a3c1c,emissive:0xb87a2c,emissiveIntensity:.32,roughness:.7});
-const mineCrys=[]; for(let i=0;i<5;i++){const a=i/5*3.0-0.7; const m=new THREE.Mesh(new THREE.OctahedronGeometry(0.3+Math.random()*0.28,0),seamMat); m.position.set(mp.x+Math.cos(a)*0.95,1.05+Math.sin(i*1.7)*0.3,mp.z+Math.sin(a)*0.95); m.rotation.set(Math.random()*3,Math.random()*3,0); scene.add(m); mineCrys.push(m);}
+function rockGeo(r){ const g=new THREE.IcosahedronGeometry(r,1); const p=g.attributes.position; for(let k=0;k<p.count;k++){ const f=0.74+Math.random()*0.46; p.setXYZ(k,p.getX(k)*f,p.getY(k)*f,p.getZ(k)*f);} g.computeVertexNormals(); return g; }
+const seamMat=new THREE.MeshStandardMaterial({color:0x4a341a,emissive:0xa86c26,emissiveIntensity:.22,roughness:.85,metalness:0});
+const mineCrys=[]; for(let i=0;i<6;i++){const a=i/6*3.2-0.8; const m=new THREE.Mesh(rockGeo(0.26+Math.random()*0.26),seamMat); m.position.set(mp.x+Math.cos(a)*0.95,1.0+Math.sin(i*1.7)*0.28,mp.z+Math.sin(a)*0.95); m.rotation.set(i,i*2,0); m.castShadow=true; scene.add(m); mineCrys.push(m);}
+// real-geometry rock chunks breaking up the smooth primitives
+for(let i=0;i<4;i++){const a=Math.random()*6.28,d=2.4+Math.random()*1.6; const r=new THREE.Mesh(rockGeo(0.5+Math.random()*0.55),stone(0x130d07)); r.position.set(mp.x+Math.cos(a)*d,0.4,mp.z+Math.sin(a)*d); r.rotation.set(Math.random()*3,Math.random()*3,0); r.castShadow=true; scene.add(r);}
 // Foundry: a dark stone basin with a low ember that breathes and lights stone from below
 const fp=Z('foundry').pos;
 const forgeBasin=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.8,1.2,18),stone(0x17110b)); forgeBasin.position.set(fp.x,0.6,fp.z); forgeBasin.castShadow=true; scene.add(forgeBasin);
@@ -175,7 +184,7 @@ const ember=new THREE.Mesh(new THREE.SphereGeometry(1.0,20,16),new THREE.MeshSta
 const forgeLight=new THREE.PointLight(0xff5a14,6,11,2.4); forgeLight.position.set(fp.x,0.95,fp.z); scene.add(forgeLight);
 // Ledger: a dim warm obelisk where the chain of light gathers
 const lp=Z('ledger').pos; const pillar=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.24,4.4,8),new THREE.MeshStandardMaterial({color:0x241a10,emissive:0x8a6024,emissiveIntensity:.28,roughness:.85})); pillar.position.set(lp.x,2.2,lp.z); scene.add(pillar);
-const star=new THREE.Mesh(new THREE.IcosahedronGeometry(0.36,0),new THREE.MeshStandardMaterial({color:0x4a3a1c,emissive:0xf0d294,emissiveIntensity:1.0,roughness:.6})); star.position.set(lp.x,4.6,lp.z); scene.add(star);
+const star=new THREE.Mesh(new THREE.IcosahedronGeometry(0.36,0),new THREE.MeshStandardMaterial({color:0x4a3a1c,emissive:0xd8b06a,emissiveIntensity:.6,roughness:.6})); star.position.set(lp.x,4.6,lp.z); scene.add(star);
 // Vault: pedestal + a single warm kept gem under guard
 const vp=Z('vault').pos; const ped=new THREE.Mesh(new THREE.CylinderGeometry(0.72,0.98,1.1,16),stone(0x1d150d)); ped.position.set(vp.x,0.55,vp.z); ped.castShadow=true; scene.add(ped);
 const seed=new THREE.Mesh(new THREE.OctahedronGeometry(0.62,0),new THREE.MeshStandardMaterial({color:0x6a4a22,emissive:0xc89a46,emissiveIntensity:.5,roughness:.5})); seed.position.set(vp.x,1.55,vp.z); scene.add(seed);
@@ -204,7 +213,7 @@ function groundShadow(w){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,w*0.58
 const FR={}; function tex(url){ if(!FR[url]){ const t=texLoader.load(url,()=>ready()); t.colorSpace=THREE.SRGBColorSpace; FR[url]=t; } return FR[url]; }
 function critter(urls,h,opts){ opts=opts||{};
   const textures=urls.map(tex);
-  const m=new THREE.SpriteMaterial({map:textures[0],transparent:true,depthWrite:false,alphaTest:0.06,color:new THREE.Color(0x8a7e64)});
+  const m=new THREE.SpriteMaterial({map:textures[0],transparent:true,depthWrite:false,alphaTest:0.06,color:new THREE.Color(0x6e6650)});
   const s=new THREE.Sprite(m); s.scale.set(h,h,1);
   s.userData=Object.assign({h,textures,frame:0,ft:0,fps:opts.fps||5,state:opts.state||'idle',phase:Math.random()*6.28,facing:1,baseY:opts.baseY||0},opts);
   scene.add(s); return s; }
