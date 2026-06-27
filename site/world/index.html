@@ -130,7 +130,7 @@ scene.add(new THREE.HemisphereLight(0x3a2c18,0x0a0604,0.3));
 const shaftLight=new THREE.SpotLight(0xffe6b4,40,66,Math.PI*0.15,0.6,1.4);
 shaftLight.position.set(0,32,0); shaftLight.target.position.set(0,0,0); scene.add(shaftLight); scene.add(shaftLight.target);
 shaftLight.castShadow=true; shaftLight.shadow.mapSize.set(2048,2048); shaftLight.shadow.camera.near=4; shaftLight.shadow.camera.far=64; shaftLight.shadow.bias=-0.0006; shaftLight.shadow.radius=4;
-scene.add(new THREE.HemisphereLight(0x5a4a2e,0x0c0906,0.7)); // warm fill so the 3D characters sit in the gloom without going to black
+scene.add(new THREE.HemisphereLight(0x4a3c24,0x0a0805,0.32)); // gentle fill; keep the cave moody (the hero is self-coloured, doesn't depend on this)
 
 // material helpers (defined before first use)
 const cMat=c=>new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:1.0,roughness:.3,metalness:.2});
@@ -442,7 +442,7 @@ function drMNext(){ drMFromAng=drMAng; drMU=0; drMWalking=true; }
 // --- PATH B PROOF: a real rigged + animated 3D character (CC0 Khronos Fox) driven by Dr. Mineral's patrol ---
 // proves the pipeline: GLTFLoader + skeletal walk/idle + real turning to face travel direction + retexture to our gloom.
 let fox=null, foxMix=null, foxWalk=null, foxIdle=null, foxHeadX=0, foxHeadZ=1; const FOX_YAW=0; // Mixamo faces +Z → no offset (was backward at PI)
-const drMKey=new THREE.PointLight(0xffd9a8,45,24,1.6); scene.add(drMKey); // strong warm hero key-light that follows Dr. Mineral so he reads + has form
+const drMKey=new THREE.PointLight(0xffcaa0,16,15,2.0); scene.add(drMKey); let camHeadX=0, camHeadZ=1; // soft warm ground-pool around him + a smoothed camera heading
 // strip horizontal root drift from a clip so the body stays pinned to the patrol (keeps the vertical bob)
 function inPlace(clip){ clip.tracks.forEach(t=>{ if(t.name.endsWith('.position')){ const v=t.values; for(let i=0;i<v.length;i+=3){ v[i]=v[0]; v[i+2]=v[2]; } } }); return clip; }
 // voxel colour transfer: paint the colourless Mixamo mesh from the original vertex-coloured InstantMesh GLB
@@ -455,14 +455,14 @@ function recolorMesh(mesh, srcPos, srcCol){ const G=40, grid=new Float32Array(G*
   for(let i=0;i<M;i++){const x=tp.getX(i),y=tp.getY(i),z=tp.getZ(i); if(x<tmn[0])tmn[0]=x;if(y<tmn[1])tmn[1]=y;if(z<tmn[2])tmn[2]=z; if(x>tmx[0])tmx[0]=x;if(y>tmx[1])tmx[1]=y;if(z>tmx[2])tmx[2]=z;}
   const ts=Math.max(tmx[0]-tmn[0],tmx[1]-tmn[1],tmx[2]-tmn[2])||1, tvx=(v,m)=>Math.min(G-1,Math.max(0,Math.floor((v-m)/ts*G)));
   const col=new Float32Array(M*3), near=(gx,gy,gz)=>{ for(let r=0;r<8;r++)for(let dx=-r;dx<=r;dx++)for(let dy=-r;dy<=r;dy++)for(let dz=-r;dz<=r;dz++){const x=gx+dx,y=gy+dy,z=gz+dz; if(x<0||y<0||z<0||x>=G||y>=G||z>=G)continue; const gi=id(x,y,z); if(cnt[gi])return[grid[gi*3]/cnt[gi],grid[gi*3+1]/cnt[gi],grid[gi*3+2]/cnt[gi]];} return [0.55,0.45,0.35];};
-  for(let i=0;i<M;i++){const c=near(tvx(tp.getX(i),tmn[0]),tvx(tp.getY(i),tmn[1]),tvx(tp.getZ(i),tmn[2])); col[i*3]=Math.min(1,c[0]*1.2+0.04); col[i*3+1]=Math.min(1,c[1]*0.92); col[i*3+2]=c[2]*0.55;} // warm the washed colours toward russet
+  for(let i=0;i<M;i++){const c=near(tvx(tp.getX(i),tmn[0]),tvx(tp.getY(i),tmn[1]),tvx(tp.getZ(i),tmn[2])); const B=0.74; col[i*3]=Math.min(1,c[0]*1.28+0.05)*B; col[i*3+1]=Math.min(1,c[1]*0.9)*B; col[i*3+2]=c[2]*0.5*B;} // warm toward russet, then pre-dim to sit in the gloom
   mesh.geometry.setAttribute('color', new THREE.BufferAttribute(col,3));
-  mesh.material = new THREE.MeshStandardMaterial({ vertexColors:true, roughness:0.92, metalness:0, emissive:0x2a1a0c, emissiveIntensity:0.28, fog:true }); // lit (takes candlelight + shadow), emissive floor so he never goes fully black
+  mesh.material = new THREE.MeshBasicMaterial({ vertexColors:true, fog:true }); // UNLIT + pre-dimmed: a deterministic warm figure — can't go black, won't glow, independent of fragile scene lights
 }
 const _fbx=new FBXLoader();
 _fbx.load('../../assets/models/drmineral-walk.fbx', m=>{
   fox=m; const box=new THREE.Box3().setFromObject(m); const sc0=3.4/((box.max.y-box.min.y)||1); m.scale.setScalar(sc0);
-  let skin=null; m.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; if(!skin)skin=o; o.material=new THREE.MeshStandardMaterial({color:0xb07a44,roughness:.9,metalness:0,emissive:0x281a0c,emissiveIntensity:.3,fog:true}); } }); // warm lit until recolour lands
+  let skin=null; m.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; if(!skin)skin=o; o.material=new THREE.MeshBasicMaterial({color:0x6e4a2a,fog:true}); } }); // warm unlit until recolour lands
   if(skin){ const pp=skin.geometry.attributes.position, nn=pp.count; let cx=0,cy=0,cz=0; for(let i=0;i<nn;i++){cx+=pp.getX(i);cy+=pp.getY(i);cz+=pp.getZ(i);} cx/=nn;cy/=nn;cz/=nn; // clamp stray Mixamo-rig vertices (the diagonal spike) into the body
     const ds=new Float32Array(nn); for(let i=0;i<nn;i++) ds[i]=Math.hypot(pp.getX(i)-cx,pp.getY(i)-cy,pp.getZ(i)-cz); const lim=[...ds].sort((a,b)=>a-b)[Math.floor(nn*0.99)]*1.8; let fx=0; for(let i=0;i<nn;i++) if(ds[i]>lim){ pp.setXYZ(i,cx,cy,cz); fx++; } if(fx){ pp.needsUpdate=true; console.log('clamped',fx,'stray vert(s)'); } }
   foxMix=new THREE.AnimationMixer(m);
@@ -604,10 +604,11 @@ function loop(){
   else {
     if(camFocus){ controls.target.lerp(new THREE.Vector3(camFocus.x*0.6,1.4,camFocus.z*0.6),0.05);
       const want=new THREE.Vector3(camFocus.x*1.5,6,camFocus.z*1.5+8); camera.position.lerp(want,0.04); }
-    else if(camMode==='follow'){ const p=drM.position; // THIRD-PERSON CHASE: behind him, framed ON him with the path ahead
-      const back=drMWalking?8.5:7.0, up=drMWalking?4.6:4.0, ahead=drMWalking?3.0:1.8;
-      _fpos.set(p.x-foxHeadX*back, up, p.z-foxHeadZ*back); camera.position.lerp(_fpos,0.06);
-      _ftar.set(p.x+foxHeadX*ahead, 2.0, p.z+foxHeadZ*ahead); controls.target.lerp(_ftar,0.06); }
+    else if(camMode==='follow'){ const p=drM.position; // CINEMATIC follow: hero shown WITHIN his world — high, back, smoothed, rule-of-thirds
+      camHeadX+=(foxHeadX-camHeadX)*0.03; camHeadZ+=(foxHeadZ-camHeadZ)*0.03; // glide the camera heading so turns ease (no snap)
+      const back=drMWalking?13:11, up=drMWalking?7.6:6.8, ahead=drMWalking?6:4;
+      _fpos.set(p.x-camHeadX*back, up, p.z-camHeadZ*back); camera.position.lerp(_fpos,0.028);
+      _ftar.set(p.x+camHeadX*ahead, 2.4, p.z+camHeadZ*ahead); controls.target.lerp(_ftar,0.03); } // look ahead+up → he sits low-third with the lab beyond
     else if(!dragging && performance.now()-idleAt>7000){ camMode='follow'; } // drift back to Dr. Mineral after idle
     controls.update();
   }
