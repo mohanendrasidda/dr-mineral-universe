@@ -111,7 +111,12 @@ scene.environment=pmrem.fromScene(new RoomEnvironment(),0.5).texture;
 const camera=new THREE.PerspectiveCamera(46,W()/H(),0.1,300); camera.position.set(16,13,19);
 const controls=new OrbitControls(camera,renderer.domElement); controls.target.set(0,1.4,0);
 controls.enableDamping=true; controls.dampingFactor=0.06; controls.minDistance=5; controls.maxDistance=70; controls.maxPolarAngle=Math.PI*0.495;
-controls.autoRotate=true; controls.autoRotateSpeed=0.09;
+controls.autoRotate=false;
+// ---- follow-cam: ride with Dr. Mineral by default; mouse drag = free explore; idle = drift back to him ----
+let camMode='follow', dragging=false, idleAt=0;
+const FOLLOW_OFF=new THREE.Vector3(5.5,4.6,8.5), _ftar=new THREE.Vector3(), _fpos=new THREE.Vector3();
+controls.addEventListener('start',()=>{ dragging=true; camMode='manual'; });
+controls.addEventListener('end',()=>{ dragging=false; idleAt=performance.now(); });
 
 const composer=new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene,camera));
@@ -434,7 +439,7 @@ function openPanel(p){ panel.style.setProperty('--c','#'+p.c.toString(16).padSta
   document.getElementById('pstep').textContent=p.step; document.getElementById('ptitle').textContent=p.title; document.getElementById('pmean').textContent=p.mean;
   panel.classList.toggle('scroll',!!p.scroll); panel.classList.add('on'); controls.autoRotate=false; camFocus=p.pos||null; }
 function openZone(z){ openPanel({step:z.step,title:z.name,mean:z.mean,c:z.c,pos:z.pos}); }
-function closeZone(){ camFocus=null; panel.classList.remove('on','scroll'); controls.autoRotate=true; }
+function closeZone(){ camFocus=null; panel.classList.remove('on','scroll'); camMode='follow'; }
 document.getElementById('panelx').addEventListener('click',closeZone);
 renderer.domElement.addEventListener('pointerdown',e=>{ downXY=[e.clientX,e.clientY]; });
 renderer.domElement.addEventListener('pointerup',e=>{ if(!downXY)return; const moved=Math.hypot(e.clientX-downXY[0],e.clientY-downXY[1]); downXY=null; if(moved>6)return;
@@ -475,7 +480,7 @@ function updateCaption(tt){ if(CINE.caps===false)return; let c=''; for(const k o
   if(c!==capCur){ capCur=c; if(capEl){ capEl.style.opacity=0; setTimeout(()=>{capEl.textContent=c; capEl.style.opacity=c?1:0;},170);} } }
 function startCine(caps){ CINE.active=true; CINE.t=0; CINE.caps=(caps!==false); controls.enabled=false; controls.autoRotate=false; document.body.classList.add('cine');
   setTimeout(()=>{ const l=document.getElementById('loading'); if(l)l.style.display='none'; },900); }
-function endCine(){ CINE.active=false; controls.target.set(0,1.4,5); controls.enabled=true; controls.autoRotate=true; document.body.classList.remove('cine'); if(capEl)capEl.style.opacity=0; if(scene.fog)scene.fog.density=0.03; fadeAudio(document.getElementById('intro-audio'),0,2500,true); }
+function endCine(){ CINE.active=false; controls.target.set(0,1.4,5); controls.enabled=true; camMode='follow'; document.body.classList.remove('cine'); if(capEl)capEl.style.opacity=0; if(scene.fog)scene.fog.density=0.03; fadeAudio(document.getElementById('intro-audio'),0,2500,true); }
 function fadeAudio(el,to,ms,stop){ if(!el)return; const from=el.volume||0,t0=performance.now();
   (function step(now){ const k=Math.min(1,(now-t0)/ms); el.volume=Math.max(0,Math.min(1,from+(to-from)*k)); if(k<1)requestAnimationFrame(step); else if(stop){try{el.pause();}catch(e){}} })(performance.now()); }
 function startScore(){ const a=document.getElementById('intro-audio'); if(!a)return; a.src='../../assets/audio/intro-score.mp3'; a.volume=0; const p=a.play(); if(p&&p.then)p.then(()=>fadeAudio(a,0.5,1800)).catch(()=>{}); else fadeAudio(a,0.5,1800); }  // calm under the campus
@@ -530,7 +535,7 @@ function loop(){
     const from=carry?mp:fp, to=carry?fp:mp, f=carry?seg:seg-1;
     h.s.position.x=from.x+(to.x-from.x)*f; h.s.position.z=from.z+(to.z-from.z)*f;
     h.s.userData.facing=((to.x-from.x)<0)?-1:1; tickCritter(h.s,dt,t);
-    h.crystal.visible=carry; h.crystal.position.set(h.s.position.x+0.4,1.0,h.s.position.z); h.crystal.rotation.y+=dt*2;
+    h.crystal.visible=false; // no floating token beside them — the carry is read from the crate in the art + the forge→ledger flyer
     if(h.prev<1&&seg>=1) forgeBlock(); h.prev=seg; });
   // flying blocks forge->ledger
   for(let i=flyers.length-1;i>=0;i--){ const fl=flyers[i]; fl.t+=dt*0.9; const p=lerpV(fp,lp,Math.min(1,fl.t)); fl.m.position.set(p.x,1.0+Math.sin(fl.t*3)*0.5*(1-fl.t),p.z); fl.m.rotation.y+=dt*3;
@@ -554,6 +559,10 @@ function loop(){
   else {
     if(camFocus){ controls.target.lerp(new THREE.Vector3(camFocus.x*0.6,1.4,camFocus.z*0.6),0.05);
       const want=new THREE.Vector3(camFocus.x*1.5,6,camFocus.z*1.5+8); camera.position.lerp(want,0.04); }
+    else if(camMode==='follow'){ const p=drM.position; // ride along with Dr. Mineral — his journey is the default view
+      _ftar.set(p.x,1.25,p.z); controls.target.lerp(_ftar,0.045);
+      _fpos.set(p.x+FOLLOW_OFF.x,FOLLOW_OFF.y,p.z+FOLLOW_OFF.z); camera.position.lerp(_fpos,0.03); }
+    else if(!dragging && performance.now()-idleAt>7000){ camMode='follow'; } // drift back to Dr. Mineral after idle
     controls.update();
   }
   composer.render();
