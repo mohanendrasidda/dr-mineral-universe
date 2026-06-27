@@ -21,3 +21,6 @@ assets/tmp/
 *.psd
 assets/video/ltx-samples/
 logs/
+
+# heavy stock clips — reproducible via scripts/teaser-fetch-footage.sh
+assets/video/footage/fx-*.mp4

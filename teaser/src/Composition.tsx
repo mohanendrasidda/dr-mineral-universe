@@ -19,6 +19,7 @@ const GOLD = "#e7b765";
 const SERIF = "'Cormorant Garamond', Georgia, serif";
 const MONO = "'IBM Plex Mono', ui-monospace, monospace";
 const ease = Easing.bezier(0.16, 1, 0.3, 1);
+const WARM = "saturate(1.18) sepia(0.12) brightness(0.98) contrast(1.04)";
 
 const fadeIO = (f: number, inE: number, outS: number, outE: number) =>
   interpolate(f, [0, inE, outS, outE], [0, 1, 1, 0], {
@@ -27,18 +28,17 @@ const fadeIO = (f: number, inE: number, outS: number, outE: number) =>
     easing: ease,
   });
 
-// cinematic vignette
 const Grade: React.FC = () => (
   <AbsoluteFill
     style={{
       background:
-        "radial-gradient(78% 72% at 50% 42%, transparent 38%, rgba(6,5,4,.72) 100%)",
+        "radial-gradient(78% 72% at 50% 42%, transparent 38%, rgba(6,5,4,.74) 100%)",
       pointerEvents: "none",
     }}
   />
 );
 
-// Ken Burns still: slow scale + drift, with fade in/out
+// Ken Burns still
 const KB: React.FC<{
   src: string;
   from?: number;
@@ -66,6 +66,7 @@ const KB: React.FC<{
         objectFit: "cover",
         transform: `scale(${s}) translate(${px}px, ${py}px)`,
         opacity: op,
+        filter: WARM,
       }}
     />
   );
@@ -129,6 +130,7 @@ const Kicker: React.FC<{ children: React.ReactNode; outE: number }> = ({ childre
   );
 };
 
+// full-frame stock clip (graded warm)
 const ClipScene: React.FC<{
   src: string;
   rate?: number;
@@ -136,10 +138,13 @@ const ClipScene: React.FC<{
   inE?: number;
   outS: number;
   outE: number;
-}> = ({ src, rate = 0.8, total, inE = 18, outS, outE }) => {
+  filter?: string;
+  fromScale?: number;
+  toScale?: number;
+}> = ({ src, rate = 0.8, total, inE = 18, outS, outE, filter = WARM, fromScale = 1.02, toScale = 1.1 }) => {
   const f = useCurrentFrame();
   const op = fadeIO(f, inE, outS, outE);
-  const z = interpolate(f, [0, total], [1.02, 1.1], { extrapolateRight: "clamp" });
+  const z = interpolate(f, [0, total], [fromScale, toScale], { extrapolateRight: "clamp" });
   return (
     <OffthreadVideo
       src={staticFile(src)}
@@ -153,6 +158,40 @@ const ClipScene: React.FC<{
         objectFit: "cover",
         opacity: op,
         transform: `scale(${z})`,
+        filter,
+      }}
+    />
+  );
+};
+
+// screen-blended motion overlay (embers / dust / sparks on black) — brings stills alive
+const Overlay: React.FC<{
+  src: string;
+  opacity?: number;
+  blend?: string;
+  rate?: number;
+  total: number;
+  fadeOut?: number;
+}> = ({ src, opacity = 0.5, blend = "screen", rate = 1, total, fadeOut = 18 }) => {
+  const f = useCurrentFrame();
+  const op = interpolate(f, [0, 14, total - fadeOut, total], [0, opacity, opacity, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return (
+    <OffthreadVideo
+      src={staticFile(src)}
+      muted
+      playbackRate={rate}
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        mixBlendMode: blend as React.CSSProperties["mixBlendMode"],
+        opacity: op,
+        pointerEvents: "none",
       }}
     />
   );
@@ -195,23 +234,28 @@ const Districts: React.FC = () => {
     ["vault.png", "04 · VAULT", "The treasury it controls."],
     ["watch.png", "05 · GUARD", "Audited. Monitored. Secured."],
   ];
-  const D = 60;
+  const D = 56;
   return (
     <AbsoluteFill style={{ background: BG }}>
       {items.map(([img, tag, line], i) => (
-        <Sequence key={img} from={i * D} durationInFrames={D + 14}>
+        <Sequence key={img} from={i * D} durationInFrames={D + 16}>
           <AbsoluteFill>
             <KB
               src={img}
-              from={1.06}
-              to={1.18}
-              panX={i % 2 ? -18 : 18}
-              outS={D - 6}
-              outE={D + 12}
-              total={D + 14}
+              from={1.07}
+              to={1.2}
+              panX={i % 2 ? -20 : 20}
+              outS={D - 4}
+              outE={D + 14}
+              total={D + 16}
             />
+            {i < 2 ? (
+              <Overlay src="fx-embers.mp4" opacity={0.65} total={D + 16} />
+            ) : (
+              <Overlay src="fx-dust.mp4" opacity={0.45} rate={0.9} total={D + 16} />
+            )}
             <Grade />
-            <SubLabel tag={tag} line={line} outS={D - 8} outE={D + 10} />
+            <SubLabel tag={tag} line={line} outS={D - 6} outE={D + 12} />
           </AbsoluteFill>
         </Sequence>
       ))}
@@ -221,7 +265,7 @@ const Districts: React.FC = () => {
 
 const TheLine: React.FC = () => {
   const f = useCurrentFrame();
-  const op = fadeIO(f, 28, 110, 148);
+  const op = fadeIO(f, 28, 115, 150);
   const heroR = interpolate(f, [0, 55], [26, 0], { extrapolateRight: "clamp", easing: ease });
   return (
     <div
@@ -262,8 +306,8 @@ const TheLine: React.FC = () => {
 
 const CTA: React.FC = () => {
   const f = useCurrentFrame();
-  const op = interpolate(f, [0, 30], [0, 1], { extrapolateRight: "clamp", easing: ease });
-  const sub = fadeIO(f, 45, 200, 240);
+  const op = interpolate(f, [0, 26], [0, 1], { extrapolateRight: "clamp", easing: ease });
+  const sub = fadeIO(f, 40, 200, 240);
   return (
     <AbsoluteFill
       style={{
@@ -316,17 +360,17 @@ export const Teaser: React.FC = () => {
         volume={(f) =>
           interpolate(
             f,
-            [0, 45, durationInFrames - 80, durationInFrames - 4],
+            [0, 45, durationInFrames - 90, durationInFrames - 4],
             [0, 0.62, 0.62, 0],
             { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
           )
         }
       />
 
-      {/* 1 — Lincoln at dusk (real Nebraska aerial) */}
+      {/* 1 — Lincoln at dusk */}
       <Sequence from={0} durationInFrames={150}>
         <AbsoluteFill style={{ background: "#000" }}>
-          <ClipScene src="clip-lincoln.mp4" rate={0.85} total={150} outS={125} outE={150} />
+          <ClipScene src="clip-lincoln.mp4" rate={0.85} total={150} outS={126} outE={150} />
           <Grade />
           <Kicker outE={150}>UNIVERSITY OF NEBRASKA · LINCOLN</Kicker>
           <Caption top="72%" size={42} outS={100} outE={140}>
@@ -336,45 +380,79 @@ export const Teaser: React.FC = () => {
       </Sequence>
 
       {/* 2 — the campus */}
-      <Sequence from={135} durationInFrames={155}>
+      <Sequence from={135} durationInFrames={150}>
         <AbsoluteFill style={{ background: "#000" }}>
-          <ClipScene src="clip-campus.mp4" rate={0.85} total={155} outS={130} outE={155} />
+          <ClipScene src="clip-campus.mp4" rate={0.85} total={150} outS={126} outE={150} />
           <Grade />
-          <Caption top="72%" size={40} italic outS={110} outE={150}>
+          <Caption top="72%" size={40} italic outS={106} outE={146}>
             A quiet campus. Nobody looks twice.
           </Caption>
         </AbsoluteFill>
       </Sequence>
 
-      {/* 3 — the descent (LTX clip) */}
-      <Sequence from={275} durationInFrames={165}>
+      {/* 3 — golden-hour surface (real forest god-rays) */}
+      <Sequence from={270} durationInFrames={135}>
         <AbsoluteFill style={{ background: "#000" }}>
-          <ClipScene src="clip-descent.mp4" rate={0.75} total={165} outS={140} outE={165} />
+          <ClipScene src="fx-forest.mp4" rate={0.7} total={135} outS={112} outE={135} fromScale={1.06} toScale={1.14} />
           <Grade />
-          <Caption top="72%" size={42} italic outS={115} outE={155}>
+          <Caption top="72%" size={40} italic outS={92} outE={130}>
+            The world above.
+          </Caption>
+        </AbsoluteFill>
+      </Sequence>
+
+      {/* 4 — the descent (LTX clip) + dust */}
+      <Sequence from={390} durationInFrames={165}>
+        <AbsoluteFill style={{ background: "#000" }}>
+          <ClipScene src="clip-descent.mp4" rate={0.72} total={165} outS={140} outE={165} />
+          <Overlay src="fx-dust.mp4" opacity={0.32} rate={0.8} total={165} />
+          <Grade />
+          <Caption top="72%" size={42} italic outS={116} outE={156}>
             But beneath it,
           </Caption>
         </AbsoluteFill>
       </Sequence>
 
-      {/* 4 — the reveal */}
-      <Sequence from={425} durationInFrames={195}>
+      {/* 5 — the reveal + dust motes drifting in the shaft */}
+      <Sequence from={540} durationInFrames={175}>
         <AbsoluteFill style={{ background: BG }}>
-          <KB src="central-cavern.png" from={1.04} to={1.16} outS={170} outE={195} total={195} />
+          <KB src="central-cavern.png" from={1.04} to={1.15} outS={150} outE={175} total={175} />
+          <Overlay src="fx-dust.mp4" opacity={0.6} rate={0.8} total={175} />
           <Grade />
-          <Caption top="44%" size={52} outS={150} outE={188}>
+          <Caption top="44%" size={52} outS={132} outE={170}>
             a lab has worked for ages.
           </Caption>
         </AbsoluteFill>
       </Sequence>
 
-      {/* 5 — the core loop across the five districts */}
-      <Sequence from={605} durationInFrames={320}>
+      {/* 6 — mineral cutaway (real crystal macro, warm-graded) */}
+      <Sequence from={700} durationInFrames={100}>
+        <AbsoluteFill style={{ background: "#000" }}>
+          <ClipScene
+            src="fx-crystal.mp4"
+            rate={0.7}
+            total={100}
+            outS={78}
+            outE={100}
+            fromScale={1.05}
+            toScale={1.16}
+            filter="sepia(0.55) saturate(1.5) hue-rotate(-12deg) brightness(0.82) contrast(1.08)"
+          />
+          <Overlay src="fx-sparks.mp4" opacity={0.4} total={100} />
+          <Grade />
+          <Caption top="74%" size={38} italic outS={62} outE={96}>
+            carved from the rock —
+          </Caption>
+        </AbsoluteFill>
+      </Sequence>
+
+      {/* 7 — the core loop across the five districts */}
+      <Sequence from={785} durationInFrames={300}>
         <Districts />
       </Sequence>
 
-      {/* 6 — the line */}
-      <Sequence from={920} durationInFrames={150}>
+      {/* 8 — the line */}
+      <Sequence from={1075} durationInFrames={155}>
         <AbsoluteFill
           style={{
             background: `radial-gradient(80% 80% at 50% 45%, #15110c 0%, ${BG} 78%)`,
@@ -386,8 +464,8 @@ export const Teaser: React.FC = () => {
         </AbsoluteFill>
       </Sequence>
 
-      {/* 7 — title card / CTA */}
-      <Sequence from={1060} durationInFrames={durationInFrames - 1060}>
+      {/* 9 — title card / CTA (overlaps the line to crossfade, no dead gap) */}
+      <Sequence from={1205} durationInFrames={durationInFrames - 1205}>
         <CTA />
       </Sequence>
     </AbsoluteFill>
