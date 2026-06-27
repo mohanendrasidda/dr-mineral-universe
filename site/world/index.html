@@ -32,6 +32,22 @@
   #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9;background:#070504;color:#f0c87e;font-family:'IBM Plex Mono',monospace;letter-spacing:.2em;font-size:12px;text-align:center;padding:20px}
   a.back{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:5;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:rgba(214,190,150,.6);text-decoration:none}
   a.back:hover{color:#f6c878}
+  /* intro cinematic */
+  #cine-bars{position:fixed;inset:0;z-index:7;pointer-events:none;opacity:0;transition:opacity .6s}
+  #cine-bars::before,#cine-bars::after{content:"";position:fixed;left:0;right:0;height:0;background:#000;transition:height .9s ease}
+  #cine-bars::before{top:0}#cine-bars::after{bottom:0}
+  body.cine #cine-bars{opacity:1}
+  body.cine #cine-bars::before,body.cine #cine-bars::after{height:9vh}
+  #cine-cap{position:fixed;left:0;right:0;bottom:16vh;z-index:8;text-align:center;pointer-events:none;
+    font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(20px,3.2vw,34px);color:#f3e6cf;
+    text-shadow:0 2px 32px rgba(0,0,0,.95);opacity:0;transition:opacity .5s;padding:0 24px;display:none}
+  body.cine #cine-cap{display:block}
+  #cine-skip{position:fixed;bottom:24px;right:24px;z-index:9;display:none;cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:rgba(214,190,150,.65);
+    border:1px solid rgba(210,170,110,.3);border-radius:999px;padding:8px 16px;background:rgba(10,7,5,.45)}
+  body.cine #cine-skip{display:inline-flex}
+  #cine-skip:hover{color:#f6c878}
+  body.cine #hud,body.cine #ctr,body.cine a.back,body.cine #hint{opacity:0!important;transition:opacity .4s}
 </style>
 </head>
 <body>
@@ -39,6 +55,9 @@
 <div id="app"></div>
 <div id="vignette"></div>
 <div id="grain"></div>
+<div id="cine-bars"></div>
+<div id="cine-cap"></div>
+<button id="cine-skip">SKIP &#8614;</button>
 <a class="back" href="../index.html">&#8592; BACK TO THE LANDING</a>
 <div id="hud"><div class="kick">THE UNIVERSITY OF NEBRASKA LAB</div><h1>THE LIVING CHAIN</h1><div class="sub">click a zone &middot; the lab is always working</div></div>
 <div id="ctr"><div class="lab">BLOCKS FORGED</div><div class="n" id="blocks">0</div><div class="s2" id="chainlen">CHAIN 0</div></div>
@@ -305,6 +324,40 @@ renderer.domElement.addEventListener('pointerup',e=>{ if(!downXY)return; const m
   mouse.x=(e.clientX/W())*2-1; mouse.y=-(e.clientY/H())*2+1; ray.setFromCamera(mouse,camera);
   const hit=ray.intersectObjects(picker)[0]; if(hit&&hit.object.userData.zone) openZone(hit.object.userData.zone); else closeZone(); });
 
+// ---------- intro cinematic: sky -> down the shaft -> into the hall -> fast sweep -> dive into the Mines ----------
+const Vc=(x,y,z)=>new THREE.Vector3(x,y,z);
+const CINE={active:false,t:0,dur:11.2,frames:[
+  {t:0.0,  p:Vc(0,74,0.3),            l:Vc(0,0,5)},      // high in the shaft of daylight, looking down (the way in)
+  {t:2.2,  p:Vc(1,30,3),              l:Vc(0,4,9)},      // plunging down the shaft into the cavern mouth
+  {t:4.0,  p:Vc(3,15,22),             l:Vc(0,1.5,2)},    // burst into the hall — wide reveal of the well + colonnades
+  {t:5.6,  p:Vc(-21,10,12),           l:Vc(0,1,1)},      // fast sweep around the central well
+  {t:7.0,  p:Vc(-15,7,-15),           l:Vc(0,1,2)},      // continue the sweep behind the galleries
+  {t:8.4,  p:Vc(8,6,-5),              l:Vc(mp.x,1.2,mp.z)}, // come around to face the Mines
+  {t:9.8,  p:Vc(mp.x*0.4,4.2,mp.z+7), l:Vc(mp.x,1.2,mp.z)}, // dive in toward the glowing seam
+  {t:11.2, p:Vc(3,5,17),              l:Vc(0,1.4,5)},    // settle where mining happens, hand over the controls
+]};
+const _cp=new THREE.Vector3(),_cl=new THREE.Vector3();
+function runCine(tt){ const F=CINE.frames; if(tt>=CINE.dur){ endCine(); return; }
+  let i=0; while(i<F.length-1 && tt>=F[i+1].t) i++; const a=F[i], b=F[i+1]||a;
+  let u=(tt-a.t)/Math.max(0.001,b.t-a.t); u=Math.max(0,Math.min(1,u)); const s=u*u*(3-2*u);
+  _cp.copy(a.p).lerp(b.p,s); _cl.copy(a.l).lerp(b.l,s); camera.position.copy(_cp); camera.lookAt(_cl); updateCaption(tt); }
+const captions=[
+  {at:0.3,t:'The University of Nebraska.'},
+  {at:2.4,t:'Above ground — an ordinary campus.'},
+  {at:4.2,t:'Below it, a lab that has run in the dark…'},
+  {at:6.6,t:'…longer than anyone above is alive.'},
+  {at:8.9,t:'It mines real security work, forges it onto the chain, and never forgets.'},
+];
+const capEl=document.getElementById('cine-cap'); let capCur=null;
+function updateCaption(tt){ let c=''; for(const k of captions){ if(tt>=k.at) c=k.t; }
+  if(c!==capCur){ capCur=c; if(capEl){ capEl.style.opacity=0; setTimeout(()=>{capEl.textContent=c; capEl.style.opacity=c?1:0;},170);} } }
+function startCine(){ CINE.active=true; CINE.t=0; controls.enabled=false; controls.autoRotate=false; document.body.classList.add('cine');
+  setTimeout(()=>{ const l=document.getElementById('loading'); if(l)l.style.display='none'; },900); }
+function endCine(){ CINE.active=false; controls.target.set(0,1.4,5); controls.enabled=true; controls.autoRotate=true; document.body.classList.remove('cine'); if(capEl)capEl.style.opacity=0; }
+function skipCine(){ const f=CINE.frames[CINE.frames.length-1]; camera.position.copy(f.p); camera.lookAt(f.l); endCine(); }
+const _sk=document.getElementById('cine-skip'); if(_sk)_sk.addEventListener('click',skipCine);
+if(/[?&]intro=1/.test(location.search)) startCine();
+
 // ---------- loop ----------
 const clock=new THREE.Clock();
 function lerpV(a,b,t){ return a.clone().lerp(b,t); }
@@ -333,10 +386,13 @@ function loop(){
   const dp=dust.geometry.attributes.position.array; for(let i=0;i<dustN;i++){ dp[i*3+1]+=dt*0.25; if(dp[i*3+1]>16)dp[i*3+1]=0; } dust.geometry.attributes.position.needsUpdate=true; dust.rotation.y+=dt*0.01;
   // keep contact shadows under the characters
   for(let i=0;i<shadowed.length;i++){ shadows[i].position.x=shadowed[i].position.x; shadows[i].position.z=shadowed[i].position.z; }
-  // focus camera
-  if(focus){ controls.target.lerp(new THREE.Vector3(focus.pos.x*0.6,1.4,focus.pos.z*0.6),0.05);
-    const want=new THREE.Vector3(focus.pos.x*1.5,6,focus.pos.z*1.5+8); camera.position.lerp(want,0.04); }
-  controls.update();
+  // intro cinematic drives the camera; otherwise normal/focus camera + controls
+  if(CINE.active){ CINE.t+=dt; runCine(CINE.t); }
+  else {
+    if(focus){ controls.target.lerp(new THREE.Vector3(focus.pos.x*0.6,1.4,focus.pos.z*0.6),0.05);
+      const want=new THREE.Vector3(focus.pos.x*1.5,6,focus.pos.z*1.5+8); camera.position.lerp(want,0.04); }
+    controls.update();
+  }
   composer.render();
 }
 addEventListener('resize',()=>{ camera.aspect=W()/H(); camera.updateProjectionMatrix(); renderer.setSize(W(),H()); composer.setSize(W(),H()); });
