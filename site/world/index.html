@@ -302,6 +302,20 @@ function tickCritter(s,dt,t){ const u=s.userData;
   const fx=(u.facing<0?-1:1);
   s.scale.set(u.h*sx*fx, u.h*sy, 1); s.position.y=u.h*sy/2+bob+(u.baseY||0); s.material.rotation=lean*fx; }
 
+// --- UV-flipbook player for AI-generated walk/work sprite SHEETS (one image, cols x rows grid) ---
+// performant: the atlas uploads to VRAM once; we only change the texture offset per frame, so a whole crew runs at 60fps.
+// usage (once a sheet exists): const s=sheetSprite('../sprites/drmineral-walk.png',6,1,2.0,{fps:8,frames:6}); ... loop: tickSheet(s,dt);
+function sheetSprite(url,cols,rows,h,opts){ opts=opts||{};
+  const t=texLoader.load(url,()=>ready()); t.colorSpace=THREE.SRGBColorSpace; t.repeat.set(1/cols,1/rows);
+  const m=new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false,fog:true,alphaTest:0.04,color:new THREE.Color(opts.tint||0x8a7e64)});
+  const s=new THREE.Sprite(m); s.scale.set(h,h,1);
+  s.userData=Object.assign({h,cols,rows,nframes:opts.frames||(cols*rows),fps:opts.fps||8,frame:0,ft:0,facing:1,baseY:opts.baseY||0,sheet:true},opts);
+  scene.add(s); return s; }
+function tickSheet(s,dt){ const u=s.userData; u.ft+=dt; const spf=1/u.fps; while(u.ft>=spf){u.ft-=spf; u.frame=(u.frame+1)%u.nframes;}
+  const col=u.frame%u.cols, row=(u.rows>1)?Math.floor(u.frame/u.cols):0;
+  s.material.map.offset.set(col/u.cols, 1-(row+1)/u.rows);
+  const fx=u.facing<0?-1:1; s.scale.set(u.h*fx,u.h,1); s.position.y=u.h/2+(u.baseY||0); }
+
 const WALK=['../sprites/walk-a.png','../sprites/walk-b.png'];
 // the cast — all consistent animated 2.5D sprites
 // keeper: small, off-centre, half-lit in the gloom (not a spotlit mascot)
