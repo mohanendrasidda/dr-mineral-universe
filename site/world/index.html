@@ -95,7 +95,7 @@ const glassMat=c=>new THREE.MeshPhysicalMaterial({color:c,emissive:c,emissiveInt
 
 // ---------- underground architecture (carved stone, falling into the dark) ----------
 const stone=(c)=>new THREE.MeshStandardMaterial({color:c||0x1f160d,roughness:1,metalness:0});
-const floor=new THREE.Mesh(new THREE.CircleGeometry(27,72),stone(0x17100a)); floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
+const floor=new THREE.Mesh(new THREE.RingGeometry(6.5,27,72,1),stone(0x17100a)); floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
 const wall=new THREE.Mesh(new THREE.CylinderGeometry(28,32,50,64,1,true),stone(0x0b0704)); wall.material.side=THREE.BackSide; wall.position.y=20; scene.add(wall);
 const dome=new THREE.Mesh(new THREE.SphereGeometry(30,44,24,0,Math.PI*2,0,Math.PI*0.5),stone(0x080503)); dome.material.side=THREE.BackSide; dome.position.y=13; scene.add(dome);
 // the shaft of discovered daylight
@@ -141,6 +141,29 @@ colInst.instanceMatrix.needsUpdate=true; archInst.instanceMatrix.needsUpdate=tru
 for(let i=0;i<14;i++){const a=Math.random()*6.283,r=6+Math.random()*16,h=2+Math.random()*5;
   const m=new THREE.Mesh(new THREE.ConeGeometry(0.4+Math.random()*0.7,h,6),stone(0x0f0a06)); m.position.set(Math.cos(a)*r,26-h/2,Math.sin(a)*r); m.rotation.x=Math.PI; scene.add(m);}
 for(let i=0;i<34;i++){ lantern((Math.random()-0.5)*48,2+Math.random()*22,(Math.random()-0.5)*48,0.11+Math.random()*0.05); }
+
+// ---------- the central WELL: galleries falling downward into the dark ----------
+const wellTiers=[{ry:-1.2,rad:6.0},{ry:-4.8,rad:5.2},{ry:-8.4,rad:4.4},{ry:-12.2,rad:3.6},{ry:-16.4,rad:2.9}];
+wellTiers.forEach(t=>{ t.cols=Math.max(8,Math.round(2*Math.PI*(t.rad-0.3)/2.4)); });
+let wC=0,wA=0,wB=0; wellTiers.forEach(t=>{ wC+=t.cols; wA+=t.cols; wB+=t.cols*3; });
+const wColInst=new THREE.InstancedMesh(colGeo,colMat,wC);
+const wArchInst=new THREE.InstancedMesh(archGeo,colMat,wA);
+const wBalInst=new THREE.InstancedMesh(balGeo,colMat,wB);
+let wci=0,wai=0,wbi=0;
+wellTiers.forEach(t=>{ const cr=t.rad-0.3;
+  const back=new THREE.Mesh(new THREE.CylinderGeometry(t.rad+0.45,t.rad+0.45,4.2,40,1,true),stone(0x060301)); back.material.side=THREE.BackSide; back.position.y=t.ry+1.9; scene.add(back);
+  const ledge=new THREE.Mesh(new THREE.CylinderGeometry(t.rad+0.45,t.rad+0.8,0.55,40,1,true),colMat); ledge.material.side=THREE.DoubleSide; ledge.position.y=t.ry; scene.add(ledge);
+  const rail=new THREE.Mesh(new THREE.TorusGeometry(t.rad+0.45,0.08,6,48),colMat); rail.rotation.x=Math.PI/2; rail.position.y=t.ry+0.78; scene.add(rail);
+  for(let i=0;i<t.cols;i++){ const a=i/t.cols*6.283;
+    dum.position.set(Math.cos(a)*cr,t.ry+1.3,Math.sin(a)*cr); dum.rotation.set(0,0,0); dum.scale.set(1,1,1); dum.updateMatrix(); wColInst.setMatrixAt(wci++,dum.matrix);
+    const am=(i+0.5)/t.cols*6.283; dum.position.set(Math.cos(am)*cr,t.ry+2.4,Math.sin(am)*cr); dum.scale.set(1,1,1); dum.lookAt(0,t.ry+2.4,0); dum.updateMatrix(); wArchInst.setMatrixAt(wai++,dum.matrix);
+    for(let b=0;b<3;b++){ const ba=(i+(b+0.5)/3)/t.cols*6.283, brd=t.rad+0.45; dum.position.set(Math.cos(ba)*brd,t.ry+0.45,Math.sin(ba)*brd); dum.rotation.set(0,0,0); dum.scale.set(1,1,1); dum.updateMatrix(); wBalInst.setMatrixAt(wbi++,dum.matrix); }
+    if(i%3===0) lantern(Math.cos(a)*(cr-0.7),t.ry+1.3,Math.sin(a)*(cr-0.7),0.12,(i%9===0));
+  }
+});
+wColInst.instanceMatrix.needsUpdate=true; wArchInst.instanceMatrix.needsUpdate=true; wBalInst.instanceMatrix.needsUpdate=true; scene.add(wColInst,wArchInst,wBalInst);
+// a faint pool of light far down the well — the shaft falling into the deep
+const deepPool=new THREE.Mesh(new THREE.CircleGeometry(2.3,32),new THREE.MeshBasicMaterial({color:0xffd690,transparent:true,opacity:0.06,depthWrite:false,blending:THREE.AdditiveBlending})); deepPool.rotation.x=-Math.PI/2; deepPool.position.y=-18; scene.add(deepPool);
 
 // ---------- P7: real PBR stone on the architecture (carved relief pops under lantern light) ----------
 const TL=new THREE.TextureLoader(); const maxAniso=renderer.capabilities.getMaxAnisotropy();
@@ -241,7 +264,7 @@ function tickCritter(s,dt,t){ const u=s.userData;
 const WALK=['../sprites/walk-a.png','../sprites/walk-b.png'];
 // the cast — all consistent animated 2.5D sprites
 // keeper: small, off-centre, half-lit in the gloom (not a spotlit mascot)
-const drM=critter(['../../assets/keyed/char-drmineral-hero-v1.png'],2.0,{state:'idle'}); drM.position.set(5.5,0,-3.5); drM.material.color.setHex(0x665c46);
+const drM=critter(['../../assets/keyed/char-drmineral-hero-v1.png'],2.0,{state:'idle'}); drM.position.set(7.2,0,-4.6); drM.material.color.setHex(0x665c46);
 const tally=critter(['../../assets/keyed/char-tally-v1.png'],1.4,{state:'idle'}); tally.position.set(lp.x+1.4,0,lp.z+0.4);
 const vellum=critter(['../../assets/keyed/char-vellum-v1.png'],1.55,{state:'idle',fps:2}); vellum.position.set(vp.x+1.5,0,vp.z+0.2);
 const miners=[]; for(let i=0;i<2;i++){ const a=i/2*6.28+0.5; const s=critter(WALK,1.6,{state:'mine',fps:2}); s.position.set(mp.x+Math.cos(a)*1.6,0,mp.z+Math.sin(a)*1.6); s.userData.facing=(Math.cos(a)<0?-1:1); miners.push(s); }
