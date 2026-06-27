@@ -562,9 +562,12 @@ function loop(){
   else {
     if(camFocus){ controls.target.lerp(new THREE.Vector3(camFocus.x*0.6,1.4,camFocus.z*0.6),0.05);
       const want=new THREE.Vector3(camFocus.x*1.5,6,camFocus.z*1.5+8); camera.position.lerp(want,0.04); }
-    else if(camMode==='follow'){ const p=drM.position; // ride along with Dr. Mineral — his journey is the default view
-      _ftar.set(p.x,1.25,p.z); controls.target.lerp(_ftar,0.045);
-      _fpos.set(p.x+FOLLOW_OFF.x,FOLLOW_OFF.y,p.z+FOLLOW_OFF.z); camera.position.lerp(_fpos,0.03); }
+    else if(camMode==='follow'){ const p=drM.position; // ORBIT the well WITH Dr. Mineral — camera sits radially OUTSIDE him at his
+      // own angle and swings around the centre as he does (never cuts across). Zooms in when he stops to inspect, out while walking.
+      const ang=Math.atan2(p.z,p.x), watching=!drMWalking;
+      const Rc=DRAD+(watching?5.6:9.0), H=watching?3.1:5.4, look=watching?0.72:0.5;
+      _fpos.set(Math.cos(ang)*Rc,H,Math.sin(ang)*Rc); camera.position.lerp(_fpos,watching?0.035:0.05);
+      _ftar.set(p.x*look,1.5,p.z*look); controls.target.lerp(_ftar,0.05); }
     else if(!dragging && performance.now()-idleAt>7000){ camMode='follow'; } // drift back to Dr. Mineral after idle
     controls.update();
   }
