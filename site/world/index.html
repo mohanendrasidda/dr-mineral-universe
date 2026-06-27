@@ -319,10 +319,10 @@ function critter(urls,h,opts){ opts=opts||{};
 function tickCritter(s,dt,t){ const u=s.userData;
   const fr=(u.stateFrames&&u.stateFrames[u.state]&&u.stateFrames[u.state].length)?u.stateFrames[u.state]:u.textures;
   let bob=0,lean=0,sx=1,sy=1; const ph=u.phase; let fi=u.frame;
-  if(u.state==='walk'){ // two footfalls per cycle: body rises mid-stride, dips + squashes on each step (weight)
-    const sp=(u.fps||4)*1.05, w=t*sp*Math.PI+ph; const step=Math.abs(Math.sin(w)), foot=1-step;
-    bob=(step-0.5)*0.06; sy=1-foot*0.05; sx=1+foot*0.04; lean=Math.sin(w)*0.05+0.035;
-    if(fr.length>1){ u.ft+=dt; const spf=1/(u.fps||4); while(u.ft>=spf){u.ft-=spf;u.frame=(u.frame+1)%fr.length;} } fi=u.frame%fr.length; }
+  if(u.state==='walk'){ // lively walk: clear bounce + weight-shift + body rock, frames synced to the footfalls
+    const sp=(u.fps||4)*1.0, w=t*sp*Math.PI+ph; const up=Math.abs(Math.sin(w)), foot=1-up;
+    bob=up*0.12-0.02; sy=1-foot*0.11; sx=1+foot*0.08; lean=Math.sin(w*0.5+ph)*0.08+Math.sin(w)*0.04;
+    if(fr.length>1){ fi=(Math.sin(w)>=0?0:1)%fr.length; u.frame=fi; } else fi=0; }
   else if(u.state==='mine'){ // a real swing: wind-up frame while raising, strike frame on the hit — synced to the motion
     const cyc=(t*0.78+ph*0.16)%1; let raise=0,strike=0;
     if(cyc<0.46){ const k=cyc/0.46; raise=k*k; } else if(cyc<0.63){ const k=(cyc-0.46)/0.17; raise=1-k; strike=Math.sin(k*Math.PI); }
@@ -354,9 +354,9 @@ const SP='../../assets/sprites/';
 // the cast — consistent animated 2.5D sprites, per-state frames keyed from the painterly art
 // keeper: small, off-centre, half-lit in the gloom (not a spotlit mascot)
 const drM=critter([],2.0,{state:'idle',fps:4,states:{idle:[SP+'drmineral-idle.png'],walk:[SP+'drmineral-walk-a.png']}}); drM.position.set(7.2,0,-4.6);
-const tally=critter([],1.5,{state:'idle',fps:3,states:{idle:[SP+'tally-idle.png',SP+'tally-idle.png',SP+'tally-idle.png',SP+'tally-hop.png']}}); tally.position.set(lp.x+1.4,0,lp.z+0.4);
-const vellum=critter([],1.7,{state:'idle',fps:2,states:{idle:[SP+'vellum-idle.png']}}); vellum.position.set(vp.x+1.5,0,vp.z+0.2);
-const miners=[]; for(let i=0;i<3;i++){ const a=i/3*6.28+0.5; const s=critter([],1.7,{state:'mine',fps:2,states:{idle:[SP+'worker-idle.png'],mine:[SP+'worker-mine-a.png',SP+'worker-mine-b.png']}}); s.position.set(mp.x+Math.cos(a)*1.7,0,mp.z+Math.sin(a)*1.7); s.userData.facing=(Math.cos(a)<0?-1:1); miners.push(s); }
+const tally=critter([],1.5,{state:'idle',fps:3,states:{idle:[SP+'tally-idle.png',SP+'tally-idle.png',SP+'tally-idle.png',SP+'tally-hop.png']}}); tally.position.set(lp.x+1.4,0,lp.z+0.4); tally.userData.facing=(tally.position.x>0?-1:1);
+const vellum=critter([],1.7,{state:'idle',fps:2,states:{idle:[SP+'vellum-idle.png']}}); vellum.position.set(vp.x+1.5,0,vp.z+0.2); vellum.userData.facing=(vellum.position.x>0?-1:1);
+const miners=[]; for(let i=0;i<3;i++){ const a=i/3*6.28+0.5; const s=critter([],1.7,{state:'mine',fps:2,states:{idle:[SP+'worker-idle.png'],mine:[SP+'worker-mine-a.png',SP+'worker-mine-b.png']}}); s.position.set(mp.x+Math.cos(a)*1.7,0,mp.z+Math.sin(a)*1.7); s.userData.facing=(s.position.x>0?-1:1); miners.push(s); /* miners face the centre while they work */ }
 const haulers=[]; for(let i=0;i<3;i++){ const s=critter([],1.7,{state:'walk',fps:3,states:{walk:[SP+'worker-walk-a.png',SP+'worker-walk-b.png'],idle:[SP+'worker-idle.png']}}); s.userData.t=i*0.66; haulers.push({s,crystal:octo(mp,0xc89a46,0.26,1.1),prev:0}); }
 // contact shadows under every character
 const shadowed=[drM,tally,vellum,...miners,...haulers.map(h=>h.s)];
@@ -429,8 +429,11 @@ const coins=[]; const coinMat=new THREE.MeshStandardMaterial({color:0xd9a850,emi
 const coinGeo=new THREE.CylinderGeometry(0.12,0.12,0.04,16); let coinTimer=1.5;
 function mintCoin(){ const m=new THREE.Mesh(coinGeo,coinMat); m.position.set(fp.x,1.5,fp.z); scene.add(m); coins.push({m,t:0}); }
 // keeper patrol — Dr. Mineral walks a slow round of the lab, overseeing
-const drMPath=[ new THREE.Vector3(7.2,0,-4.6), Z('mines').pos.clone().multiplyScalar(0.82), Z('foundry').pos.clone().multiplyScalar(0.82), Z('ledger').pos.clone().multiplyScalar(0.82) ];
-let drMSeg=0, drMU=0;
+// Dr. Mineral wanders the lab at random — walks to a district, pauses to check the work, then moves on
+const drMSpots=ZONES.map(z=>z.pos.clone().multiplyScalar(0.8));
+let drMTo=drMSpots[0].clone(), drMWatch=0; const drMSpeed=2.1;
+function drMPick(){ let n,g=0; do{ n=drMSpots[Math.floor(Math.random()*drMSpots.length)]; }while(n.distanceTo(drM.position)<2 && drMSpots.length>1 && ++g<8); drMTo=n.clone(); }
+drMPick();
 
 // ---------- click to focus ----------
 const ray=new THREE.Raycaster(), mouse=new THREE.Vector2(); let camFocus=null, downXY=null;
@@ -521,10 +524,12 @@ function loop(){
   tickCritter(tally,dt,t); tickCritter(vellum,dt,t);
   miners.forEach(s=>tickCritter(s,dt,t));
   // keeper patrol (Dr. Mineral oversees the lab) + his hovering assistant orb
-  { const a=drMPath[drMSeg], b=drMPath[(drMSeg+1)%drMPath.length]; drMU+=dt*0.06; if(drMU>=1){drMU=0; drMSeg=(drMSeg+1)%drMPath.length;}
-    const e=drMU<0.5?2*drMU*drMU:1-Math.pow(-2*drMU+2,2)/2;
-    drM.position.x=a.x+(b.x-a.x)*e; drM.position.z=a.z+(b.z-a.z)*e;
-    drM.userData.facing=((b.x-a.x)<0)?-1:1; drM.userData.state=(drMU>0.12&&drMU<0.88)?'walk':'idle'; }
+  { if(drMWatch>0){ drMWatch-=dt; drM.userData.state='idle'; drM.userData.facing=(drM.position.x>0?-1:1); // pausing to check the work, facing the centre
+      if(drMWatch<=0) drMPick(); }
+    else { const dx=drMTo.x-drM.position.x, dz=drMTo.z-drM.position.z, dist=Math.hypot(dx,dz);
+      if(dist<0.3){ drMWatch=3+Math.random()*4; drM.userData.state='idle'; } // arrived at a district — watch a while
+      else { const s=Math.min(dist,drMSpeed*dt); drM.position.x+=dx/dist*s; drM.position.z+=dz/dist*s;
+        drM.userData.facing=(dx<0?-1:1); drM.userData.state='walk'; } } }
   tickCritter(drM,dt,t);
   orb.position.set(drM.position.x+0.85,1.85+Math.sin(t*2.4)*0.16,drM.position.z+0.3); orb.rotation.y=Math.sin(t*1.1)*0.4; orbSh.position.set(orb.position.x,0.05,orb.position.z);
   // token minting: a coin struck every couple of seconds, Foundry -> Vault
