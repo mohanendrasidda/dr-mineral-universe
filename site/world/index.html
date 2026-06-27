@@ -143,12 +143,12 @@ for(let i=0;i<14;i++){const a=Math.random()*6.283,r=6+Math.random()*16,h=2+Math.
 for(let i=0;i<34;i++){ lantern((Math.random()-0.5)*48,2+Math.random()*22,(Math.random()-0.5)*48,0.11+Math.random()*0.05); }
 
 // ---------- P7: real PBR stone on the architecture (carved relief pops under lantern light) ----------
-const TL=new THREE.TextureLoader();
+const TL=new THREE.TextureLoader(); const maxAniso=renderer.capabilities.getMaxAnisotropy();
 function stoneMaps(rx,ry){ const d=TL.load('../../assets/textures/stone_diff.jpg'),n=TL.load('../../assets/textures/stone_nor.jpg'),r=TL.load('../../assets/textures/stone_rough.jpg');
-  d.colorSpace=THREE.SRGBColorSpace; [d,n,r].forEach(t=>{ t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(rx,ry); }); return {d,n,r}; }
+  d.colorSpace=THREE.SRGBColorSpace; [d,n,r].forEach(t=>{ t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(rx,ry); t.anisotropy=maxAniso; }); return {d,n,r}; }
 function applyStone(mat,rx,ry,tint){ const m=stoneMaps(rx,ry); mat.map=m.d; mat.normalMap=m.n; mat.roughnessMap=m.r; mat.normalScale=new THREE.Vector2(1.1,1.1); if(tint!==undefined) mat.color.setHex(tint); mat.roughness=1; mat.metalness=0; mat.needsUpdate=true; }
 applyStone(colMat,1.2,1.6,0x756142);
-applyStone(floor.material,10,10,0x463826);
+applyStone(floor.material,6,6,0x463826);
 applyStone(wall.material,16,6,0x2c2216);
 
 // ---------- zones ----------
@@ -180,17 +180,18 @@ ZONES.forEach(z=>{
 function octo(p,c,h,y){const m=new THREE.Mesh(new THREE.OctahedronGeometry(h,0),new THREE.MeshStandardMaterial({color:0x6a4a22,emissive:c,emissiveIntensity:.4,roughness:.6})); m.position.set(p.x,(y||h*0.9),p.z); m.castShadow=true; scene.add(m); return m;}
 // Mines: a dull crystal seam in a dark rock mound (heavy, dim — not candy gems)
 const mp=Z('mines').pos;
-const mineMound=new THREE.Mesh(new THREE.ConeGeometry(2.3,1.7,7),stone(0x140d08)); mineMound.position.set(mp.x,0.85,mp.z); mineMound.rotation.y=0.4; mineMound.castShadow=true; scene.add(mineMound);
+const rockMat=stone(0x46341e); applyStone(rockMat,2.5,2.5,0x42321e);
+const mineMound=new THREE.Mesh(new THREE.ConeGeometry(2.3,1.7,7),rockMat); mineMound.position.set(mp.x,0.85,mp.z); mineMound.rotation.y=0.4; mineMound.castShadow=true; scene.add(mineMound);
 function rockGeo(r){ const g=new THREE.IcosahedronGeometry(r,1); const p=g.attributes.position; for(let k=0;k<p.count;k++){ const f=0.74+Math.random()*0.46; p.setXYZ(k,p.getX(k)*f,p.getY(k)*f,p.getZ(k)*f);} g.computeVertexNormals(); return g; }
 const seamMat=new THREE.MeshStandardMaterial({color:0x4a341a,emissive:0xa86c26,emissiveIntensity:.22,roughness:.85,metalness:0});
 const mineCrys=[]; for(let i=0;i<6;i++){const a=i/6*3.2-0.8; const m=new THREE.Mesh(rockGeo(0.26+Math.random()*0.26),seamMat); m.position.set(mp.x+Math.cos(a)*0.95,1.0+Math.sin(i*1.7)*0.28,mp.z+Math.sin(a)*0.95); m.rotation.set(i,i*2,0); m.castShadow=true; scene.add(m); mineCrys.push(m);}
 // real-geometry rock chunks breaking up the smooth primitives
-for(let i=0;i<4;i++){const a=Math.random()*6.28,d=2.4+Math.random()*1.6; const r=new THREE.Mesh(rockGeo(0.5+Math.random()*0.55),stone(0x130d07)); r.position.set(mp.x+Math.cos(a)*d,0.4,mp.z+Math.sin(a)*d); r.rotation.set(Math.random()*3,Math.random()*3,0); r.castShadow=true; scene.add(r);}
+for(let i=0;i<4;i++){const a=Math.random()*6.28,d=2.4+Math.random()*1.6; const r=new THREE.Mesh(rockGeo(0.5+Math.random()*0.55),rockMat); r.position.set(mp.x+Math.cos(a)*d,0.4,mp.z+Math.sin(a)*d); r.rotation.set(Math.random()*3,Math.random()*3,0); r.castShadow=true; scene.add(r);}
 // Foundry: a dark stone basin with a low ember that breathes and lights stone from below
 const fp=Z('foundry').pos;
 const forgeBasin=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.8,1.2,18),stone(0x17110b)); forgeBasin.position.set(fp.x,0.6,fp.z); forgeBasin.castShadow=true; scene.add(forgeBasin);
-const ember=new THREE.Mesh(new THREE.SphereGeometry(1.0,20,16),new THREE.MeshStandardMaterial({color:0x2e1404,emissive:0xc24a12,emissiveIntensity:.85,roughness:1})); ember.position.set(fp.x,1.05,fp.z); ember.scale.y=0.45; scene.add(ember);
-const forgeLight=new THREE.PointLight(0xff5a14,6,11,2.4); forgeLight.position.set(fp.x,0.95,fp.z); scene.add(forgeLight);
+const ember=new THREE.Mesh(new THREE.SphereGeometry(1.0,20,16),new THREE.MeshStandardMaterial({color:0x241008,emissive:0x9a4412,emissiveIntensity:.5,roughness:1})); ember.position.set(fp.x,1.0,fp.z); ember.scale.y=0.42; scene.add(ember);
+const forgeLight=new THREE.PointLight(0xdc7826,6,11,2.4); forgeLight.position.set(fp.x,0.9,fp.z); scene.add(forgeLight);
 // Ledger: a dim warm obelisk where the chain of light gathers
 const lp=Z('ledger').pos; const pillar=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.24,4.4,8),new THREE.MeshStandardMaterial({color:0x241a10,emissive:0x8a6024,emissiveIntensity:.28,roughness:.85})); pillar.position.set(lp.x,2.2,lp.z); scene.add(pillar);
 const star=new THREE.Mesh(new THREE.IcosahedronGeometry(0.36,0),new THREE.MeshStandardMaterial({color:0x4a3a1c,emissive:0xd8b06a,emissiveIntensity:.6,roughness:.6})); star.position.set(lp.x,4.6,lp.z); scene.add(star);
@@ -301,7 +302,7 @@ function loop(){
   for(let i=flyers.length-1;i>=0;i--){ const fl=flyers[i]; fl.t+=dt*0.9; const p=lerpV(fp,lp,Math.min(1,fl.t)); fl.m.position.set(p.x,1.0+Math.sin(fl.t*3)*0.5*(1-fl.t),p.z); fl.m.rotation.y+=dt*3;
     if(fl.t>=1){ landBlock(fl.m); flyers.splice(i,1); } }
   // props
-  forgeLight.intensity=4.2+Math.sin(t*1.5)*1.5; ember.material.emissiveIntensity=0.7+Math.sin(t*1.5)*0.22; star.rotation.y+=dt*0.5; star.position.y=4.6+Math.sin(t*1.1)*0.1;
+  forgeLight.intensity=4.0+Math.sin(t*1.5)*1.3; ember.material.emissiveIntensity=0.45+Math.sin(t*1.5)*0.15; star.rotation.y+=dt*0.5; star.position.y=4.6+Math.sin(t*1.1)*0.1;
   seed.rotation.y+=dt*0.25; eye.rotation.z+=dt*0.18; mineCrys.forEach((c,i)=>c.rotation.y+=dt*(0.1+i*0.02));
   ZONES.forEach((z,i)=>z.light.intensity=4+Math.sin(t*1.0+i)*1.1);
   chain.children.forEach((l,i)=>l.material&&(l.rotation.y+=dt*0.4));
