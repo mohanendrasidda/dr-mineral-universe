@@ -48,6 +48,17 @@
   body.cine #cine-skip{display:inline-flex}
   #cine-skip:hover{color:#f6c878}
   body.cine #hud,body.cine #ctr,body.cine a.back,body.cine #hint{opacity:0!important;transition:opacity .4s}
+  /* intro video (campus flyover -> descent), plays before the 3D world */
+  #intro-video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:8;background:#000;opacity:0;transition:opacity .8s;display:none}
+  body.introvid #intro-video{display:block}
+  #intro-splash{position:fixed;inset:0;z-index:9;display:none;align-items:center;justify-content:center;text-align:center;
+    background:radial-gradient(120% 90% at 50% 40%, rgba(22,13,5,.55), #050302)}
+  body.introvid #intro-splash{display:flex}
+  #intro-splash .ik{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.34em;color:rgba(238,196,126,.82)}
+  #intro-splash h2{margin:14px 0 24px;font-family:'Cinzel',serif;font-weight:700;font-size:clamp(28px,5vw,52px);color:#f6e9d0;text-shadow:0 0 50px rgba(245,196,107,.4)}
+  #intro-go{cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.18em;color:#0a0807;border:none;border-radius:8px;padding:15px 32px;background:linear-gradient(180deg,#f6c878,#e0a23a);box-shadow:0 12px 40px -10px rgba(231,162,58,.7)}
+  #intro-splash .ihint{margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:rgba(200,182,150,.5)}
+  body.introvid #cine-skip{display:inline-flex;z-index:10}
 </style>
 </head>
 <body>
@@ -57,6 +68,8 @@
 <div id="grain"></div>
 <div id="cine-bars"></div>
 <div id="cine-cap"></div>
+<video id="intro-video" playsinline preload="auto"></video>
+<div id="intro-splash"><div><div class="ik">THE UNIVERSITY OF NEBRASKA</div><h2>Descend into the Lab</h2><button id="intro-go">&#9654;&nbsp;&nbsp;BEGIN</button><div class="ihint">SOUND ON &middot; ~40 SECONDS &middot; OR SKIP</div></div></div>
 <button id="cine-skip">SKIP &#8614;</button>
 <a class="back" href="../index.html">&#8592; BACK TO THE LANDING</a>
 <div id="hud"><div class="kick">THE UNIVERSITY OF NEBRASKA LAB</div><h1>THE LIVING CHAIN</h1><div class="sub">click a zone &middot; the lab is always working</div></div>
@@ -355,8 +368,21 @@ function startCine(){ CINE.active=true; CINE.t=0; controls.enabled=false; contro
   setTimeout(()=>{ const l=document.getElementById('loading'); if(l)l.style.display='none'; },900); }
 function endCine(){ CINE.active=false; controls.target.set(0,1.4,5); controls.enabled=true; controls.autoRotate=true; document.body.classList.remove('cine'); if(capEl)capEl.style.opacity=0; }
 function skipCine(){ const f=CINE.frames[CINE.frames.length-1]; camera.position.copy(f.p); camera.lookAt(f.l); endCine(); }
-const _sk=document.getElementById('cine-skip'); if(_sk)_sk.addEventListener('click',skipCine);
-if(/[?&]intro=1/.test(location.search)) startCine();
+// video intro (campus flyover -> descent) if present, else the in-engine 3D dive
+function finishVideoIntro(){ const vid=document.getElementById('intro-video'), f=CINE.frames[CINE.frames.length-1];
+  camera.position.copy(f.p); camera.lookAt(f.l);
+  if(vid){ vid.style.opacity=0; try{vid.pause();}catch(e){} }
+  setTimeout(()=>{ if(vid)vid.style.display='none'; document.body.classList.remove('introvid'); endCine(); },800); }
+function startVideoIntro(src){ const vid=document.getElementById('intro-video'), splash=document.getElementById('intro-splash'), go=document.getElementById('intro-go');
+  document.body.classList.add('introvid'); const l=document.getElementById('loading'); if(l)l.style.display='none';
+  if(go)go.addEventListener('click',()=>{ if(splash)splash.style.display='none'; vid.src=src; vid.muted=false; vid.style.opacity=1; const pr=vid.play(); if(pr&&pr.catch)pr.catch(()=>{vid.muted=true;vid.play();}); });
+  if(vid)vid.addEventListener('ended',finishVideoIntro); }
+function unifiedSkip(){ if(document.body.classList.contains('introvid'))finishVideoIntro(); else skipCine(); }
+const _sk=document.getElementById('cine-skip'); if(_sk)_sk.addEventListener('click',unifiedSkip);
+if(/[?&]intro=1/.test(location.search)){
+  const _src='../../assets/video/intro.mp4';
+  fetch(_src,{method:'HEAD'}).then(r=>{ if(r.ok)startVideoIntro(_src); else startCine(); }).catch(()=>startCine());
+}
 
 // ---------- loop ----------
 const clock=new THREE.Clock();
