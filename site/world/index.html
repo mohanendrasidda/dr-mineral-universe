@@ -9,6 +9,8 @@
 <style>
   *{box-sizing:border-box} html,body{margin:0;height:100%;background:#070504;overflow:hidden;font-family:'Spectral',serif;color:#efe3cf}
   #app{position:fixed;inset:0}
+  #vignette{position:fixed;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse 80% 74% at 50% 45%, transparent 50%, rgba(4,3,2,.62) 100%)}
+  #grain{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:.045;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
   .mono{font-family:'IBM Plex Mono',monospace}
   #hud{position:fixed;top:18px;left:20px;z-index:5;pointer-events:none}
   #hud .kick{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.32em;color:rgba(238,196,126,.8)}
@@ -35,6 +37,8 @@
 <body>
 <div id="loading">WAKING THE LAB…</div>
 <div id="app"></div>
+<div id="vignette"></div>
+<div id="grain"></div>
 <a class="back" href="../index.html">&#8592; BACK TO THE LANDING</a>
 <div id="hud"><div class="kick">THE UNIVERSITY OF NEBRASKA LAB</div><h1>THE LIVING CHAIN</h1><div class="sub">click a zone &middot; the lab is always working</div></div>
 <div id="ctr"><div class="lab">BLOCKS FORGED</div><div class="n" id="blocks">0</div><div class="s2" id="chainlen">CHAIN 0</div></div>
@@ -71,7 +75,7 @@ scene.environment=pmrem.fromScene(new RoomEnvironment(),0.5).texture;
 const camera=new THREE.PerspectiveCamera(46,W()/H(),0.1,300); camera.position.set(16,13,19);
 const controls=new OrbitControls(camera,renderer.domElement); controls.target.set(0,1.4,0);
 controls.enableDamping=true; controls.dampingFactor=0.06; controls.minDistance=8; controls.maxDistance=42; controls.maxPolarAngle=Math.PI*0.485;
-controls.autoRotate=true; controls.autoRotateSpeed=0.3;
+controls.autoRotate=true; controls.autoRotateSpeed=0.18;
 
 const composer=new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene,camera));
