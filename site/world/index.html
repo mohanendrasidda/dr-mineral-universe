@@ -104,13 +104,13 @@ renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.toneMappingExposure=0.8;
 document.getElementById('app').appendChild(renderer.domElement);
 
-const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0a0603); scene.fog=new THREE.FogExp2(0x140d06,0.04);
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0a0603); scene.fog=new THREE.FogExp2(0x140d06,0.03);
 // environment map -> real reflections on metal & glass
 const pmrem=new THREE.PMREMGenerator(renderer);
 scene.environment=pmrem.fromScene(new RoomEnvironment(),0.5).texture;
 const camera=new THREE.PerspectiveCamera(46,W()/H(),0.1,300); camera.position.set(16,13,19);
 const controls=new OrbitControls(camera,renderer.domElement); controls.target.set(0,1.4,0);
-controls.enableDamping=true; controls.dampingFactor=0.06; controls.minDistance=8; controls.maxDistance=42; controls.maxPolarAngle=Math.PI*0.485;
+controls.enableDamping=true; controls.dampingFactor=0.06; controls.minDistance=5; controls.maxDistance=70; controls.maxPolarAngle=Math.PI*0.495;
 controls.autoRotate=true; controls.autoRotateSpeed=0.09;
 
 const composer=new EffectComposer(renderer);
@@ -130,9 +130,9 @@ const glassMat=c=>new THREE.MeshPhysicalMaterial({color:c,emissive:c,emissiveInt
 
 // ---------- underground architecture (carved stone, falling into the dark) ----------
 const stone=(c)=>new THREE.MeshStandardMaterial({color:c||0x1f160d,roughness:1,metalness:0});
-const floor=new THREE.Mesh(new THREE.RingGeometry(6.5,27,72,1),stone(0x17100a)); floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
-const wall=new THREE.Mesh(new THREE.CylinderGeometry(28,32,50,64,1,true),stone(0x0b0704)); wall.material.side=THREE.BackSide; wall.position.y=20; scene.add(wall);
-const dome=new THREE.Mesh(new THREE.SphereGeometry(30,44,24,0,Math.PI*2,0,Math.PI*0.5),stone(0x080503)); dome.material.side=THREE.BackSide; dome.position.y=13; scene.add(dome);
+const floor=new THREE.Mesh(new THREE.RingGeometry(6.5,34,80,1),stone(0x17100a)); floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
+const wall=new THREE.Mesh(new THREE.CylinderGeometry(35,39,56,64,1,true),stone(0x0b0704)); wall.material.side=THREE.BackSide; wall.position.y=22; scene.add(wall);
+const dome=new THREE.Mesh(new THREE.SphereGeometry(37,44,24,0,Math.PI*2,0,Math.PI*0.5),stone(0x080503)); dome.material.side=THREE.BackSide; dome.position.y=14; scene.add(dome);
 // the shaft of discovered daylight
 const shaftCone=new THREE.Mesh(new THREE.ConeGeometry(6.5,36,64,1,true),new THREE.MeshBasicMaterial({color:0xffe2a8,transparent:true,opacity:0.038,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending})); shaftCone.position.set(0,18,0); scene.add(shaftCone);
 const pool=new THREE.Mesh(new THREE.CircleGeometry(4.6,44),new THREE.MeshBasicMaterial({color:0xffe2a8,transparent:true,opacity:0.05,depthWrite:false,blending:THREE.AdditiveBlending})); pool.rotation.x=-Math.PI/2; pool.position.y=0.06; scene.add(pool);
@@ -148,7 +148,7 @@ function lantern(x,y,z,s,light){ const m=new THREE.Mesh(new THREE.SphereGeometry
 const colGeo=new THREE.CylinderGeometry(0.4,0.48,2.2,8);
 const archGeo=new THREE.TorusGeometry(1.4,0.22,5,14,Math.PI); // half-ring arch
 const balGeo=new THREE.CylinderGeometry(0.07,0.07,0.66,6);
-const tiers=[{ry:2.4,rad:25},{ry:6.7,rad:23.2},{ry:10.8,rad:21.4},{ry:14.7,rad:19.4},{ry:18.4,rad:17.2}];
+const tiers=[{ry:2.4,rad:31},{ry:6.9,rad:29},{ry:11.2,rad:27},{ry:15.3,rad:24.6},{ry:19.2,rad:22}];
 tiers.forEach(t=>{ t.cols=Math.round(2*Math.PI*(t.rad-0.3)/2.8); });
 let totalCols=0,totalBal=0,totalArch=0; tiers.forEach(t=>{ totalCols+=t.cols; totalBal+=t.cols*3; totalArch+=t.cols; });
 const colInst=new THREE.InstancedMesh(colGeo,colMat,totalCols);
@@ -175,7 +175,7 @@ colInst.instanceMatrix.needsUpdate=true; archInst.instanceMatrix.needsUpdate=tru
 // stalactites + scattered deep lanterns for atmospheric depth
 for(let i=0;i<14;i++){const a=Math.random()*6.283,r=6+Math.random()*16,h=2+Math.random()*5;
   const m=new THREE.Mesh(new THREE.ConeGeometry(0.4+Math.random()*0.7,h,6),stone(0x0f0a06)); m.position.set(Math.cos(a)*r,26-h/2,Math.sin(a)*r); m.rotation.x=Math.PI; scene.add(m);}
-for(let i=0;i<34;i++){ lantern((Math.random()-0.5)*48,2+Math.random()*22,(Math.random()-0.5)*48,0.11+Math.random()*0.05); }
+for(let i=0;i<42;i++){ lantern((Math.random()-0.5)*60,2+Math.random()*24,(Math.random()-0.5)*60,0.11+Math.random()*0.05); }
 
 // ---------- the central WELL: galleries falling downward into the dark ----------
 const wellTiers=[{ry:-1.2,rad:6.0},{ry:-4.8,rad:5.2},{ry:-8.4,rad:4.4},{ry:-12.2,rad:3.6},{ry:-16.4,rad:2.9}];
@@ -353,19 +353,20 @@ const _ninscr=new THREE.Mesh(new THREE.PlaneGeometry(2.05,2.6),new THREE.MeshSta
 _ninscr.position.set(0,1.95,0.235); _ninscr.rotation.x=-0.06;
 const _nlight=new THREE.PointLight(0xffb262,2.2,6,2.4); _nlight.position.set(0,3.3,1.3);
 noticeGroup.add(_nbase,_nslab,_ninscr,_nlight);
-noticeGroup.position.set(-5,0,7); noticeGroup.rotation.y=0.73; scene.add(noticeGroup);
-const _nsh=groundShadow(3.0); _nsh.position.set(-5,0.05,7);
+noticeGroup.position.set(-8,0,5); noticeGroup.rotation.y=1.0; scene.add(noticeGroup);
+const _nsh=groundShadow(3.0); _nsh.position.set(-8,0.05,5);
 _ninscr.userData.panel={step:'THE LAB · THE WORK',title:'What the lab is building',c:0xe6c886,pos:noticeGroup.position,
   mean:'THIS CYCLE — the blockchain core is being forged.\n\nSOON — the first version of the tokenomics ecosystem, and a test-token dApp on the testnet.\n\nHere the lab posts its releases and honours its contributors.'};
-// the keeper's assistant — a small ornate brass lantern with a warm glowing core (drifts beside him)
+// the keeper's assistant — a small glowing teal creature with two antenna curls + eyes; always drifts beside him
 const orb=new THREE.Group();
-const _obrass=new THREE.MeshStandardMaterial({color:0x6a4a22,metalness:1,roughness:.35,emissive:0x2a1a08,emissiveIntensity:.2});
-orb.add(new THREE.Mesh(new THREE.SphereGeometry(0.1,16,16),new THREE.MeshStandardMaterial({color:0x3a2410,emissive:0xffb24a,emissiveIntensity:1.1,roughness:.5})));
-const _or1=new THREE.Mesh(new THREE.TorusGeometry(0.13,0.012,6,20),_obrass); const _or2=_or1.clone(); _or2.rotation.y=Math.PI/2;
-const _ocap=new THREE.Mesh(new THREE.ConeGeometry(0.05,0.08,8),_obrass); _ocap.position.y=0.16;
-const _ofin=new THREE.Mesh(new THREE.SphereGeometry(0.028,8,8),_obrass); _ofin.position.y=-0.15;
-orb.add(_or1,_or2,_ocap,_ofin); orb.add(new THREE.PointLight(0xffa848,0.6,3.2,2.2)); scene.add(orb);
-const orbSh=groundShadow(0.55);
+const _atc=new THREE.MeshStandardMaterial({color:0x07343a,emissive:0x2fe0d0,emissiveIntensity:1.25,roughness:.4,metalness:.2});
+orb.add(new THREE.Mesh(new THREE.SphereGeometry(0.22,18,16),_atc));
+function _antenna(side){ const a=new THREE.Mesh(new THREE.TorusGeometry(0.12,0.02,6,16,Math.PI*1.05),_atc); a.position.set(side*0.09,0.19,0); a.rotation.z=side*0.7; a.rotation.y=side*0.35; return a; }
+orb.add(_antenna(1),_antenna(-1));
+const _eyeMat=new THREE.MeshStandardMaterial({color:0x041a1a,roughness:.3});
+const _e1=new THREE.Mesh(new THREE.SphereGeometry(0.038,8,8),_eyeMat); _e1.position.set(0.075,0.03,0.2); const _e2=_e1.clone(); _e2.position.set(-0.075,0.03,0.2);
+orb.add(_e1,_e2); orb.add(new THREE.PointLight(0x40e0d0,1.0,4.5,2)); scene.add(orb);
+const orbSh=groundShadow(0.6);
 drM.userData.panel={step:'THE KEEPER',title:'Dr. Mineral',c:0xd8b06a,scroll:true,
   mean:'Above ground, an ordinary campus squirrel. Below it, the keeper of this lab — he sees that every contribution is mined, forged onto the chain, and remembered, so no one is ever forgotten.\n\nDIRECTIVE, this cycle — harden the chain core. Miners to the seam. Foundry, keep forging.'};
 // token minting — coins struck at the Foundry, carried to the Vault
@@ -399,7 +400,7 @@ const CINE={active:false,t:0,dur:17.0,caps:true};
 // smooth spline: shaft descent -> burst in -> pull WAY back (whole lab) -> slow orbit of the premises -> spiral into the Mines
 const _pts=[ Vc(0,72,1), Vc(1,34,5), Vc(5,16,22), Vc(12,26,37), Vc(-26,23,29), Vc(-39,20,-5), Vc(-14,23,-38), Vc(21,21,-31), Vc(35,17,16), Vc(12,9,21), Vc(3.5,5,16) ];
 const _looks=[ Vc(0,0,6), Vc(0,5,11), Vc(0,2,2), Vc(0,3.5,0), Vc(0,2,0.01), Vc(0,2,-0.01), Vc(0,2,0.02), Vc(0,2,-0.02), Vc(0,2,0), Vc(0,1.6,7), Vc(0,1.3,9.2) ];
-const _fog=[ 0.05, 0.045, 0.028, 0.012, 0.011, 0.011, 0.011, 0.012, 0.018, 0.03, 0.04 ];
+const _fog=[ 0.05, 0.045, 0.028, 0.011, 0.01, 0.01, 0.01, 0.011, 0.016, 0.025, 0.03 ];
 const _posCurve=new THREE.CatmullRomCurve3(_pts,false,'catmullrom',0.35);
 const _lookCurve=new THREE.CatmullRomCurve3(_looks,false,'catmullrom',0.35);
 const _cp=new THREE.Vector3(),_cl=new THREE.Vector3();
@@ -424,7 +425,7 @@ function updateCaption(tt){ if(CINE.caps===false)return; let c=''; for(const k o
   if(c!==capCur){ capCur=c; if(capEl){ capEl.style.opacity=0; setTimeout(()=>{capEl.textContent=c; capEl.style.opacity=c?1:0;},170);} } }
 function startCine(caps){ CINE.active=true; CINE.t=0; CINE.caps=(caps!==false); controls.enabled=false; controls.autoRotate=false; document.body.classList.add('cine');
   setTimeout(()=>{ const l=document.getElementById('loading'); if(l)l.style.display='none'; },900); }
-function endCine(){ CINE.active=false; controls.target.set(0,1.4,5); controls.enabled=true; controls.autoRotate=true; document.body.classList.remove('cine'); if(capEl)capEl.style.opacity=0; if(scene.fog)scene.fog.density=0.04; fadeAudio(document.getElementById('intro-audio'),0,2500,true); }
+function endCine(){ CINE.active=false; controls.target.set(0,1.4,5); controls.enabled=true; controls.autoRotate=true; document.body.classList.remove('cine'); if(capEl)capEl.style.opacity=0; if(scene.fog)scene.fog.density=0.03; fadeAudio(document.getElementById('intro-audio'),0,2500,true); }
 function fadeAudio(el,to,ms,stop){ if(!el)return; const from=el.volume||0,t0=performance.now();
   (function step(now){ const k=Math.min(1,(now-t0)/ms); el.volume=Math.max(0,Math.min(1,from+(to-from)*k)); if(k<1)requestAnimationFrame(step); else if(stop){try{el.pause();}catch(e){}} })(performance.now()); }
 function startScore(){ const a=document.getElementById('intro-audio'); if(!a)return; a.src='../../assets/audio/intro-score.mp3'; a.volume=0; const p=a.play(); if(p&&p.then)p.then(()=>fadeAudio(a,0.5,1800)).catch(()=>{}); else fadeAudio(a,0.5,1800); }  // calm under the campus
@@ -470,7 +471,7 @@ function loop(){
     drM.position.x=a.x+(b.x-a.x)*e; drM.position.z=a.z+(b.z-a.z)*e;
     drM.userData.facing=((b.x-a.x)<0)?-1:1; drM.userData.state=(drMU>0.12&&drMU<0.88)?'walk':'idle'; }
   tickCritter(drM,dt,t);
-  orb.position.set(drM.position.x+0.7,1.95+Math.sin(t*2)*0.12,drM.position.z+0.25); orb.rotation.y+=dt*1.6; orbSh.position.set(orb.position.x,0.05,orb.position.z);
+  orb.position.set(drM.position.x+0.85,1.85+Math.sin(t*2.4)*0.16,drM.position.z+0.3); orb.rotation.y=Math.sin(t*1.1)*0.4; orbSh.position.set(orb.position.x,0.05,orb.position.z);
   // token minting: a coin struck every couple of seconds, Foundry -> Vault
   coinTimer-=dt; if(coinTimer<=0){ coinTimer=2.2+Math.random()*1.6; mintCoin(); }
   for(let i=coins.length-1;i>=0;i--){ const cn=coins[i]; cn.t+=dt*0.5; const p=lerpV(fp,Z('vault').pos,Math.min(1,cn.t)); cn.m.position.set(p.x,1.4+Math.sin(cn.t*Math.PI)*1.1,p.z); cn.m.rotation.y+=dt*5; cn.m.rotation.z+=dt*3; if(cn.t>=1){ scene.remove(cn.m); coins.splice(i,1); } }
