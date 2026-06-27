@@ -356,10 +356,11 @@ const SP='../../assets/sprites/';
 const drM=critter([],2.0,{state:'idle',fps:4,states:{idle:[SP+'drmineral-idle.png'],walk:[SP+'drmineral-walk-a.png']}}); drM.position.set(7.2,0,-4.6);
 const tally=critter([],1.5,{state:'idle',fps:3,states:{idle:[SP+'tally-idle.png',SP+'tally-idle.png',SP+'tally-idle.png',SP+'tally-hop.png']}}); tally.position.set(lp.x+1.4,0,lp.z+0.4); tally.userData.facing=(tally.position.x>0?-1:1);
 const vellum=critter([],1.7,{state:'idle',fps:2,states:{idle:[SP+'vellum-idle.png']}}); vellum.position.set(vp.x+1.5,0,vp.z+0.2); vellum.userData.facing=(vellum.position.x>0?-1:1);
-const miners=[]; for(let i=0;i<3;i++){ const a=i/3*6.28+0.5; const s=critter([],1.7,{state:'mine',fps:2,states:{idle:[SP+'worker-idle.png'],mine:[SP+'worker-mine-a.png',SP+'worker-mine-b.png']}}); s.position.set(mp.x+Math.cos(a)*1.7,0,mp.z+Math.sin(a)*1.7); s.userData.facing=(s.position.x>0?-1:1); miners.push(s); /* miners face the centre while they work */ }
-const haulers=[]; for(let i=0;i<3;i++){ const s=critter([],1.7,{state:'walk',fps:3,states:{walk:[SP+'worker-walk-a.png',SP+'worker-walk-b.png'],idle:[SP+'worker-idle.png']}}); s.userData.t=i*0.66; haulers.push({s,crystal:octo(mp,0xc89a46,0.26,1.1),prev:0}); }
+// SMALL CAST FIRST — one miner only (stationary, working the seam). We stabilise 4 characters before scaling up.
+const miners=[]; { const s=critter([],1.7,{state:'mine',fps:2,states:{idle:[SP+'worker-idle.png'],mine:[SP+'worker-mine-a.png',SP+'worker-mine-b.png']}}); s.position.set(mp.x+1.7,0,mp.z+0.3); s.userData.facing=(s.position.x>mp.x?-1:1); miners.push(s); }
+const haulers=[]; let forgeTimer=4; // haulers removed for now (they clipped through props); chain kept alive by a timer
 // contact shadows under every character
-const shadowed=[drM,tally,vellum,...miners,...haulers.map(h=>h.s)];
+const shadowed=[drM,tally,vellum,...miners];
 const shadows=shadowed.map(s=>groundShadow(s.userData.h*0.85));
 workstation(mp.x+2.8, mp.z+1.2, -0.7); workstation(fp.x-2.4, fp.z+1.8, 0.9);  // grounded benches (shadowTex ready now)
 function crate(x,z,s){ const m=new THREE.Mesh(new THREE.BoxGeometry(s,s,s),stone(0x281c10)); m.position.set(x,s/2,z); m.rotation.y=Math.random()*3; m.castShadow=true; scene.add(m); const sh=groundShadow(s*1.7); sh.position.set(x,0.05,z); return m; }
@@ -429,12 +430,12 @@ const coins=[]; const coinMat=new THREE.MeshStandardMaterial({color:0xd9a850,emi
 const coinGeo=new THREE.CylinderGeometry(0.12,0.12,0.04,16); let coinTimer=1.5;
 function mintCoin(){ const m=new THREE.Mesh(coinGeo,coinMat); m.position.set(fp.x,1.5,fp.z); scene.add(m); coins.push({m,t:0}); }
 // keeper patrol — Dr. Mineral walks a slow round of the lab, overseeing
-// Dr. Mineral patrols the district RING — walks the bridges to the ADJACENT district only (never a chord across
-// the central light / the well), pauses to watch the work, and sometimes reverses. Outer radius clears the props.
-const drMSpots=ZONES.map(z=>z.pos.clone().multiplyScalar(1.18));
-drM.position.copy(drMSpots[0]);
-let drMIdx=0, drMDir=1, drMFrom=drMSpots[0].clone(), drMTo=drMSpots[0].clone(), drMU=0, drMWalking=false, drMWatch=2.5; const drMSpeed=2.8;
-function drMNext(){ drMIdx=(drMIdx+drMDir+ZONES.length)%ZONES.length; drMFrom.copy(drM.position); drMTo.copy(drMSpots[drMIdx]); drMU=0; drMWalking=true; }
+// Dr. Mineral patrols a CIRCLE around the whole district ring — radius clears every platform (≤12) and the central
+// well (6.5), so he goes AROUND each district, never onto/through one. Pauses to inspect; sometimes reverses.
+const DRAD=13.2, STEP=2*Math.PI/5, drMAngles=ZONES.map((z,i)=>Math.PI/2 - i*STEP);
+let drMAng=drMAngles[0], drMDir=1, drMFromAng=drMAngles[0], drMU=0, drMWalking=false, drMWatch=2.5; const drMSpeed=3.0;
+drM.position.set(Math.cos(drMAng)*DRAD,0,Math.sin(drMAng)*DRAD);
+function drMNext(){ drMFromAng=drMAng; drMU=0; drMWalking=true; }
 
 // ---------- click to focus ----------
 const ray=new THREE.Raycaster(), mouse=new THREE.Vector2(); let camFocus=null, downXY=null;
@@ -525,24 +526,20 @@ function loop(){
   tickCritter(tally,dt,t); tickCritter(vellum,dt,t);
   miners.forEach(s=>tickCritter(s,dt,t));
   // keeper patrol (Dr. Mineral oversees the lab) + his hovering assistant orb
-  { if(drMWalking){ const dx=drMTo.x-drMFrom.x, dz=drMTo.z-drMFrom.z, len=Math.hypot(dx,dz)||1;
-      drMU+=dt*drMSpeed/len; if(drMU>=1){ drMU=1; drMWalking=false; drMWatch=3+Math.random()*4; if(Math.random()<0.35) drMDir*=-1; }
-      const e=drMU<0.5?2*drMU*drMU:1-Math.pow(-2*drMU+2,2)/2; drM.position.x=drMFrom.x+dx*e; drM.position.z=drMFrom.z+dz*e;
-      drM.userData.facing=(dx<0?-1:1); drM.userData.state='walk'; }
-    else { drMWatch-=dt; drM.userData.state='idle'; drM.userData.facing=(drM.position.x>0?-1:1); // watch the work, facing inward toward the centre
+  { if(drMWalking){ drMU+=dt*drMSpeed/(DRAD*STEP);
+      if(drMU>=1){ drMU=1; drMWalking=false; drMWatch=3+Math.random()*3.5; if(Math.random()<0.3) drMDir*=-1; }
+      const e=drMU<0.5?2*drMU*drMU:1-Math.pow(-2*drMU+2,2)/2; drMAng=drMFromAng+drMDir*STEP*e;
+      const px=Math.cos(drMAng)*DRAD, pz=Math.sin(drMAng)*DRAD;
+      drM.userData.facing=((px-drM.position.x)<0?-1:1); drM.position.x=px; drM.position.z=pz; drM.userData.state='walk'; }
+    else { drMWatch-=dt; drM.userData.state='idle'; drM.userData.facing=(drM.position.x>0?-1:1); // inspect the district, facing inward
       if(drMWatch<=0) drMNext(); } }
   tickCritter(drM,dt,t);
   orb.position.set(drM.position.x+0.85,1.85+Math.sin(t*2.4)*0.16,drM.position.z+0.3); orb.rotation.y=Math.sin(t*1.1)*0.4; orbSh.position.set(orb.position.x,0.05,orb.position.z);
   // token minting: a coin struck every couple of seconds, Foundry -> Vault
   coinTimer-=dt; if(coinTimer<=0){ coinTimer=2.2+Math.random()*1.6; mintCoin(); }
   for(let i=coins.length-1;i>=0;i--){ const cn=coins[i]; cn.t+=dt*0.5; const p=lerpV(fp,Z('vault').pos,Math.min(1,cn.t)); cn.m.position.set(p.x,1.4+Math.sin(cn.t*Math.PI)*1.1,p.z); cn.m.rotation.y+=dt*5; cn.m.rotation.z+=dt*3; if(cn.t>=1){ scene.remove(cn.m); coins.splice(i,1); } }
-  // haulers Mine->Foundry->Mine (walk cycle + carried crystal)
-  haulers.forEach(h=>{ h.s.userData.t+=dt*0.11; const seg=h.s.userData.t%2; const carry=seg<1;
-    const from=carry?mp:fp, to=carry?fp:mp, f=carry?seg:seg-1;
-    h.s.position.x=from.x+(to.x-from.x)*f; h.s.position.z=from.z+(to.z-from.z)*f;
-    h.s.userData.facing=((to.x-from.x)<0)?-1:1; tickCritter(h.s,dt,t);
-    h.crystal.visible=false; // no floating token beside them — the carry is read from the crate in the art + the forge→ledger flyer
-    if(h.prev<1&&seg>=1) forgeBlock(); h.prev=seg; });
+  // (haulers removed while we stabilise the small cast) — keep the chain alive: forge a block to the Ledger on a timer
+  forgeTimer-=dt; if(forgeTimer<=0){ forgeTimer=5+Math.random()*3; forgeBlock(); }
   // flying blocks forge->ledger
   for(let i=flyers.length-1;i>=0;i--){ const fl=flyers[i]; fl.t+=dt*0.9; const p=lerpV(fp,lp,Math.min(1,fl.t)); fl.m.position.set(p.x,1.0+Math.sin(fl.t*3)*0.5*(1-fl.t),p.z); fl.m.rotation.y+=dt*3;
     if(fl.t>=1){ landBlock(fl.m); flyers.splice(i,1); } }
