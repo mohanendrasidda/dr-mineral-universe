@@ -289,12 +289,6 @@ const wp=Z('watch').pos; const eye=new THREE.Mesh(new THREE.TorusGeometry(0.9,0.
 
 // ---------- billboard sprites ----------
 const texLoader=new THREE.TextureLoader();
-const URLS={
-  hero:'../../assets/keyed/char-drmineral-hero-v1.png',
-  tally:'../../assets/keyed/char-tally-v1.png',
-  vellum:'../../assets/keyed/char-vellum-v1.png',
-  walk:'../sprites/walk-a.png',
-};
 let loaded=0; function ready(){ if(++loaded>=2){ const l=document.getElementById('loading'); if(l&&l.textContent==='WAKING THE LAB…')l.style.display='none'; } }
 function sprite(url,h){ const tex=texLoader.load(url,()=>ready()); tex.colorSpace=THREE.SRGBColorSpace;
   const m=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
@@ -308,27 +302,34 @@ function groundShadow(w){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,w*0.58
 // ---------- animated 2.5D sprite system (everyone is an animated sprite) ----------
 const FR={}; function tex(url){ if(!FR[url]){ const t=texLoader.load(url,()=>ready()); t.colorSpace=THREE.SRGBColorSpace; FR[url]=t; } return FR[url]; }
 function critter(urls,h,opts){ opts=opts||{};
-  const textures=urls.map(tex);
-  const m=new THREE.SpriteMaterial({map:textures[0],transparent:true,depthWrite:false,fog:true,alphaTest:0.02,color:new THREE.Color(0x6e6650)});
+  // per-state frame sets: opts.states = {idle:[...urls], walk:[...], mine:[...]}
+  const stateFrames={}; if(opts.states){ for(const k in opts.states) stateFrames[k]=opts.states[k].map(tex); }
+  const initState=opts.state||(opts.states?Object.keys(opts.states)[0]:'idle');
+  const textures=(urls&&urls.length)?urls.map(tex):(stateFrames[initState]||[]);
+  const fr0=(stateFrames[initState]&&stateFrames[initState].length)?stateFrames[initState]:textures;
+  const m=new THREE.SpriteMaterial({map:fr0[0],transparent:true,depthWrite:false,fog:true,alphaTest:0.02,color:new THREE.Color(opts.tint!==undefined?opts.tint:0xc0b69e)});
   const s=new THREE.Sprite(m); s.scale.set(h,h,1);
-  s.userData=Object.assign({h,textures,frame:0,ft:0,fps:opts.fps||5,state:opts.state||'idle',phase:Math.random()*6.28,facing:1,baseY:opts.baseY||0},opts);
-  scene.add(s); return s; }
+  s.userData=Object.assign({h,textures,stateFrames,frame:0,ft:0,fps:opts.fps||5,state:initState,phase:Math.random()*6.28,facing:1,baseY:opts.baseY||0,aspect:undefined},opts);
+  s.userData.state=initState; scene.add(s); return s; }
 function tickCritter(s,dt,t){ const u=s.userData;
-  if(u.textures.length>1 && u.state==='walk'){ u.ft+=dt; const spf=1/u.fps; while(u.ft>=spf){u.ft-=spf;u.frame=(u.frame+1)%u.textures.length;} } else u.frame=0;
-  if(s.material.map!==u.textures[u.frame]){ s.material.map=u.textures[u.frame]; s.material.needsUpdate=true; }
-  let bob=0,lean=0,sx=1,sy=1; const ph=u.phase;
+  const fr=(u.stateFrames&&u.stateFrames[u.state]&&u.stateFrames[u.state].length)?u.stateFrames[u.state]:u.textures;
+  let bob=0,lean=0,sx=1,sy=1; const ph=u.phase; let fi=u.frame;
   if(u.state==='walk'){ // two footfalls per cycle: body rises mid-stride, dips + squashes on each step (weight)
     const sp=(u.fps||4)*1.05, w=t*sp*Math.PI+ph; const step=Math.abs(Math.sin(w)), foot=1-step;
-    bob=(step-0.5)*0.06; sy=1-foot*0.05; sx=1+foot*0.04; lean=Math.sin(w)*0.05+0.035; }
-  else if(u.state==='mine'){ // a real swing: wind up -> strike down -> recoil -> rest
+    bob=(step-0.5)*0.06; sy=1-foot*0.05; sx=1+foot*0.04; lean=Math.sin(w)*0.05+0.035;
+    if(fr.length>1){ u.ft+=dt; const spf=1/(u.fps||4); while(u.ft>=spf){u.ft-=spf;u.frame=(u.frame+1)%fr.length;} } fi=u.frame%fr.length; }
+  else if(u.state==='mine'){ // a real swing: wind-up frame while raising, strike frame on the hit — synced to the motion
     const cyc=(t*0.78+ph*0.16)%1; let raise=0,strike=0;
     if(cyc<0.46){ const k=cyc/0.46; raise=k*k; } else if(cyc<0.63){ const k=(cyc-0.46)/0.17; raise=1-k; strike=Math.sin(k*Math.PI); }
-    bob=-strike*0.10; lean=-raise*0.10+strike*0.15; sy=1-strike*0.12; sx=1+strike*0.10; }
-  else { // idle: slow breathing + a slow weight-shift, never mechanical
-    const br=Math.sin(t*1.5+ph); sy=1+br*0.022; bob=br*0.014; lean=Math.sin(t*0.33+ph)*0.025+Math.sin(t*0.1+ph)*0.018; }
-  // flip via per-sprite scale.x sign — never mutate the shared texture's UV
-  const fx=(u.facing<0?-1:1);
-  s.scale.set(u.h*sx*fx, u.h*sy, 1); s.position.y=u.h*sy/2+bob+(u.baseY||0); s.material.rotation=lean*fx; }
+    bob=-strike*0.10; lean=-raise*0.10+strike*0.15; sy=1-strike*0.12; sx=1+strike*0.10;
+    fi=(fr.length>=2)?(cyc<0.46?0:Math.min(1,fr.length-1)):0; }
+  else { // idle: slow breathing + a slow weight-shift; cycles frames if the state has more than one (e.g. a wing-flick)
+    const br=Math.sin(t*1.5+ph); sy=1+br*0.022; bob=br*0.014; lean=Math.sin(t*0.33+ph)*0.025+Math.sin(t*0.1+ph)*0.018;
+    if(fr.length>1){ u.ft+=dt; const spf=1/(u.fps||2.4); while(u.ft>=spf){u.ft-=spf;u.frame=(u.frame+1)%fr.length;} } fi=u.frame%fr.length; }
+  if(s.material.map!==fr[fi]){ s.material.map=fr[fi]; s.material.needsUpdate=true; }
+  if(u.aspect===undefined){ const im=fr[fi].image; if(im&&im.width) u.aspect=im.width/im.height; } // lock real aspect once loaded
+  const asp=u.aspect||1, fx=(u.facing<0?-1:1);
+  s.scale.set(u.h*asp*sx*fx, u.h*sy, 1); s.position.y=u.h*sy/2+bob+(u.baseY||0); s.material.rotation=lean*fx; }
 
 // --- UV-flipbook player for AI-generated walk/work sprite SHEETS (one image, cols x rows grid) ---
 // performant: the atlas uploads to VRAM once; we only change the texture offset per frame, so a whole crew runs at 60fps.
@@ -344,14 +345,14 @@ function tickSheet(s,dt){ const u=s.userData; u.ft+=dt; const spf=1/u.fps; while
   s.material.map.offset.set(col/u.cols, 1-(row+1)/u.rows);
   const fx=u.facing<0?-1:1; s.scale.set(u.h*fx,u.h,1); s.position.y=u.h/2+(u.baseY||0); }
 
-const WALK=['../sprites/walk-a.png','../sprites/walk-b.png'];
-// the cast — all consistent animated 2.5D sprites
+const SP='../../assets/sprites/';
+// the cast — consistent animated 2.5D sprites, per-state frames keyed from the painterly art
 // keeper: small, off-centre, half-lit in the gloom (not a spotlit mascot)
-const drM=critter(['../../assets/keyed/char-drmineral-hero-v1.png'],2.0,{state:'idle'}); drM.position.set(7.2,0,-4.6); drM.material.color.setHex(0x665c46);
-const tally=critter(['../../assets/keyed/char-tally-v1.png'],1.4,{state:'idle'}); tally.position.set(lp.x+1.4,0,lp.z+0.4);
-const vellum=critter(['../../assets/keyed/char-vellum-v1.png'],1.55,{state:'idle',fps:2}); vellum.position.set(vp.x+1.5,0,vp.z+0.2);
-const miners=[]; for(let i=0;i<3;i++){ const a=i/3*6.28+0.5; const s=critter(WALK,1.6,{state:'mine',fps:2}); s.position.set(mp.x+Math.cos(a)*1.7,0,mp.z+Math.sin(a)*1.7); s.userData.facing=(Math.cos(a)<0?-1:1); miners.push(s); }
-const haulers=[]; for(let i=0;i<3;i++){ const s=critter(WALK,1.6,{state:'walk',fps:3}); s.userData.t=i*0.66; haulers.push({s,crystal:octo(mp,0xc89a46,0.26,1.1),prev:0}); }
+const drM=critter([],2.0,{state:'idle',fps:4,states:{idle:[SP+'drmineral-idle.png'],walk:[SP+'drmineral-walk-a.png']}}); drM.position.set(7.2,0,-4.6);
+const tally=critter([],1.5,{state:'idle',fps:3,states:{idle:[SP+'tally-idle.png',SP+'tally-idle.png',SP+'tally-idle.png',SP+'tally-hop.png']}}); tally.position.set(lp.x+1.4,0,lp.z+0.4);
+const vellum=critter([],1.7,{state:'idle',fps:2,states:{idle:[SP+'vellum-idle.png']}}); vellum.position.set(vp.x+1.5,0,vp.z+0.2);
+const miners=[]; for(let i=0;i<3;i++){ const a=i/3*6.28+0.5; const s=critter([],1.7,{state:'mine',fps:2,states:{idle:[SP+'worker-idle.png'],mine:[SP+'worker-mine-a.png',SP+'worker-mine-b.png']}}); s.position.set(mp.x+Math.cos(a)*1.7,0,mp.z+Math.sin(a)*1.7); s.userData.facing=(Math.cos(a)<0?-1:1); miners.push(s); }
+const haulers=[]; for(let i=0;i<3;i++){ const s=critter([],1.7,{state:'walk',fps:3,states:{walk:[SP+'worker-walk-a.png',SP+'worker-walk-b.png'],idle:[SP+'worker-idle.png']}}); s.userData.t=i*0.66; haulers.push({s,crystal:octo(mp,0xc89a46,0.26,1.1),prev:0}); }
 // contact shadows under every character
 const shadowed=[drM,tally,vellum,...miners,...haulers.map(h=>h.s)];
 const shadows=shadowed.map(s=>groundShadow(s.userData.h*0.85));
