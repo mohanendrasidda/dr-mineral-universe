@@ -314,13 +314,10 @@ function critter(urls,h,opts){ opts=opts||{};
 function tickCritter(s,dt,t){ const u=s.userData;
   const fr=(u.stateFrames&&u.stateFrames[u.state]&&u.stateFrames[u.state].length)?u.stateFrames[u.state]:u.textures;
   let bob=0,lean=0,sx=1,sy=1; const ph=u.phase; let fi=u.frame;
-  if(u.state==='walk'){ // MOVEMENT-DRIVEN: frames + bob advance with the DISTANCE moved, so feet track the ground (no moonwalk/glide)
-    if(!u._pp) u._pp=new THREE.Vector3(s.position.x,0,s.position.z);
-    const moved=Math.hypot(s.position.x-u._pp.x, s.position.z-u._pp.z); u._pp.set(s.position.x,0,s.position.z);
-    u._ph=((u._ph||0)+moved/(u.stride||0.85))%1; const w=u._ph*6.2832;
-    const step=Math.abs(Math.sin(w)), foot=1-step;
-    bob=(step-0.5)*0.07; sy=1-foot*0.06; sx=1+foot*0.05; lean=Math.sin(w)*0.055+0.03;
-    fi=(fr.length>1)?Math.floor(u._ph*fr.length)%fr.length:0; }
+  if(u.state==='walk'){ // two footfalls per cycle: body rises mid-stride, dips + squashes on each step (weight)
+    const sp=(u.fps||4)*1.05, w=t*sp*Math.PI+ph; const step=Math.abs(Math.sin(w)), foot=1-step;
+    bob=(step-0.5)*0.06; sy=1-foot*0.05; sx=1+foot*0.04; lean=Math.sin(w)*0.05+0.035;
+    if(fr.length>1){ u.ft+=dt; const spf=1/(u.fps||4); while(u.ft>=spf){u.ft-=spf;u.frame=(u.frame+1)%fr.length;} } fi=u.frame%fr.length; }
   else if(u.state==='mine'){ // a real swing: wind-up frame while raising, strike frame on the hit — synced to the motion
     const cyc=(t*0.78+ph*0.16)%1; let raise=0,strike=0;
     if(cyc<0.46){ const k=cyc/0.46; raise=k*k; } else if(cyc<0.63){ const k=(cyc-0.46)/0.17; raise=1-k; strike=Math.sin(k*Math.PI); }
