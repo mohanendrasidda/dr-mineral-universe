@@ -67,5 +67,21 @@ Many `assets/raw/` renders wrap the squirrel in a literal chain (a blockchain pu
 - The site surfaces, in-world: **the team** (each teammate an animal avatar working/mining), **releases/versions** (the world growing), **announcements** (voiced by Dr. Mineral or his assistant), and **reward / bug-bounty winners** (honored in the Ledger / Hall of Contributors), plus **the story** of the lab and Dr. Mineral.
 - Still Sidd's IP — just no longer firewalled from his own venture. (The old "keep separate from UNL/cohort" rule and the influence-tactics exclusion are retired here; if any real *third-party/institutional* IP shows up, flag it.)
 
+## ⚠️ Rendering reality — INTERNALIZED (do not re-chase)
+**Pixar-level and an interactive browser WebGL scene are two different mediums. Free image-to-3D tops out at "decent game prop." You cannot batch-convert the cast through TripoSR/TRELLIS/Hunyuan and get animatable characters.** Specifically:
+- Image-to-3D = **triangle soup**, no edge loops/quad topology → **un-riggable, un-deformable.** Prop generators, not a character pipeline.
+- Their "fur" is **painted into the diffuse texture** — no hair geometry/groom. Looks like smeared paint from behind.
+- No **subsurface scattering** / layered specular — flat matte shading, not Pixar skin.
+- **No rig, no skeleton, no blendshapes, no animation.** A static mesh can't be animated without full retopo + rig from scratch.
+- Three.js = **real-time rasterization** (60fps, direct light, no GI). Pixar = **offline path-tracing** (RenderMan, minutes/hrs/frame, GI/SSS/groom). A medium gap, not a settings gap.
+
+**Achievable targets for THIS product (a living website), pick one — none are "Pixar":**
+1. **2.5D sprite animation** (Clash-of-Clans feel) — animated sprite cycles (walk/mine/idle); charming, performant, free-ish; sidesteps rigging entirely. Best fit for "always-working world." 
+2. **Sourced rigged-animated low-poly 3D** (Quaternius CC0, Sketchfab CC) — real in-browser movement, free, but generic low-poly (won't match our painterly renders, not photoreal).
+3. **Custom rigged 3D** matching our designs — needs a commissioned 3D artist (real money/time).
+4. **Offline-rendered / AI video** (Blender, or Luma/Kling) — near-cinematic but NON-interactive; for the teaser only.
+
+Don't promise film quality in the live scene. Recommend by product need; be explicit about the ceiling.
+
 ## Conventions
 Commit with descriptive messages; flag canon changes in the message. The site runs over local http (`python3 -m http.server 8011` from repo root) — the 3D world needs it for textures.
