@@ -439,7 +439,7 @@ drM.position.set(Math.cos(drMAng)*DRAD,0,Math.sin(drMAng)*DRAD);
 function drMNext(){ drMFromAng=drMAng; drMU=0; drMWalking=true; }
 // --- PATH B PROOF: a real rigged + animated 3D character (CC0 Khronos Fox) driven by Dr. Mineral's patrol ---
 // proves the pipeline: GLTFLoader + skeletal walk/idle + real turning to face travel direction + retexture to our gloom.
-let fox=null, foxMix=null, foxWalk=null, foxIdle=null; const foxPrev=new THREE.Vector3(); const FOX_YAW=Math.PI; // flip by ±PI/2 or 0 if it faces wrong
+let fox=null, foxMix=null, foxWalk=null, foxIdle=null, foxHeadX=0, foxHeadZ=1; const FOX_YAW=0; // facing offset; add Math.PI if it ever faces backward
 new GLTFLoader().load('../../assets/models/fox.glb', g=>{
   fox=g.scene; const box=new THREE.Box3().setFromObject(fox); const s=2.4/(box.max.y-box.min.y); fox.scale.setScalar(s);
   fox.traverse(o=>{ if(o.isMesh){ o.castShadow=true; if(o.material){ o.material.metalness=0; o.material.roughness=1; if(o.material.color) o.material.color.multiplyScalar(0.9); } } });
@@ -547,10 +547,10 @@ function loop(){
     else { drMWatch-=dt; drM.userData.state='idle'; drM.userData.facing=(drM.position.x>0?-1:1); // inspect the district, facing inward
       if(drMWatch<=0) drMNext(); } }
   tickCritter(drM,dt,t);
+  // heading = the fox's forward (tangent of the orbit while walking; kept when paused) — drives both the body + the chase-cam
+  if(drMWalking){ foxHeadX=-Math.sin(drMAng)*drMDir; foxHeadZ=Math.cos(drMAng)*drMDir; }
   if(fox){ foxMix.update(dt); fox.position.set(drM.position.x,0,drM.position.z);
-    const vx=drM.position.x-foxPrev.x, vz=drM.position.z-foxPrev.z;
-    if(Math.hypot(vx,vz)>0.0008) fox.rotation.y=Math.atan2(vx,vz)+FOX_YAW; // turn to face where it walks — real 3D turning
-    foxPrev.copy(drM.position);
+    fox.rotation.y=Math.atan2(foxHeadX,foxHeadZ)+FOX_YAW; // turn to face heading — real 3D turning
     const w=drM.userData.state==='walk'?1:0; foxWalk.setEffectiveWeight(w); foxIdle.setEffectiveWeight(1-w); }
   orb.position.set(drM.position.x+0.85,1.85+Math.sin(t*2.4)*0.16,drM.position.z+0.3); orb.rotation.y=Math.sin(t*1.1)*0.4; orbSh.position.set(orb.position.x,0.05,orb.position.z);
   // token minting: a coin struck every couple of seconds, Foundry -> Vault
@@ -580,12 +580,10 @@ function loop(){
   else {
     if(camFocus){ controls.target.lerp(new THREE.Vector3(camFocus.x*0.6,1.4,camFocus.z*0.6),0.05);
       const want=new THREE.Vector3(camFocus.x*1.5,6,camFocus.z*1.5+8); camera.position.lerp(want,0.04); }
-    else if(camMode==='follow'){ const p=drM.position; // ORBIT the well WITH Dr. Mineral — camera sits radially OUTSIDE him at his
-      // own angle and swings around the centre as he does (never cuts across). Zooms in when he stops to inspect, out while walking.
-      const ang=Math.atan2(p.z,p.x), watching=!drMWalking;
-      const Rc=DRAD+(watching?5.6:9.0), H=watching?3.1:5.4, look=watching?0.72:0.5;
-      _fpos.set(Math.cos(ang)*Rc,H,Math.sin(ang)*Rc); camera.position.lerp(_fpos,watching?0.035:0.05);
-      _ftar.set(p.x*look,1.5,p.z*look); controls.target.lerp(_ftar,0.05); }
+    else if(camMode==='follow'){ const p=drM.position; // THIRD-PERSON CHASE: sit BEHIND the fox along its heading and look where it looks
+      const back=drMWalking?8.0:6.5, up=drMWalking?4.4:3.7, ahead=drMWalking?6.0:3.5;
+      _fpos.set(p.x-foxHeadX*back, up, p.z-foxHeadZ*back); camera.position.lerp(_fpos,0.06);
+      _ftar.set(p.x+foxHeadX*ahead, 1.5, p.z+foxHeadZ*ahead); controls.target.lerp(_ftar,0.06); }
     else if(!dragging && performance.now()-idleAt>7000){ camMode='follow'; } // drift back to Dr. Mineral after idle
     controls.update();
   }
