@@ -27,7 +27,9 @@
   #panel.on{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
   #panel .step{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.24em;color:var(--c,#f0c87e)}
   #panel h2{margin:8px 0 2px;font-family:'Cormorant Garamond',serif;font-weight:600;font-size:30px;color:#f5e8d1}
-  #panel .mean{margin-top:10px;font-size:15.5px;line-height:1.6;color:rgba(228,215,191,.92)}
+  #panel .mean{margin-top:10px;font-size:15.5px;line-height:1.6;color:rgba(228,215,191,.92);white-space:pre-line}
+  #panel.scroll{background:linear-gradient(180deg,rgba(26,20,11,.92),rgba(18,14,8,.93));border-color:rgba(120,200,255,.42)}
+  #panel.scroll .step{color:#8ad0ff}
   #panel .x{position:absolute;top:12px;right:14px;cursor:pointer;color:rgba(220,200,170,.6);font-size:18px;font-family:'IBM Plex Mono',monospace}
   #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9;background:#070504;color:#f0c87e;font-family:'IBM Plex Mono',monospace;letter-spacing:.2em;font-size:12px;text-align:center;padding:20px}
   a.back{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:5;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:rgba(214,190,150,.6);text-decoration:none}
@@ -325,18 +327,58 @@ const dust=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',n
   new THREE.PointsMaterial({color:0xe8b86a,size:0.055,transparent:true,opacity:0.28,depthWrite:false}));
 scene.add(dust);
 
+// ---------- living lab: notice board · keeper's scroll · token minting ----------
+// the notice board the lab posts its roadmap on
+function boardTex(){ const c=document.createElement('canvas'); c.width=512; c.height=384; const x=c.getContext('2d');
+  x.fillStyle='#16100a'; x.fillRect(0,0,512,384); x.strokeStyle='#c8902e'; x.lineWidth=4; x.strokeRect(14,14,484,356);
+  x.textAlign='center'; x.fillStyle='#f0c87e'; x.font='bold 30px Georgia'; x.fillText('LAB NOTICE', 256, 58);
+  x.fillStyle='#a88a5a'; x.font='13px monospace'; x.fillText('THE CHAIN  ·  WEEKLY', 256, 82);
+  x.textAlign='left'; x.fillStyle='#e6c886'; x.font='17px Georgia'; x.fillText('THIS WEEK', 46, 138);
+  x.fillStyle='#cbb892'; x.font='15px Georgia'; x.fillText('Forging the blockchain core.', 46, 164);
+  x.fillStyle='#e6c886'; x.font='17px Georgia'; x.fillText('NEXT 2 WEEKS', 46, 212);
+  x.fillStyle='#cbb892'; x.font='15px Georgia'; x.fillText('·  v1 tokenomics ecosystem', 46, 238); x.fillText('·  test-token dApp on testnet', 46, 264);
+  x.textAlign='center'; x.fillStyle='#7a6648'; x.font='12px monospace'; x.fillText('releases & bounty winners posted here', 256, 342);
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=maxAniso; return t; }
+const _btex=boardTex();
+const boardGroup=new THREE.Group();
+const _bp1=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,3.4,8),colMat); _bp1.position.set(-1.85,1.7,0);
+const _bp2=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,3.4,8),colMat); _bp2.position.set(1.85,1.7,0);
+const boardPanel=new THREE.Mesh(new THREE.PlaneGeometry(3.6,2.7),new THREE.MeshStandardMaterial({map:_btex,emissive:0xffd9a0,emissiveMap:_btex,emissiveIntensity:.35,roughness:.85,side:THREE.DoubleSide}));
+boardPanel.position.set(0,2.5,0);
+const boardLight=new THREE.PointLight(0xffba66,3.2,8,2.2); boardLight.position.set(0,3.6,1.4);
+boardGroup.add(_bp1,_bp2,boardPanel,boardLight);
+const _bx=lp.x*1.18,_bz=lp.z*1.18; boardGroup.position.set(_bx,0,_bz); boardGroup.rotation.y=Math.atan2(-_bx,-_bz); scene.add(boardGroup);
+boardPanel.userData.panel={step:'LAB NOTICE · THE CHAIN',title:'This week & next',c:0xe6c886,pos:boardGroup.position,
+  mean:'THIS WEEK — forging the blockchain core.\n\nNEXT 2 WEEKS — the first version of the tokenomics ecosystem, and the test-token dApp goes live on testnet.\n\nEvery release, version, and reward / bounty winner is posted here.'};
+// the keeper's assistant — a small hovering orb that carries his notes
+const orb=new THREE.Mesh(new THREE.IcosahedronGeometry(0.15,1),new THREE.MeshStandardMaterial({color:0x0e2a38,emissive:0x36c2ff,emissiveIntensity:1.5,roughness:.3,metalness:.5}));
+orb.add(new THREE.PointLight(0x49ccff,1.1,4,2)); scene.add(orb);
+drM.userData.panel={step:'THE KEEPER',title:'Dr. Mineral',c:0x8ad0ff,scroll:true,
+  mean:'Above ground, an ordinary campus squirrel. Below it, the keeper of this lab — he sees that every contribution is mined, forged onto the chain, and remembered, so no one is ever forgotten.\n\nDIRECTIVE, this cycle — harden the chain core. Miners to the seam. Foundry, keep forging.'};
+// token minting — coins struck at the Foundry, carried to the Vault
+const coins=[]; const coinMat=new THREE.MeshStandardMaterial({color:0xf2c75a,emissive:0xb8801f,emissiveIntensity:.55,metalness:1,roughness:.3});
+const coinGeo=new THREE.CylinderGeometry(0.17,0.17,0.05,18); let coinTimer=1.5;
+function mintCoin(){ const m=new THREE.Mesh(coinGeo,coinMat); m.position.set(fp.x,1.5,fp.z); scene.add(m); coins.push({m,t:0}); }
+// keeper patrol — Dr. Mineral walks a slow round of the lab, overseeing
+const drMPath=[ new THREE.Vector3(7.2,0,-4.6), Z('mines').pos.clone().multiplyScalar(0.82), Z('foundry').pos.clone().multiplyScalar(0.82), Z('ledger').pos.clone().multiplyScalar(0.82) ];
+let drMSeg=0, drMU=0;
+
 // ---------- click to focus ----------
-const ray=new THREE.Raycaster(), mouse=new THREE.Vector2(); let focus=null, downXY=null;
+const ray=new THREE.Raycaster(), mouse=new THREE.Vector2(); let camFocus=null, downXY=null;
 const panel=document.getElementById('panel');
-function openZone(z){ focus=z; panel.style.setProperty('--c','#'+z.c.toString(16).padStart(6,'0'));
-  document.getElementById('pstep').textContent=z.step; document.getElementById('ptitle').textContent=z.name; document.getElementById('pmean').textContent=z.mean;
-  panel.classList.add('on'); controls.autoRotate=false; }
-function closeZone(){ focus=null; panel.classList.remove('on'); controls.autoRotate=true; }
+function openPanel(p){ panel.style.setProperty('--c','#'+p.c.toString(16).padStart(6,'0'));
+  document.getElementById('pstep').textContent=p.step; document.getElementById('ptitle').textContent=p.title; document.getElementById('pmean').textContent=p.mean;
+  panel.classList.toggle('scroll',!!p.scroll); panel.classList.add('on'); controls.autoRotate=false; camFocus=p.pos||null; }
+function openZone(z){ openPanel({step:z.step,title:z.name,mean:z.mean,c:z.c,pos:z.pos}); }
+function closeZone(){ camFocus=null; panel.classList.remove('on','scroll'); controls.autoRotate=true; }
 document.getElementById('panelx').addEventListener('click',closeZone);
 renderer.domElement.addEventListener('pointerdown',e=>{ downXY=[e.clientX,e.clientY]; });
 renderer.domElement.addEventListener('pointerup',e=>{ if(!downXY)return; const moved=Math.hypot(e.clientX-downXY[0],e.clientY-downXY[1]); downXY=null; if(moved>6)return;
   mouse.x=(e.clientX/W())*2-1; mouse.y=-(e.clientY/H())*2+1; ray.setFromCamera(mouse,camera);
-  const hit=ray.intersectObjects(picker)[0]; if(hit&&hit.object.userData.zone) openZone(hit.object.userData.zone); else closeZone(); });
+  const hit=ray.intersectObjects([...picker,boardPanel,drM])[0];
+  if(hit&&hit.object.userData.zone) openZone(hit.object.userData.zone);
+  else if(hit&&hit.object.userData.panel){ const pp=hit.object.userData.panel; openPanel(Object.assign({},pp,{pos:hit.object===drM?drM.position:(pp.pos||null)})); }
+  else closeZone(); });
 
 // ---------- intro cinematic: sky -> down the shaft -> into the hall -> fast sweep -> dive into the Mines ----------
 const Vc=(x,y,z)=>new THREE.Vector3(x,y,z);
@@ -407,8 +449,18 @@ function loop(){
   requestAnimationFrame(loop);
   const dt=Math.min(0.05,clock.getDelta()), t=clock.getElapsedTime();
   // animated 2.5D cast
-  tickCritter(drM,dt,t); tickCritter(tally,dt,t); tickCritter(vellum,dt,t);
+  tickCritter(tally,dt,t); tickCritter(vellum,dt,t);
   miners.forEach(s=>tickCritter(s,dt,t));
+  // keeper patrol (Dr. Mineral oversees the lab) + his hovering assistant orb
+  { const a=drMPath[drMSeg], b=drMPath[(drMSeg+1)%drMPath.length]; drMU+=dt*0.06; if(drMU>=1){drMU=0; drMSeg=(drMSeg+1)%drMPath.length;}
+    const e=drMU<0.5?2*drMU*drMU:1-Math.pow(-2*drMU+2,2)/2;
+    drM.position.x=a.x+(b.x-a.x)*e; drM.position.z=a.z+(b.z-a.z)*e;
+    drM.userData.facing=((b.x-a.x)<0)?-1:1; drM.userData.state=(drMU>0.12&&drMU<0.88)?'walk':'idle'; }
+  tickCritter(drM,dt,t);
+  orb.position.set(drM.position.x+0.7,1.95+Math.sin(t*2)*0.12,drM.position.z+0.25); orb.rotation.y+=dt*1.6;
+  // token minting: a coin struck every couple of seconds, Foundry -> Vault
+  coinTimer-=dt; if(coinTimer<=0){ coinTimer=2.2+Math.random()*1.6; mintCoin(); }
+  for(let i=coins.length-1;i>=0;i--){ const cn=coins[i]; cn.t+=dt*0.5; const p=lerpV(fp,Z('vault').pos,Math.min(1,cn.t)); cn.m.position.set(p.x,1.4+Math.sin(cn.t*Math.PI)*1.1,p.z); cn.m.rotation.y+=dt*5; cn.m.rotation.z+=dt*3; if(cn.t>=1){ scene.remove(cn.m); coins.splice(i,1); } }
   // haulers Mine->Foundry->Mine (walk cycle + carried crystal)
   haulers.forEach(h=>{ h.s.userData.t+=dt*0.11; const seg=h.s.userData.t%2; const carry=seg<1;
     const from=carry?mp:fp, to=carry?fp:mp, f=carry?seg:seg-1;
@@ -431,8 +483,8 @@ function loop(){
   // intro cinematic drives the camera; otherwise normal/focus camera + controls
   if(CINE.active){ CINE.t+=dt; runCine(CINE.t); }
   else {
-    if(focus){ controls.target.lerp(new THREE.Vector3(focus.pos.x*0.6,1.4,focus.pos.z*0.6),0.05);
-      const want=new THREE.Vector3(focus.pos.x*1.5,6,focus.pos.z*1.5+8); camera.position.lerp(want,0.04); }
+    if(camFocus){ controls.target.lerp(new THREE.Vector3(camFocus.x*0.6,1.4,camFocus.z*0.6),0.05);
+      const want=new THREE.Vector3(camFocus.x*1.5,6,camFocus.z*1.5+8); camera.position.lerp(want,0.04); }
     controls.update();
   }
   composer.render();
