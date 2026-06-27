@@ -3,6 +3,8 @@ import {
   AbsoluteFill,
   Sequence,
   Img,
+  OffthreadVideo,
+  Audio,
   staticFile,
   interpolate,
   useCurrentFrame,
@@ -10,502 +12,361 @@ import {
   Easing,
 } from "remotion";
 
-// ---- palette ----
-const BG = "#0b0d12";
-const INK = "#eae3d2";
+// ---- palette / type ----
+const BG = "#0a0807";
+const INK = "#efe3cf";
 const GOLD = "#e7b765";
-const GOLD2 = "#9a6a3a";
-const SERIF = "Georgia, 'Times New Roman', serif";
-
+const SERIF = "'Cormorant Garamond', Georgia, serif";
+const MONO = "'IBM Plex Mono', ui-monospace, monospace";
 const ease = Easing.bezier(0.16, 1, 0.3, 1);
 
-// fade-in then fade-out helper based on a local frame
-const fadeInOut = (
-  f: number,
-  inEnd: number,
-  outStart: number,
-  outEnd: number
-) =>
-  interpolate(f, [0, inEnd, outStart, outEnd], [0, 1, 1, 0], {
+const fadeIO = (f: number, inE: number, outS: number, outE: number) =>
+  interpolate(f, [0, inE, outS, outE], [0, 1, 1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: ease,
   });
 
-// ---------- reusable art ----------
-const Stars: React.FC<{ count?: number; warm?: boolean }> = ({
-  count = 90,
-  warm = false,
+// cinematic vignette
+const Grade: React.FC = () => (
+  <AbsoluteFill
+    style={{
+      background:
+        "radial-gradient(78% 72% at 50% 42%, transparent 38%, rgba(6,5,4,.72) 100%)",
+      pointerEvents: "none",
+    }}
+  />
+);
+
+// Ken Burns still: slow scale + drift, with fade in/out
+const KB: React.FC<{
+  src: string;
+  from?: number;
+  to?: number;
+  panX?: number;
+  panY?: number;
+  inE?: number;
+  outS: number;
+  outE: number;
+  total: number;
+}> = ({ src, from = 1.05, to = 1.16, panX = 0, panY = 0, inE = 22, outS, outE, total }) => {
+  const f = useCurrentFrame();
+  const s = interpolate(f, [0, total], [from, to], { extrapolateRight: "clamp" });
+  const px = interpolate(f, [0, total], [0, panX], { extrapolateRight: "clamp" });
+  const py = interpolate(f, [0, total], [0, panY], { extrapolateRight: "clamp" });
+  const op = fadeIO(f, inE, outS, outE);
+  return (
+    <Img
+      src={staticFile(src)}
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        transform: `scale(${s}) translate(${px}px, ${py}px)`,
+        opacity: op,
+      }}
+    />
+  );
+};
+
+const Caption: React.FC<{
+  children: React.ReactNode;
+  top: string;
+  size?: number;
+  italic?: boolean;
+  inE?: number;
+  outS: number;
+  outE: number;
+}> = ({ children, top, size = 44, italic = false, inE = 24, outS, outE }) => {
+  const f = useCurrentFrame();
+  const op = fadeIO(f, inE, outS, outE);
+  const rise = interpolate(f, [0, 40], [14, 0], { extrapolateRight: "clamp", easing: ease });
+  return (
+    <div
+      style={{
+        position: "absolute",
+        width: "100%",
+        top,
+        textAlign: "center",
+        color: INK,
+        fontFamily: SERIF,
+        fontWeight: 500,
+        fontSize: size,
+        fontStyle: italic ? "italic" : "normal",
+        letterSpacing: 0.5,
+        opacity: op,
+        transform: `translateY(${rise}px)`,
+        textShadow: "0 2px 30px #000d",
+        padding: "0 8%",
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+const Kicker: React.FC<{ children: React.ReactNode; outE: number }> = ({ children, outE }) => {
+  const f = useCurrentFrame();
+  const op = fadeIO(f, 20, outE - 40, outE);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        width: "100%",
+        top: "12%",
+        textAlign: "center",
+        color: "rgba(231,183,101,.82)",
+        fontFamily: MONO,
+        fontSize: 15,
+        letterSpacing: "0.36em",
+        opacity: op,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+const ClipScene: React.FC<{
+  src: string;
+  rate?: number;
+  total: number;
+  inE?: number;
+  outS: number;
+  outE: number;
+}> = ({ src, rate = 0.8, total, inE = 18, outS, outE }) => {
+  const f = useCurrentFrame();
+  const op = fadeIO(f, inE, outS, outE);
+  const z = interpolate(f, [0, total], [1.02, 1.1], { extrapolateRight: "clamp" });
+  return (
+    <OffthreadVideo
+      src={staticFile(src)}
+      playbackRate={rate}
+      muted
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        opacity: op,
+        transform: `scale(${z})`,
+      }}
+    />
+  );
+};
+
+const SubLabel: React.FC<{ tag: string; line: string; outS: number; outE: number }> = ({
+  tag,
+  line,
+  outS,
+  outE,
 }) => {
-  const frame = useCurrentFrame();
-  const dots = new Array(count).fill(0).map((_, i) => {
-    const x = (i * 97.13) % 100;
-    const y = (i * 53.71) % 60;
-    const tw = 0.35 + 0.65 * Math.abs(Math.sin(frame * 0.04 + i));
-    const s = 1 + (i % 3);
-    return (
+  const f = useCurrentFrame();
+  const op = fadeIO(f, 14, outS, outE);
+  return (
+    <div style={{ position: "absolute", left: "8%", bottom: "16%", opacity: op }}>
+      <div style={{ fontFamily: MONO, fontSize: 14, letterSpacing: "0.22em", color: GOLD }}>
+        {tag}
+      </div>
       <div
-        key={i}
         style={{
-          position: "absolute",
-          left: `${x}%`,
-          top: `${y}%`,
-          width: s,
-          height: s,
-          borderRadius: "50%",
-          background: warm ? GOLD : "#ffffff",
-          opacity: tw * (warm ? 0.5 : 0.7),
+          fontFamily: SERIF,
+          fontWeight: 500,
+          fontSize: 40,
+          color: INK,
+          marginTop: 6,
+          textShadow: "0 2px 24px #000d",
         }}
-      />
-    );
-  });
-  return <>{dots}</>;
+      >
+        {line}
+      </div>
+    </div>
+  );
 };
 
-const AcornSVG: React.FC<{ size?: number; color?: string }> = ({
-  size = 60,
-  color = GOLD,
-}) => (
-  <svg width={size} height={size * 1.2} viewBox="0 0 100 120">
-    <ellipse cx="50" cy="78" rx="30" ry="34" fill={color} />
-    <path d="M16 44 Q50 26 84 44 Q84 56 50 58 Q16 56 16 44 Z" fill={GOLD2} />
-    <rect x="46" y="20" width="8" height="16" rx="4" fill={GOLD2} />
-  </svg>
-);
-
-// a small stylized squirrel silhouette
-const Squirrel: React.FC<{ color?: string; size?: number }> = ({
-  color = "#05070b",
-  size = 150,
-}) => (
-  <svg width={size} height={size} viewBox="0 0 200 200">
-    <path d="M150 170 C 210 150 205 60 150 60 C 185 80 175 140 130 150 Z" fill={color} />
-    <path d="M70 175 C 55 120 70 95 105 100 C 140 105 140 165 110 178 Z" fill={color} />
-    <circle cx="92" cy="92" r="26" fill={color} />
-    <path d="M78 70 L82 50 L96 66 Z" fill={color} />
-    <circle cx="100" cy="135" r="9" fill={GOLD2} />
-  </svg>
-);
-
-// ---------- scenes ----------
-const SurfaceNight: React.FC = () => {
-  const frame = useCurrentFrame();
-  const { width, height } = useVideoConfig();
-  const titleOp = fadeInOut(frame, 30, 95, 130);
+const Districts: React.FC = () => {
+  const items: [string, string, string][] = [
+    ["mines.png", "01 · MINE", "Do the security work."],
+    ["foundry.png", "02 · FORGE", "Mint the reward onto the chain."],
+    ["ledger.png", "03 · RECORD", "Logged on-chain, forever."],
+    ["vault.png", "04 · VAULT", "The treasury it controls."],
+    ["watch.png", "05 · GUARD", "Audited. Monitored. Secured."],
+  ];
+  const D = 60;
   return (
-    <AbsoluteFill
-      style={{
-        background: `radial-gradient(120% 90% at 50% 120%, #1a2230 0%, ${BG} 60%)`,
-      }}
-    >
-      <Stars />
-      {[...Array(7)].map((_, i) => (
-        <div
-          key={i}
-          style={{
-            position: "absolute",
-            bottom: height * 0.16,
-            left: `${6 + i * 13}%`,
-            width: `${7 + (i % 3) * 3}%`,
-            height: `${10 + (i % 4) * 7}%`,
-            background: "#0c1119",
-            borderTop: "2px solid #161d28",
-          }}
-        />
+    <AbsoluteFill style={{ background: BG }}>
+      {items.map(([img, tag, line], i) => (
+        <Sequence key={img} from={i * D} durationInFrames={D + 14}>
+          <AbsoluteFill>
+            <KB
+              src={img}
+              from={1.06}
+              to={1.18}
+              panX={i % 2 ? -18 : 18}
+              outS={D - 6}
+              outE={D + 12}
+              total={D + 14}
+            />
+            <Grade />
+            <SubLabel tag={tag} line={line} outS={D - 8} outE={D + 10} />
+          </AbsoluteFill>
+        </Sequence>
       ))}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          width,
-          height: height * 0.16,
-          background: "#070a0e",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: height * 0.16 - 4,
-          left: width * 0.5 - 75,
-        }}
-      >
-        <Squirrel />
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          width,
-          top: height * 0.22,
-          textAlign: "center",
-          color: INK,
-          fontFamily: SERIF,
-          fontSize: 52,
-          letterSpacing: 1,
-          opacity: titleOp,
-        }}
-      >
-        An ordinary campus.
-        <div
-          style={{
-            fontSize: 24,
-            color: "#9aa0ab",
-            marginTop: 14,
-            fontStyle: "italic",
-          }}
-        >
-          Nobody ever looks twice.
-        </div>
-      </div>
     </AbsoluteFill>
   );
 };
 
-const Descent: React.FC = () => {
-  const frame = useCurrentFrame();
-  const { width, height } = useVideoConfig();
-  const seam = interpolate(frame, [0, 70], [0, height * 1.4], {
-    extrapolateRight: "clamp",
-    easing: ease,
-  });
-  const warmth = interpolate(frame, [0, 90], [0, 1], {
-    extrapolateRight: "clamp",
-  });
-  const txt = fadeInOut(frame, 25, 70, 100);
-  const imgOp = interpolate(frame, [38, 95], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: ease,
-  });
-  const imgZoom = interpolate(frame, [38, 110], [1.12, 1.0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+const TheLine: React.FC = () => {
+  const f = useCurrentFrame();
+  const op = fadeIO(f, 28, 110, 148);
+  const heroR = interpolate(f, [0, 55], [26, 0], { extrapolateRight: "clamp", easing: ease });
   return (
-    <AbsoluteFill style={{ background: BG }}>
-      <AbsoluteFill
-        style={{
-          opacity: warmth,
-          background: `radial-gradient(60% 60% at 50% 50%, ${GOLD2}55, ${BG} 70%)`,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          left: width * 0.5 - seam / 2,
-          top: height * 0.5 - seam / 2,
-          width: seam,
-          height: seam,
-          borderRadius: "50%",
-          background: `radial-gradient(circle, ${GOLD} 0%, ${GOLD2} 35%, transparent 70%)`,
-          filter: "blur(6px)",
-        }}
-      />
+    <div
+      style={{
+        opacity: op,
+        display: "flex",
+        alignItems: "center",
+        gap: 40,
+        maxWidth: 1120,
+        padding: "0 60px",
+      }}
+    >
       <Img
-        src={staticFile("env-first-descent.png")}
+        src={staticFile("drmineral.png")}
         style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          opacity: imgOp,
-          transform: `scale(${imgZoom})`,
+          height: 380,
+          transform: `translateY(${heroR}px)`,
+          filter: "drop-shadow(0 18px 50px rgba(231,183,101,.22))",
         }}
       />
       <div
         style={{
-          position: "absolute",
-          width,
-          top: height * 0.78,
-          textAlign: "center",
           color: INK,
           fontFamily: SERIF,
-          fontSize: 34,
+          fontWeight: 500,
+          fontSize: 46,
           fontStyle: "italic",
-          opacity: txt,
+          maxWidth: 540,
+          lineHeight: 1.3,
         }}
       >
-        …until the morning the ground answered.
+        “I don’t collect treasure.
+        <br />I collect discoveries.”
       </div>
-    </AbsoluteFill>
+    </div>
   );
 };
 
-const Cavern: React.FC = () => {
-  const frame = useCurrentFrame();
-  const { width, height } = useVideoConfig();
-  const reveal = interpolate(frame, [0, 45], [0, 1], {
-    extrapolateRight: "clamp",
-    easing: ease,
-  });
-  const zoom = interpolate(frame, [0, 190], [1.04, 1.15], {
-    extrapolateRight: "clamp",
-  });
-  const titleOp = fadeInOut(frame, 50, 135, 180);
+const CTA: React.FC = () => {
+  const f = useCurrentFrame();
+  const op = interpolate(f, [0, 30], [0, 1], { extrapolateRight: "clamp", easing: ease });
+  const sub = fadeIO(f, 45, 200, 240);
   return (
-    <AbsoluteFill style={{ background: "#0e0a10" }}>
-      <Img
-        src={staticFile("env-central-cavern.png")}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          opacity: reveal,
-          transform: `scale(${zoom})`,
-        }}
-      />
-      <AbsoluteFill
-        style={{
-          background:
-            "radial-gradient(80% 70% at 50% 32%, transparent, rgba(8,6,5,.55) 78%)",
-        }}
-      />
+    <AbsoluteFill
+      style={{
+        background: `radial-gradient(90% 80% at 50% 42%, #16120e 0%, ${BG} 80%)`,
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+        opacity: op,
+      }}
+    >
+      <div style={{ fontFamily: MONO, fontSize: 14, letterSpacing: "0.34em", color: "rgba(231,183,101,.8)" }}>
+        UNIVERSITY OF NEBRASKA
+      </div>
       <div
         style={{
-          position: "absolute",
-          width,
-          top: height * 0.42,
-          textAlign: "center",
-          color: INK,
           fontFamily: SERIF,
-          fontSize: 50,
+          fontWeight: 700,
+          fontSize: 70,
+          color: "#f6e9d0",
+          marginTop: 12,
           letterSpacing: 1,
-          opacity: titleOp,
-          textShadow: "0 2px 30px #000c",
+          textShadow: "0 0 50px rgba(245,196,107,.35)",
         }}
       >
-        A civilization beneath it.
+        The Lab Reward Coin
       </div>
-    </AbsoluteFill>
-  );
-};
-
-const Line: React.FC = () => {
-  const frame = useCurrentFrame();
-  const { width } = useVideoConfig();
-  const op = fadeInOut(frame, 35, 80, 115);
-  const rise = interpolate(frame, [0, 50], [16, 0], {
-    extrapolateRight: "clamp",
-    easing: ease,
-  });
-  const heroRise = interpolate(frame, [0, 55], [30, 0], {
-    extrapolateRight: "clamp",
-    easing: ease,
-  });
-  return (
-    <AbsoluteFill
-      style={{
-        background: `radial-gradient(80% 80% at 50% 50%, #16120f 0%, ${BG} 75%)`,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
       <div
         style={{
-          opacity: op,
-          display: "flex",
-          alignItems: "center",
-          gap: 48,
-          maxWidth: 1120,
-          padding: "0 48px",
+          fontFamily: SERIF,
+          fontStyle: "italic",
+          fontSize: 26,
+          color: "rgba(214,199,170,.85)",
+          marginTop: 16,
+          opacity: sub,
         }}
       >
-        <Img
-          src={staticFile("drmineral-hero.png")}
-          style={{
-            height: 430,
-            transform: `translateY(${heroRise}px)`,
-            filter: "drop-shadow(0 18px 50px rgba(231,183,101,.22))",
-          }}
-        />
-        <div style={{ textAlign: "left", transform: `translateY(${rise}px)` }}>
-          <div style={{ marginBottom: 16 }}>
-            <AcornSVG size={44} />
-          </div>
-          <div
-            style={{
-              color: INK,
-              fontFamily: SERIF,
-              fontSize: 44,
-              fontStyle: "italic",
-              maxWidth: 520,
-              lineHeight: 1.32,
-            }}
-          >
-            “I don't collect treasure.
-            <br />I collect discoveries.”
-          </div>
-        </div>
+        a coin for real security work
       </div>
     </AbsoluteFill>
   );
 };
 
-const ChainGrows: React.FC = () => {
-  const frame = useCurrentFrame();
-  const links = 9;
-  const op = fadeInOut(frame, 25, 90, 115);
-  const versions = ["v1", "v8", "v25"];
-  const vIdx = Math.min(
-    2,
-    Math.floor(
-      interpolate(frame, [20, 95], [0, 3], {
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-      })
-    )
-  );
-  return (
-    <AbsoluteFill
-      style={{
-        background: `radial-gradient(90% 80% at 50% 40%, #1a1410 0%, ${BG} 75%)`,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <div style={{ opacity: op, textAlign: "center" }}>
-        <div
-          style={{
-            display: "flex",
-            gap: 10,
-            justifyContent: "center",
-            marginBottom: 36,
-          }}
-        >
-          {[...Array(links)].map((_, i) => {
-            const appear = interpolate(
-              frame,
-              [i * 7, i * 7 + 22],
-              [0, 1],
-              {
-                extrapolateLeft: "clamp",
-                extrapolateRight: "clamp",
-                easing: ease,
-              }
-            );
-            return (
-              <div
-                key={i}
-                style={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: "50%",
-                  border: `4px solid ${GOLD}`,
-                  opacity: appear,
-                  transform: `scale(${0.6 + appear * 0.4})`,
-                  boxShadow: `0 0 18px ${GOLD2}`,
-                }}
-              />
-            );
-          })}
-        </div>
-        <div
-          style={{ color: INK, fontFamily: SERIF, fontSize: 44, letterSpacing: 1 }}
-        >
-          The lab keeps growing.
-        </div>
-        <div
-          style={{
-            color: GOLD,
-            fontFamily: SERIF,
-            fontSize: 30,
-            marginTop: 14,
-            letterSpacing: 4,
-          }}
-        >
-          {versions[vIdx]} →
-        </div>
-      </div>
-    </AbsoluteFill>
-  );
-};
-
-const TitleCard: React.FC = () => {
-  const frame = useCurrentFrame();
-  const op = interpolate(frame, [0, 40], [0, 1], {
-    extrapolateRight: "clamp",
-    easing: ease,
-  });
-  const spread = interpolate(frame, [0, 60], [16, 7], {
-    extrapolateRight: "clamp",
-    easing: ease,
-  });
-  return (
-    <AbsoluteFill
-      style={{
-        background: `radial-gradient(70% 70% at 50% 45%, #1c1510 0%, ${BG} 80%)`,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <div style={{ opacity: op, textAlign: "center" }}>
-        <div
-          style={{ display: "flex", justifyContent: "center", marginBottom: 22 }}
-        >
-          <AcornSVG size={64} />
-        </div>
-        <div
-          style={{
-            color: INK,
-            fontFamily: SERIF,
-            fontWeight: 700,
-            fontSize: 60,
-            letterSpacing: spread,
-          }}
-        >
-          THE DR. MINERAL
-        </div>
-        <div
-          style={{
-            color: GOLD,
-            fontFamily: SERIF,
-            fontWeight: 700,
-            fontSize: 60,
-            letterSpacing: spread + 6,
-            marginTop: 4,
-          }}
-        >
-          UNIVERSE
-        </div>
-        <div
-          style={{
-            color: "#9aa0ab",
-            fontFamily: SERIF,
-            fontStyle: "italic",
-            fontSize: 26,
-            marginTop: 22,
-          }}
-        >
-          an underground civilization of curious minds
-        </div>
-      </div>
-    </AbsoluteFill>
-  );
-};
-
-// ---------- main ----------
+// ---- master ----
 export const Teaser: React.FC = () => {
+  const { durationInFrames } = useVideoConfig();
   return (
     <AbsoluteFill style={{ background: BG }}>
-      <Sequence durationInFrames={150}>
-        <SurfaceNight />
+      <Audio
+        src={staticFile("score.mp3")}
+        volume={(f) =>
+          interpolate(
+            f,
+            [0, 45, durationInFrames - 80, durationInFrames - 4],
+            [0, 0.62, 0.62, 0],
+            { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+          )
+        }
+      />
+
+      {/* 1 — descent (LTX clip) */}
+      <Sequence from={0} durationInFrames={175}>
+        <AbsoluteFill style={{ background: "#000" }}>
+          <ClipScene src="clip-descent.mp4" rate={0.75} total={175} outS={150} outE={175} />
+          <Grade />
+          <Kicker outE={175}>UNIVERSITY OF NEBRASKA · A LIVING LAB</Kicker>
+          <Caption top="70%" size={40} italic outS={120} outE={160}>
+            Beneath an ordinary campus,
+          </Caption>
+        </AbsoluteFill>
       </Sequence>
-      <Sequence from={150} durationInFrames={110}>
-        <Descent />
+
+      {/* 2 — the reveal */}
+      <Sequence from={160} durationInFrames={205}>
+        <AbsoluteFill style={{ background: BG }}>
+          <KB src="central-cavern.png" from={1.04} to={1.16} outS={180} outE={205} total={205} />
+          <Grade />
+          <Caption top="44%" size={52} outS={150} outE={195}>
+            a lab that has worked for ages.
+          </Caption>
+        </AbsoluteFill>
       </Sequence>
-      <Sequence from={260} durationInFrames={190}>
-        <Cavern />
+
+      {/* 3 — the core loop across the five districts */}
+      <Sequence from={360} durationInFrames={320}>
+        <Districts />
       </Sequence>
-      <Sequence from={450} durationInFrames={120}>
-        <Line />
+
+      {/* 4 — the line */}
+      <Sequence from={675} durationInFrames={150}>
+        <AbsoluteFill
+          style={{
+            background: `radial-gradient(80% 80% at 50% 45%, #15110c 0%, ${BG} 78%)`,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <TheLine />
+        </AbsoluteFill>
       </Sequence>
-      <Sequence from={570} durationInFrames={120}>
-        <ChainGrows />
-      </Sequence>
-      <Sequence from={690} durationInFrames={90}>
-        <TitleCard />
+
+      {/* 5 — title card / CTA */}
+      <Sequence from={815} durationInFrames={durationInFrames - 815}>
+        <CTA />
       </Sequence>
     </AbsoluteFill>
   );

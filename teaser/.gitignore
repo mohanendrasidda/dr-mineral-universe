@@ -9,3 +9,9 @@ out
 node_modules/
 out/
 .remotion/
+
+# reproducible via scripts/teaser-stage-assets.sh
+public/*.png
+public/*.mp4
+public/*.mp3
+out/
