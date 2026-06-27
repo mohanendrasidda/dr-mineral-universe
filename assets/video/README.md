@@ -1,9 +1,10 @@
 # assets/video
 
-Drop the finished intro cinematic here as **`intro.mp4`** (H.264 MP4, 1920×1080, ~35–45s, music/audio baked in).
+**`intro.mp4`** — the campus opening for the Enter-the-Lab cinematic. Plays silent (the score lives in `assets/audio/`), then hands into the live 3D underground.
 
-The world auto-detects it: clicking **ENTER THE LAB** on the landing → `world/index.html?intro=1` → a "▶ BEGIN" splash starts the video with sound → on end it dissolves into the interactive 3D world (positioned in the Mines).
+## Current source — REAL UNL footage
+Cut from **"Campus in Gold"** — University of Nebraska–Lincoln, MediaHub (`mediahub.unl.edu/media/21577`), golden autumn campus footage. Three graded shots: the tree-lined mall (establishing) → backlit golden leaves (mood) → the NEBRASKA "N" (identity) → fade to the descent. Letterbox bars cropped, warm grade + vignette to match the world, 1080p.
 
-If `intro.mp4` is absent, Enter falls back to the in-engine 3D camera dive — nothing breaks.
+**Licensing:** UNL footage used by a UNL-affiliated team; for public launch get a nod from **UNL Comms/Marketing** (same as team names + sponsor).
 
-Prompts to generate it: see `docs/15_intro-video-brief.md`.
+Source file kept in `~/Downloads/media.mp4` (Kaltura download). Prompts for an all-AI fallback are in `docs/15_intro-video-brief.md`.
