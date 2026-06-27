@@ -362,9 +362,9 @@ const captions=[
   {at:8.9,t:'It mines real security work, forges it onto the chain, and never forgets.'},
 ];
 const capEl=document.getElementById('cine-cap'); let capCur=null;
-function updateCaption(tt){ let c=''; for(const k of captions){ if(tt>=k.at) c=k.t; }
+function updateCaption(tt){ if(CINE.caps===false)return; let c=''; for(const k of captions){ if(tt>=k.at) c=k.t; }
   if(c!==capCur){ capCur=c; if(capEl){ capEl.style.opacity=0; setTimeout(()=>{capEl.textContent=c; capEl.style.opacity=c?1:0;},170);} } }
-function startCine(){ CINE.active=true; CINE.t=0; controls.enabled=false; controls.autoRotate=false; document.body.classList.add('cine');
+function startCine(caps){ CINE.active=true; CINE.t=0; CINE.caps=(caps!==false); controls.enabled=false; controls.autoRotate=false; document.body.classList.add('cine');
   setTimeout(()=>{ const l=document.getElementById('loading'); if(l)l.style.display='none'; },900); }
 function endCine(){ CINE.active=false; controls.target.set(0,1.4,5); controls.enabled=true; controls.autoRotate=true; document.body.classList.remove('cine'); if(capEl)capEl.style.opacity=0; }
 function skipCine(){ const f=CINE.frames[CINE.frames.length-1]; camera.position.copy(f.p); camera.lookAt(f.l); endCine(); }
@@ -376,7 +376,9 @@ function finishVideoIntro(){ const vid=document.getElementById('intro-video'), f
 function startVideoIntro(src){ const vid=document.getElementById('intro-video'), splash=document.getElementById('intro-splash'), go=document.getElementById('intro-go');
   document.body.classList.add('introvid'); const l=document.getElementById('loading'); if(l)l.style.display='none';
   if(go)go.addEventListener('click',()=>{ if(splash)splash.style.display='none'; vid.src=src; vid.muted=false; vid.style.opacity=1; const pr=vid.play(); if(pr&&pr.catch)pr.catch(()=>{vid.muted=true;vid.play();}); });
-  if(vid)vid.addEventListener('ended',finishVideoIntro); }
+  if(vid)vid.addEventListener('ended',videoToWorld); }
+function videoToWorld(){ startCine(false); const vid=document.getElementById('intro-video');
+  if(vid){ vid.style.opacity=0; setTimeout(()=>{ vid.style.display='none'; document.body.classList.remove('introvid'); },1200); } }
 function unifiedSkip(){ if(document.body.classList.contains('introvid'))finishVideoIntro(); else skipCine(); }
 const _sk=document.getElementById('cine-skip'); if(_sk)_sk.addEventListener('click',unifiedSkip);
 if(/[?&]intro=1/.test(location.search)){
