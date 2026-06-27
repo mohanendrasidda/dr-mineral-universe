@@ -286,12 +286,18 @@ function critter(urls,h,opts){ opts=opts||{};
   s.userData=Object.assign({h,textures,frame:0,ft:0,fps:opts.fps||5,state:opts.state||'idle',phase:Math.random()*6.28,facing:1,baseY:opts.baseY||0},opts);
   scene.add(s); return s; }
 function tickCritter(s,dt,t){ const u=s.userData;
-  if(u.textures.length>1 && (u.state==='walk'||u.state==='mine')){ u.ft+=dt; const spf=1/u.fps; while(u.ft>=spf){u.ft-=spf;u.frame=(u.frame+1)%u.textures.length;} } else u.frame=0;
+  if(u.textures.length>1 && u.state==='walk'){ u.ft+=dt; const spf=1/u.fps; while(u.ft>=spf){u.ft-=spf;u.frame=(u.frame+1)%u.textures.length;} } else u.frame=0;
   if(s.material.map!==u.textures[u.frame]){ s.material.map=u.textures[u.frame]; s.material.needsUpdate=true; }
   let bob=0,lean=0,sx=1,sy=1; const ph=u.phase;
-  if(u.state==='walk'){ const w=t*u.fps*Math.PI+ph; bob=Math.abs(Math.sin(w))*0.05; lean=Math.sin(w)*0.06; sy=1+Math.sin(w*2)*0.04; }
-  else if(u.state==='mine'){ const mm=Math.sin(t*4+ph); bob=Math.max(0,-mm)*0.04; sy=1-Math.max(0,mm)*0.12; sx=1+Math.max(0,mm)*0.10; lean=0.06; }
-  else { sy=1+Math.sin(t*1.6+ph)*0.025; bob=Math.sin(t*1.2+ph)*0.02; lean=Math.sin(t*0.5+ph)*0.02; }
+  if(u.state==='walk'){ // two footfalls per cycle: body rises mid-stride, dips + squashes on each step (weight)
+    const sp=(u.fps||4)*1.05, w=t*sp*Math.PI+ph; const step=Math.abs(Math.sin(w)), foot=1-step;
+    bob=(step-0.5)*0.06; sy=1-foot*0.05; sx=1+foot*0.04; lean=Math.sin(w)*0.05+0.035; }
+  else if(u.state==='mine'){ // a real swing: wind up -> strike down -> recoil -> rest
+    const cyc=(t*0.78+ph*0.16)%1; let raise=0,strike=0;
+    if(cyc<0.46){ const k=cyc/0.46; raise=k*k; } else if(cyc<0.63){ const k=(cyc-0.46)/0.17; raise=1-k; strike=Math.sin(k*Math.PI); }
+    bob=-strike*0.10; lean=-raise*0.10+strike*0.15; sy=1-strike*0.12; sx=1+strike*0.10; }
+  else { // idle: slow breathing + a slow weight-shift, never mechanical
+    const br=Math.sin(t*1.5+ph); sy=1+br*0.022; bob=br*0.014; lean=Math.sin(t*0.33+ph)*0.025+Math.sin(t*0.1+ph)*0.018; }
   // flip via per-sprite scale.x sign — never mutate the shared texture's UV
   const fx=(u.facing<0?-1:1);
   s.scale.set(u.h*sx*fx, u.h*sy, 1); s.position.y=u.h*sy/2+bob+(u.baseY||0); s.material.rotation=lean*fx; }
@@ -351,9 +357,15 @@ noticeGroup.position.set(-5,0,7); noticeGroup.rotation.y=0.73; scene.add(noticeG
 const _nsh=groundShadow(3.0); _nsh.position.set(-5,0.05,7);
 _ninscr.userData.panel={step:'THE LAB · THE WORK',title:'What the lab is building',c:0xe6c886,pos:noticeGroup.position,
   mean:'THIS CYCLE — the blockchain core is being forged.\n\nSOON — the first version of the tokenomics ecosystem, and a test-token dApp on the testnet.\n\nHere the lab posts its releases and honours its contributors.'};
-// the keeper's assistant — a small dim warm wisp that drifts beside him (a lantern, not a sci-fi drone)
-const orb=new THREE.Mesh(new THREE.IcosahedronGeometry(0.12,1),new THREE.MeshStandardMaterial({color:0x2a1d0c,emissive:0xffa23a,emissiveIntensity:0.85,roughness:.6,metalness:0}));
-orb.add(new THREE.PointLight(0xffa848,0.6,3.2,2.2)); scene.add(orb);
+// the keeper's assistant — a small ornate brass lantern with a warm glowing core (drifts beside him)
+const orb=new THREE.Group();
+const _obrass=new THREE.MeshStandardMaterial({color:0x6a4a22,metalness:1,roughness:.35,emissive:0x2a1a08,emissiveIntensity:.2});
+orb.add(new THREE.Mesh(new THREE.SphereGeometry(0.1,16,16),new THREE.MeshStandardMaterial({color:0x3a2410,emissive:0xffb24a,emissiveIntensity:1.1,roughness:.5})));
+const _or1=new THREE.Mesh(new THREE.TorusGeometry(0.13,0.012,6,20),_obrass); const _or2=_or1.clone(); _or2.rotation.y=Math.PI/2;
+const _ocap=new THREE.Mesh(new THREE.ConeGeometry(0.05,0.08,8),_obrass); _ocap.position.y=0.16;
+const _ofin=new THREE.Mesh(new THREE.SphereGeometry(0.028,8,8),_obrass); _ofin.position.y=-0.15;
+orb.add(_or1,_or2,_ocap,_ofin); orb.add(new THREE.PointLight(0xffa848,0.6,3.2,2.2)); scene.add(orb);
+const orbSh=groundShadow(0.55);
 drM.userData.panel={step:'THE KEEPER',title:'Dr. Mineral',c:0xd8b06a,scroll:true,
   mean:'Above ground, an ordinary campus squirrel. Below it, the keeper of this lab — he sees that every contribution is mined, forged onto the chain, and remembered, so no one is ever forgotten.\n\nDIRECTIVE, this cycle — harden the chain core. Miners to the seam. Foundry, keep forging.'};
 // token minting — coins struck at the Foundry, carried to the Vault
@@ -458,7 +470,7 @@ function loop(){
     drM.position.x=a.x+(b.x-a.x)*e; drM.position.z=a.z+(b.z-a.z)*e;
     drM.userData.facing=((b.x-a.x)<0)?-1:1; drM.userData.state=(drMU>0.12&&drMU<0.88)?'walk':'idle'; }
   tickCritter(drM,dt,t);
-  orb.position.set(drM.position.x+0.7,1.95+Math.sin(t*2)*0.12,drM.position.z+0.25); orb.rotation.y+=dt*1.6;
+  orb.position.set(drM.position.x+0.7,1.95+Math.sin(t*2)*0.12,drM.position.z+0.25); orb.rotation.y+=dt*1.6; orbSh.position.set(orb.position.x,0.05,orb.position.z);
   // token minting: a coin struck every couple of seconds, Foundry -> Vault
   coinTimer-=dt; if(coinTimer<=0){ coinTimer=2.2+Math.random()*1.6; mintCoin(); }
   for(let i=coins.length-1;i>=0;i--){ const cn=coins[i]; cn.t+=dt*0.5; const p=lerpV(fp,Z('vault').pos,Math.min(1,cn.t)); cn.m.position.set(p.x,1.4+Math.sin(cn.t*Math.PI)*1.1,p.z); cn.m.rotation.y+=dt*5; cn.m.rotation.z+=dt*3; if(cn.t>=1){ scene.remove(cn.m); coins.splice(i,1); } }
