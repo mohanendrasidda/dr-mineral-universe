@@ -19,3 +19,5 @@ dist/
 # Asset working scratch (keep raw/ and keyed/ tracked; ignore tmp exports)
 assets/tmp/
 *.psd
+assets/video/ltx-samples/
+logs/
