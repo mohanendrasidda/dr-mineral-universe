@@ -93,42 +93,39 @@ shaftLight.castShadow=true; shaftLight.shadow.mapSize.set(2048,2048); shaftLight
 const cMat=c=>new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:1.0,roughness:.3,metalness:.2});
 const glassMat=c=>new THREE.MeshPhysicalMaterial({color:c,emissive:c,emissiveIntensity:.5,metalness:0,roughness:.05,transmission:.92,ior:1.8,thickness:1.4,transparent:true,envMapIntensity:1.3});
 
-// ---------- underground cavern ----------
-const floor=new THREE.Mesh(new THREE.CircleGeometry(24,72),new THREE.MeshStandardMaterial({color:0x1c140d,roughness:.95,metalness:0}));
-floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
-// tall dark cave walls
-const wall=new THREE.Mesh(new THREE.CylinderGeometry(24,27,42,64,1,true),new THREE.MeshStandardMaterial({color:0x0d0906,roughness:1,side:THREE.BackSide}));
-wall.position.y=16; scene.add(wall);
-// rock ceiling dome (closes the cavern)
-const dome=new THREE.Mesh(new THREE.SphereGeometry(26,44,24,0,Math.PI*2,0,Math.PI*0.5),new THREE.MeshStandardMaterial({color:0x0b0705,roughness:1,side:THREE.BackSide}));
-dome.position.y=11; scene.add(dome);
-// the shaft of light from the entrance above — how the lab was found
-const shaftCone=new THREE.Mesh(new THREE.ConeGeometry(7.5,32,64,1,true),new THREE.MeshBasicMaterial({color:0xffe9c0,transparent:true,opacity:0.035,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));
-shaftCone.position.set(0,16,0); scene.add(shaftCone);
-const pool=new THREE.Mesh(new THREE.CircleGeometry(5.5,44),new THREE.MeshBasicMaterial({color:0xffe9c0,transparent:true,opacity:0.10,depthWrite:false,blending:THREE.AdditiveBlending}));
-pool.rotation.x=-Math.PI/2; pool.position.y=0.07; scene.add(pool);
-// stalactites hanging from the ceiling
-for(let i=0;i<18;i++){const a=Math.random()*6.28,r=5+Math.random()*16,h=2+Math.random()*5;
-  const m=new THREE.Mesh(new THREE.ConeGeometry(0.4+Math.random()*0.7,h,6),new THREE.MeshStandardMaterial({color:0x120c08,roughness:1}));
-  m.position.set(Math.cos(a)*r,21-h/2,Math.sin(a)*r); m.rotation.x=Math.PI; scene.add(m);}
-// stalagmites / rock pillars rising near the walls
-for(let i=0;i<14;i++){const a=i/14*6.28,r=18+Math.sin(i*2)*2,h=4+Math.random()*9;
-  const m=new THREE.Mesh(new THREE.ConeGeometry(1.2+Math.random(),h,6),new THREE.MeshStandardMaterial({color:0x140e09,roughness:1}));
-  m.position.set(Math.cos(a)*r,h/2,Math.sin(a)*r); m.rotation.y=Math.random()*3; scene.add(m);}
-// bioluminescent crystals embedded in the cave walls
-const wallCols=[0xb98cff,0x6fd0ff,0xf6c878,0x7fd1a6];
-for(let i=0;i<30;i++){const a=Math.random()*6.28,y=2+Math.random()*16,c=wallCols[i%4];
-  const m=new THREE.Mesh(new THREE.OctahedronGeometry(0.25+Math.random()*0.4,0),glassMat(c));
-  m.position.set(Math.cos(a)*22.6,y,Math.sin(a)*22.6); m.rotation.set(Math.random()*3,Math.random()*3,0); scene.add(m);}
+// ---------- underground architecture (carved stone, falling into the dark) ----------
+const stone=(c)=>new THREE.MeshStandardMaterial({color:c||0x1f160d,roughness:1,metalness:0});
+const floor=new THREE.Mesh(new THREE.CircleGeometry(27,72),stone(0x17100a)); floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
+const wall=new THREE.Mesh(new THREE.CylinderGeometry(28,32,50,64,1,true),stone(0x0b0704)); wall.material.side=THREE.BackSide; wall.position.y=20; scene.add(wall);
+const dome=new THREE.Mesh(new THREE.SphereGeometry(30,44,24,0,Math.PI*2,0,Math.PI*0.5),stone(0x080503)); dome.material.side=THREE.BackSide; dome.position.y=13; scene.add(dome);
+// the shaft of discovered daylight
+const shaftCone=new THREE.Mesh(new THREE.ConeGeometry(6.5,36,64,1,true),new THREE.MeshBasicMaterial({color:0xffe2a8,transparent:true,opacity:0.038,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending})); shaftCone.position.set(0,18,0); scene.add(shaftCone);
+const pool=new THREE.Mesh(new THREE.CircleGeometry(4.6,44),new THREE.MeshBasicMaterial({color:0xffe2a8,transparent:true,opacity:0.085,depthWrite:false,blending:THREE.AdditiveBlending})); pool.rotation.x=-Math.PI/2; pool.position.y=0.06; scene.add(pool);
+// a field of tiny warm lanterns buried in the depth (glow via bloom; no debris crystals)
+const colMat=stone(0x1a1209);
+const lanternMat=new THREE.MeshStandardMaterial({color:0x3a2810,emissive:0xffa238,emissiveIntensity:1.3,roughness:1});
+function lantern(x,y,z,s){ const m=new THREE.Mesh(new THREE.SphereGeometry(s||0.15,8,8),lanternMat); m.position.set(x,y,z); scene.add(m); return m; }
+// tier upon tier of colonnaded galleries rising into the dark
+for(let tier=0;tier<5;tier++){
+  const ry=2.4+tier*4.3, rad=25-tier*1.3;
+  const ledge=new THREE.Mesh(new THREE.CylinderGeometry(rad,rad+0.7,0.8,48,1,true),colMat); ledge.material.side=THREE.DoubleSide; ledge.position.y=ry; scene.add(ledge);
+  const cols=24; for(let i=0;i<cols;i++){ const a=i/cols*6.283; const x=Math.cos(a)*(rad-0.4), z=Math.sin(a)*(rad-0.4);
+    const col=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.36,3.6,8),colMat); col.position.set(x,ry+1.9,z); scene.add(col);
+    if(i%2===0) lantern(Math.cos(a)*(rad-1.2),ry+0.9,Math.sin(a)*(rad-1.2)); }
+}
+// stalactites + scattered deep lanterns for atmospheric depth
+for(let i=0;i<16;i++){const a=Math.random()*6.283,r=6+Math.random()*17,h=2+Math.random()*5;
+  const m=new THREE.Mesh(new THREE.ConeGeometry(0.4+Math.random()*0.7,h,6),stone(0x0f0a06)); m.position.set(Math.cos(a)*r,25-h/2,Math.sin(a)*r); m.rotation.x=Math.PI; scene.add(m);}
+for(let i=0;i<44;i++){ lantern((Math.random()-0.5)*48, 1.5+Math.random()*23, (Math.random()-0.5)*48, 0.12+Math.random()*0.06); }
 
 // ---------- zones ----------
 const R=9.2;
 const ZONES=[
- {key:'mines',  name:'The Mines',  step:'01 · MINE',   c:0xb98cff, mean:'Where the work happens — finding bugs, running audits, writing it up. Real security work is the lab’s mining.'},
- {key:'foundry',name:'The Foundry',step:'02 · FORGE',  c:0xf2902e, mean:'Verified work is forged into a reward token and welded onto the chain — a permanent, public record.'},
- {key:'ledger', name:'The Ledger', step:'03 · RECORD', c:0x9fc6e8, mean:'Every contribution recorded on-chain, forever. Where reward & bug-bounty winners are honored.'},
- {key:'vault',  name:'The Vault',  step:'04 · SINK',   c:0x6fd0ff, mean:'Mined value is kept here — and the sink the institution controls, so the coin stays healthy.'},
- {key:'watch',  name:'The Watch',  step:'05 · GUARD',  c:0xe2603a, mean:'Slither, Echidna, monitoring. A security-led cohort’s home-field edge: the chain is guarded.'},
+ {key:'mines',  name:'The Mines',  step:'01 · MINE',   c:0xcf9a52, mean:'Where the work happens — finding bugs, running audits, writing it up. Real security work is the lab’s mining.'},
+ {key:'foundry',name:'The Foundry',step:'02 · FORGE',  c:0xc06820, mean:'Verified work is forged into a reward token and welded onto the chain — a permanent, public record.'},
+ {key:'ledger', name:'The Ledger', step:'03 · RECORD', c:0xe6c886, mean:'Every contribution recorded on-chain, forever. Where reward & bug-bounty winners are honored.'},
+ {key:'vault',  name:'The Vault',  step:'04 · SINK',   c:0xc2a060, mean:'Mined value is kept here — and the sink the institution controls, so the coin stays healthy.'},
+ {key:'watch',  name:'The Watch',  step:'05 · GUARD',  c:0xa9743a, mean:'Slither, Echidna, monitoring. A security-led cohort’s home-field edge: the chain is guarded.'},
 ];
 ZONES.forEach((z,i)=>{ const a=Math.PI/2 - i*(2*Math.PI/5); z.pos=new THREE.Vector3(Math.cos(a)*R,0,Math.sin(a)*R); });
 const Z=k=>ZONES.find(z=>z.key===k);
@@ -136,7 +133,7 @@ const Z=k=>ZONES.find(z=>z.key===k);
 // glowing loop paths between consecutive zones
 for(let i=0;i<ZONES.length;i++){ const a=ZONES[i].pos, b=ZONES[(i+1)%ZONES.length].pos;
   const mid=a.clone().add(b).multiplyScalar(0.5); const len=a.distanceTo(b);
-  const strip=new THREE.Mesh(new THREE.BoxGeometry(len,0.06,0.5),new THREE.MeshStandardMaterial({color:0x7a5a2a,emissive:0xc8902e,emissiveIntensity:.5,roughness:.6}));
+  const strip=new THREE.Mesh(new THREE.BoxGeometry(len,0.05,0.45),new THREE.MeshStandardMaterial({color:0x2a1f12,emissive:0x8a5f24,emissiveIntensity:.1,roughness:.9}));
   strip.position.set(mid.x,0.05,mid.z); strip.rotation.y=-Math.atan2(b.z-a.z,b.x-a.x); scene.add(strip); }
 
 // zone platforms + lights + props
@@ -145,21 +142,27 @@ ZONES.forEach(z=>{
   const plat=new THREE.Mesh(new THREE.CylinderGeometry(2.5,2.8,0.5,40),new THREE.MeshStandardMaterial({color:0x2c2118,roughness:.9}));
   plat.position.copy(z.pos); plat.position.y=0.25; scene.add(plat);
   plat.userData.zone=z; picker.push(plat);
-  const pl=new THREE.PointLight(z.c,16,18,2); pl.position.copy(z.pos); pl.position.y=2.6; scene.add(pl); z.light=pl;
+  const pl=new THREE.PointLight(z.c,5,12,2.2); pl.position.copy(z.pos); pl.position.y=1.8; scene.add(pl); z.light=pl;
 });
-function octo(p,c,h,y){const m=new THREE.Mesh(new THREE.OctahedronGeometry(h,0),glassMat(c)); m.position.set(p.x,(y||h*0.9),p.z); m.castShadow=true; scene.add(m); return m;}
-// Mines: crystal cluster
-const mp=Z('mines').pos; const mineCrys=[]; for(let i=0;i<7;i++){const a=i/7*6.28; mineCrys.push(octo(new THREE.Vector3(mp.x+Math.cos(a)*1.5,0,mp.z+Math.sin(a)*1.5),0xb98cff,0.4+Math.random()*0.5));}
-// Foundry: forge ring + light
-const fp=Z('foundry').pos; const forge=new THREE.Mesh(new THREE.TorusGeometry(1.3,0.34,16,40),new THREE.MeshStandardMaterial({color:0xff8a2a,emissive:0xff7a18,emissiveIntensity:1.1,roughness:.4})); forge.position.set(fp.x,1.3,fp.z); forge.rotation.x=Math.PI/2; scene.add(forge);
-const forgeLight=new THREE.PointLight(0xff8a2a,18,16,2); forgeLight.position.set(fp.x,1.7,fp.z); scene.add(forgeLight);
-// Ledger: pillar + star (chain grows toward here)
-const lp=Z('ledger').pos; const pillar=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,4.2,12),cMat(0x9fc6e8)); pillar.position.set(lp.x,2.1,lp.z); scene.add(pillar);
-const star=new THREE.Mesh(new THREE.IcosahedronGeometry(0.42,0),new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xbfe0ff,emissiveIntensity:1.8})); star.position.set(lp.x,4.5,lp.z); scene.add(star);
-// Vault: pedestal + blue gem
-const vp=Z('vault').pos; const ped=new THREE.Mesh(new THREE.CylinderGeometry(0.7,0.95,1,16),new THREE.MeshStandardMaterial({color:0x2a2118,roughness:.9})); ped.position.set(vp.x,0.75,vp.z); scene.add(ped); const seed=octo(vp,0x6fd0ff,0.7,1.8);
-// Watch: eye
-const wp=Z('watch').pos; const eye=new THREE.Mesh(new THREE.TorusGeometry(0.95,0.16,12,32),cMat(0xe2603a)); eye.position.set(wp.x,1.9,wp.z); scene.add(eye); const pupil=new THREE.Mesh(new THREE.SphereGeometry(0.34,16,16),new THREE.MeshStandardMaterial({color:0xffcaa0,emissive:0xff9a60,emissiveIntensity:1.3})); pupil.position.set(wp.x,1.9,wp.z); scene.add(pupil);
+function octo(p,c,h,y){const m=new THREE.Mesh(new THREE.OctahedronGeometry(h,0),new THREE.MeshStandardMaterial({color:0x6a4a22,emissive:c,emissiveIntensity:.4,roughness:.6})); m.position.set(p.x,(y||h*0.9),p.z); m.castShadow=true; scene.add(m); return m;}
+// Mines: a dull crystal seam in a dark rock mound (heavy, dim — not candy gems)
+const mp=Z('mines').pos;
+const mineMound=new THREE.Mesh(new THREE.ConeGeometry(2.3,1.7,7),stone(0x140d08)); mineMound.position.set(mp.x,0.85,mp.z); mineMound.rotation.y=0.4; mineMound.castShadow=true; scene.add(mineMound);
+const seamMat=new THREE.MeshStandardMaterial({color:0x5a3c1c,emissive:0xb87a2c,emissiveIntensity:.32,roughness:.7});
+const mineCrys=[]; for(let i=0;i<5;i++){const a=i/5*3.0-0.7; const m=new THREE.Mesh(new THREE.OctahedronGeometry(0.3+Math.random()*0.28,0),seamMat); m.position.set(mp.x+Math.cos(a)*0.95,1.05+Math.sin(i*1.7)*0.3,mp.z+Math.sin(a)*0.95); m.rotation.set(Math.random()*3,Math.random()*3,0); scene.add(m); mineCrys.push(m);}
+// Foundry: a dark stone basin with a low ember that breathes and lights stone from below
+const fp=Z('foundry').pos;
+const forgeBasin=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.8,1.2,18),stone(0x17110b)); forgeBasin.position.set(fp.x,0.6,fp.z); forgeBasin.castShadow=true; scene.add(forgeBasin);
+const ember=new THREE.Mesh(new THREE.SphereGeometry(1.0,20,16),new THREE.MeshStandardMaterial({color:0x2e1404,emissive:0xc24a12,emissiveIntensity:.85,roughness:1})); ember.position.set(fp.x,1.05,fp.z); ember.scale.y=0.45; scene.add(ember);
+const forgeLight=new THREE.PointLight(0xff5a14,6,11,2.4); forgeLight.position.set(fp.x,0.95,fp.z); scene.add(forgeLight);
+// Ledger: a dim warm obelisk where the chain of light gathers
+const lp=Z('ledger').pos; const pillar=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.24,4.4,8),new THREE.MeshStandardMaterial({color:0x241a10,emissive:0x8a6024,emissiveIntensity:.28,roughness:.85})); pillar.position.set(lp.x,2.2,lp.z); scene.add(pillar);
+const star=new THREE.Mesh(new THREE.IcosahedronGeometry(0.36,0),new THREE.MeshStandardMaterial({color:0x4a3a1c,emissive:0xf0d294,emissiveIntensity:1.0,roughness:.6})); star.position.set(lp.x,4.6,lp.z); scene.add(star);
+// Vault: pedestal + a single warm kept gem under guard
+const vp=Z('vault').pos; const ped=new THREE.Mesh(new THREE.CylinderGeometry(0.72,0.98,1.1,16),stone(0x1d150d)); ped.position.set(vp.x,0.55,vp.z); ped.castShadow=true; scene.add(ped);
+const seed=new THREE.Mesh(new THREE.OctahedronGeometry(0.62,0),new THREE.MeshStandardMaterial({color:0x6a4a22,emissive:0xc89a46,emissiveIntensity:.5,roughness:.5})); seed.position.set(vp.x,1.55,vp.z); scene.add(seed);
+// Watch: a dim warm eye in the shadow
+const wp=Z('watch').pos; const eye=new THREE.Mesh(new THREE.TorusGeometry(0.9,0.15,12,28),new THREE.MeshStandardMaterial({color:0x2a1c10,emissive:0x9a6826,emissiveIntensity:.45,roughness:.7})); eye.position.set(wp.x,1.85,wp.z); scene.add(eye); const pupil=new THREE.Mesh(new THREE.SphereGeometry(0.3,16,16),new THREE.MeshStandardMaterial({color:0x3a2810,emissive:0xc08a3a,emissiveIntensity:.6,roughness:.6})); pupil.position.set(wp.x,1.85,wp.z); scene.add(pupil);
 
 // ---------- billboard sprites ----------
 const texLoader=new THREE.TextureLoader();
@@ -183,7 +186,7 @@ function groundShadow(w){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,w*0.58
 const FR={}; function tex(url){ if(!FR[url]){ const t=texLoader.load(url,()=>ready()); t.colorSpace=THREE.SRGBColorSpace; FR[url]=t; } return FR[url]; }
 function critter(urls,h,opts){ opts=opts||{};
   const textures=urls.map(tex);
-  const m=new THREE.SpriteMaterial({map:textures[0],transparent:true,depthWrite:false});
+  const m=new THREE.SpriteMaterial({map:textures[0],transparent:true,depthWrite:false,color:new THREE.Color(0xb6aa8e)});
   const s=new THREE.Sprite(m); s.scale.set(h,h,1);
   s.userData=Object.assign({h,textures,frame:0,ft:0,fps:opts.fps||5,state:opts.state||'idle',phase:Math.random()*6.28,facing:1,baseY:opts.baseY||0},opts);
   scene.add(s); return s; }
@@ -204,7 +207,7 @@ const drM=critter(['../../assets/keyed/char-drmineral-hero-v1.png'],3.2,{state:'
 const tally=critter(['../../assets/keyed/char-tally-v1.png'],2.0,{state:'idle'}); tally.position.set(lp.x+1.6,0,lp.z+0.4);
 const vellum=critter(['../../assets/keyed/char-vellum-v1.png'],1.9,{state:'idle',fps:2}); vellum.position.set(vp.x+1.6,0,vp.z+0.2);
 const miners=[]; for(let i=0;i<3;i++){ const a=i/3*6.28; const s=critter(WALK,1.7,{state:'mine',fps:2}); s.position.set(mp.x+Math.cos(a)*1.7,0,mp.z+Math.sin(a)*1.7); s.userData.facing=(Math.cos(a)<0?-1:1); miners.push(s); }
-const haulers=[]; for(let i=0;i<3;i++){ const s=critter(WALK,1.7,{state:'walk',fps:3}); s.userData.t=i*0.66; haulers.push({s,crystal:octo(mp,0xd9b3ff,0.26,1.1),prev:0}); }
+const haulers=[]; for(let i=0;i<3;i++){ const s=critter(WALK,1.7,{state:'walk',fps:3}); s.userData.t=i*0.66; haulers.push({s,crystal:octo(mp,0xc89a46,0.26,1.1),prev:0}); }
 // contact shadows under every character
 const shadowed=[drM,tally,vellum,...miners,...haulers.map(h=>h.s)];
 const shadows=shadowed.map(s=>groundShadow(s.userData.h*0.85));
@@ -261,9 +264,9 @@ function loop(){
   for(let i=flyers.length-1;i>=0;i--){ const fl=flyers[i]; fl.t+=dt*0.9; const p=lerpV(fp,lp,Math.min(1,fl.t)); fl.m.position.set(p.x,1.0+Math.sin(fl.t*3)*0.5*(1-fl.t),p.z); fl.m.rotation.y+=dt*3;
     if(fl.t>=1){ landBlock(fl.m); flyers.splice(i,1); } }
   // props
-  forge.rotation.z+=dt*0.6; forgeLight.intensity=15+Math.sin(t*4)*4; star.rotation.y+=dt*1.2; star.position.y=4.5+Math.sin(t*2)*0.16;
-  seed.rotation.y+=dt*0.8; eye.rotation.z+=dt*0.5; mineCrys.forEach((c,i)=>c.rotation.y+=dt*(0.3+i*0.04));
-  ZONES.forEach((z,i)=>z.light.intensity=9+Math.sin(t*1.1+i)*1.8);
+  forgeLight.intensity=4.2+Math.sin(t*1.5)*1.5; ember.material.emissiveIntensity=0.7+Math.sin(t*1.5)*0.22; star.rotation.y+=dt*0.5; star.position.y=4.6+Math.sin(t*1.1)*0.1;
+  seed.rotation.y+=dt*0.25; eye.rotation.z+=dt*0.18; mineCrys.forEach((c,i)=>c.rotation.y+=dt*(0.1+i*0.02));
+  ZONES.forEach((z,i)=>z.light.intensity=4+Math.sin(t*1.0+i)*1.1);
   chain.children.forEach((l,i)=>l.material&&(l.rotation.y+=dt*0.4));
   // dust drift
   const dp=dust.geometry.attributes.position.array; for(let i=0;i<dustN;i++){ dp[i*3+1]+=dt*0.25; if(dp[i*3+1]>16)dp[i*3+1]=0; } dust.geometry.attributes.position.needsUpdate=true; dust.rotation.y+=dt*0.01;
