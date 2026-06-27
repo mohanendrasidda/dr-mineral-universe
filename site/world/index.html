@@ -562,12 +562,10 @@ function startVideoIntro(src){ const vid=document.getElementById('intro-video'),
   document.body.classList.add('introvid'); const l=document.getElementById('loading'); if(l)l.style.display='none';
   if(splash)splash.style.display='none';
   if(vid)vid.addEventListener('ended',videoToWorld);
-  const begin=()=>{ if(splash)splash.style.display='none'; if(vid){ vid.muted=false; vid.style.opacity=1; vid.play().catch(()=>{}); } startScore(); };
-  // autoplay with sound straight away (continuing the click from the landing); only fall back to a tap if blocked
-  if(vid){ vid.src=src; vid.muted=false; vid.style.opacity=1;
-    const pr=vid.play();
-    if(pr&&pr.then) pr.then(()=>startScore()).catch(()=>{ if(splash)splash.style.display='flex'; document.addEventListener('pointerdown',begin,{once:true}); });
-    else startScore();
+  // muted autoplay is always allowed → the intro starts immediately, NO "BEGIN" gate; sound fades in on the first tap
+  if(vid){ vid.src=src; vid.muted=true; vid.style.opacity=1; vid.play().catch(()=>{});
+    const unmute=()=>{ try{ vid.muted=false; }catch(e){} startScore(); };
+    document.addEventListener('pointerdown',unmute,{once:true});
   } }
 function videoToWorld(){ startCine(false); fadeAudio(document.getElementById('intro-audio'),0.92,3200); // swell as the descent into the lab begins
   const vid=document.getElementById('intro-video');
