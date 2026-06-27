@@ -323,36 +323,58 @@ export const Teaser: React.FC = () => {
         }
       />
 
-      {/* 1 — descent (LTX clip) */}
-      <Sequence from={0} durationInFrames={175}>
+      {/* 1 — Lincoln at dusk (real Nebraska aerial) */}
+      <Sequence from={0} durationInFrames={150}>
         <AbsoluteFill style={{ background: "#000" }}>
-          <ClipScene src="clip-descent.mp4" rate={0.75} total={175} outS={150} outE={175} />
+          <ClipScene src="clip-lincoln.mp4" rate={0.85} total={150} outS={125} outE={150} />
           <Grade />
-          <Kicker outE={175}>UNIVERSITY OF NEBRASKA · A LIVING LAB</Kicker>
-          <Caption top="70%" size={40} italic outS={120} outE={160}>
-            Beneath an ordinary campus,
+          <Kicker outE={150}>UNIVERSITY OF NEBRASKA · LINCOLN</Kicker>
+          <Caption top="72%" size={42} outS={100} outE={140}>
+            An ordinary city.
           </Caption>
         </AbsoluteFill>
       </Sequence>
 
-      {/* 2 — the reveal */}
-      <Sequence from={160} durationInFrames={205}>
+      {/* 2 — the campus */}
+      <Sequence from={135} durationInFrames={155}>
+        <AbsoluteFill style={{ background: "#000" }}>
+          <ClipScene src="clip-campus.mp4" rate={0.85} total={155} outS={130} outE={155} />
+          <Grade />
+          <Caption top="72%" size={40} italic outS={110} outE={150}>
+            A quiet campus. Nobody looks twice.
+          </Caption>
+        </AbsoluteFill>
+      </Sequence>
+
+      {/* 3 — the descent (LTX clip) */}
+      <Sequence from={275} durationInFrames={165}>
+        <AbsoluteFill style={{ background: "#000" }}>
+          <ClipScene src="clip-descent.mp4" rate={0.75} total={165} outS={140} outE={165} />
+          <Grade />
+          <Caption top="72%" size={42} italic outS={115} outE={155}>
+            But beneath it,
+          </Caption>
+        </AbsoluteFill>
+      </Sequence>
+
+      {/* 4 — the reveal */}
+      <Sequence from={425} durationInFrames={195}>
         <AbsoluteFill style={{ background: BG }}>
-          <KB src="central-cavern.png" from={1.04} to={1.16} outS={180} outE={205} total={205} />
+          <KB src="central-cavern.png" from={1.04} to={1.16} outS={170} outE={195} total={195} />
           <Grade />
-          <Caption top="44%" size={52} outS={150} outE={195}>
-            a lab that has worked for ages.
+          <Caption top="44%" size={52} outS={150} outE={188}>
+            a lab has worked for ages.
           </Caption>
         </AbsoluteFill>
       </Sequence>
 
-      {/* 3 — the core loop across the five districts */}
-      <Sequence from={360} durationInFrames={320}>
+      {/* 5 — the core loop across the five districts */}
+      <Sequence from={605} durationInFrames={320}>
         <Districts />
       </Sequence>
 
-      {/* 4 — the line */}
-      <Sequence from={675} durationInFrames={150}>
+      {/* 6 — the line */}
+      <Sequence from={920} durationInFrames={150}>
         <AbsoluteFill
           style={{
             background: `radial-gradient(80% 80% at 50% 45%, #15110c 0%, ${BG} 78%)`,
@@ -364,8 +386,8 @@ export const Teaser: React.FC = () => {
         </AbsoluteFill>
       </Sequence>
 
-      {/* 5 — title card / CTA */}
-      <Sequence from={815} durationInFrames={durationInFrames - 815}>
+      {/* 7 — title card / CTA */}
+      <Sequence from={1060} durationInFrames={durationInFrames - 1060}>
         <CTA />
       </Sequence>
     </AbsoluteFill>
