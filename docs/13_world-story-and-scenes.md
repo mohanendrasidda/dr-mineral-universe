@@ -9,6 +9,11 @@ Beneath an ordinary university, in the dark, there is a place that should not ex
 
 **The feeling we are building:** *"I have discovered something extraordinary and secret, and it has been here all along."* Wonder. Reverence. A held breath. Not a giggle.
 
+## 1b. Visual target — REALISTIC 3D (not stylized)
+**As real as it can be. Not Pixar, not anime, not cartoon.** Real materials (rough wet stone, aged brass, glass crystal, molten metal), real dramatic light, real depth and fog. The realism is what sells "this is a real, hidden place."
+- **Environment = genuinely achievable in real 3D** (PBR materials, dramatic dim lighting, fog/depth, real glass/metal, even real-geometry props via image-to-3D for static rocks/crystals/machinery — no rigging needed). This is where realism is built, and it carries the whole mood.
+- **Characters = the honest limit.** Realistic *animated* 3D creatures need modeling+rigging (artist/paid) — free tools can't. **In this dark register that's a feature:** keep figures small, distant, and in shadow — silhouettes and forms at work in the gloom. Darkness hides model fidelity and *deepens* the mystery. Detailed realistic character models are a later, paid/artist step if ever needed.
+
 ## 2. The mood, in one line each (the tone lock)
 - **Ancient, not new.** Worn stone, old brass, centuries of patient work. Nothing feels freshly-built or game-like.
 - **Vast and deep, not small and flat.** You sense a city falling away into darkness, not a little arena.

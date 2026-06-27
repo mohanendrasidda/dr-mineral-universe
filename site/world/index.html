@@ -66,16 +66,17 @@ const renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(W(),H()); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.0;
 renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMappingExposure=0.8;
 document.getElementById('app').appendChild(renderer.domElement);
 
-const scene=new THREE.Scene(); scene.background=new THREE.Color(0x050302); scene.fog=new THREE.FogExp2(0x070403,0.028);
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x040201); scene.fog=new THREE.FogExp2(0x060302,0.042);
 // environment map -> real reflections on metal & glass
 const pmrem=new THREE.PMREMGenerator(renderer);
 scene.environment=pmrem.fromScene(new RoomEnvironment(),0.5).texture;
 const camera=new THREE.PerspectiveCamera(46,W()/H(),0.1,300); camera.position.set(16,13,19);
 const controls=new OrbitControls(camera,renderer.domElement); controls.target.set(0,1.4,0);
 controls.enableDamping=true; controls.dampingFactor=0.06; controls.minDistance=8; controls.maxDistance=42; controls.maxPolarAngle=Math.PI*0.485;
-controls.autoRotate=true; controls.autoRotateSpeed=0.18;
+controls.autoRotate=true; controls.autoRotateSpeed=0.09;
 
 const composer=new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene,camera));
@@ -83,7 +84,7 @@ const bloom=new UnrealBloomPass(new THREE.Vector2(W(),H()),0.65,0.35,0.82);
 composer.addPass(bloom);
 
 // ---------- lighting (dark cave; the shaft is the drama) ----------
-scene.add(new THREE.HemisphereLight(0x2a2016,0x050302,0.34));
+scene.add(new THREE.HemisphereLight(0x2a2016,0x050302,0.2));
 const shaftLight=new THREE.SpotLight(0xfff0d0,80,70,Math.PI*0.14,0.55,1.3);
 shaftLight.position.set(0,32,0); shaftLight.target.position.set(0,0,0); scene.add(shaftLight); scene.add(shaftLight.target);
 shaftLight.castShadow=true; shaftLight.shadow.mapSize.set(2048,2048); shaftLight.shadow.camera.near=4; shaftLight.shadow.camera.far=64; shaftLight.shadow.bias=-0.0006; shaftLight.shadow.radius=4;
@@ -202,8 +203,8 @@ const WALK=['../sprites/walk-a.png','../sprites/walk-b.png'];
 const drM=critter(['../../assets/keyed/char-drmineral-hero-v1.png'],3.2,{state:'idle'}); drM.position.set(0,0,0);
 const tally=critter(['../../assets/keyed/char-tally-v1.png'],2.0,{state:'idle'}); tally.position.set(lp.x+1.6,0,lp.z+0.4);
 const vellum=critter(['../../assets/keyed/char-vellum-v1.png'],1.9,{state:'idle',fps:2}); vellum.position.set(vp.x+1.6,0,vp.z+0.2);
-const miners=[]; for(let i=0;i<3;i++){ const a=i/3*6.28; const s=critter(WALK,1.7,{state:'mine',fps:4}); s.position.set(mp.x+Math.cos(a)*1.7,0,mp.z+Math.sin(a)*1.7); s.userData.facing=(Math.cos(a)<0?-1:1); miners.push(s); }
-const haulers=[]; for(let i=0;i<3;i++){ const s=critter(WALK,1.7,{state:'walk',fps:6}); s.userData.t=i*0.66; haulers.push({s,crystal:octo(mp,0xd9b3ff,0.26,1.1),prev:0}); }
+const miners=[]; for(let i=0;i<3;i++){ const a=i/3*6.28; const s=critter(WALK,1.7,{state:'mine',fps:2}); s.position.set(mp.x+Math.cos(a)*1.7,0,mp.z+Math.sin(a)*1.7); s.userData.facing=(Math.cos(a)<0?-1:1); miners.push(s); }
+const haulers=[]; for(let i=0;i<3;i++){ const s=critter(WALK,1.7,{state:'walk',fps:3}); s.userData.t=i*0.66; haulers.push({s,crystal:octo(mp,0xd9b3ff,0.26,1.1),prev:0}); }
 // contact shadows under every character
 const shadowed=[drM,tally,vellum,...miners,...haulers.map(h=>h.s)];
 const shadows=shadowed.map(s=>groundShadow(s.userData.h*0.85));
@@ -250,7 +251,7 @@ function loop(){
   tickCritter(drM,dt,t); tickCritter(tally,dt,t); tickCritter(vellum,dt,t);
   miners.forEach(s=>tickCritter(s,dt,t));
   // haulers Mine->Foundry->Mine (walk cycle + carried crystal)
-  haulers.forEach(h=>{ h.s.userData.t+=dt*0.22; const seg=h.s.userData.t%2; const carry=seg<1;
+  haulers.forEach(h=>{ h.s.userData.t+=dt*0.11; const seg=h.s.userData.t%2; const carry=seg<1;
     const from=carry?mp:fp, to=carry?fp:mp, f=carry?seg:seg-1;
     h.s.position.x=from.x+(to.x-from.x)*f; h.s.position.z=from.z+(to.z-from.z)*f;
     h.s.userData.facing=((to.x-from.x)<0)?-1:1; tickCritter(h.s,dt,t);
@@ -262,7 +263,7 @@ function loop(){
   // props
   forge.rotation.z+=dt*0.6; forgeLight.intensity=15+Math.sin(t*4)*4; star.rotation.y+=dt*1.2; star.position.y=4.5+Math.sin(t*2)*0.16;
   seed.rotation.y+=dt*0.8; eye.rotation.z+=dt*0.5; mineCrys.forEach((c,i)=>c.rotation.y+=dt*(0.3+i*0.04));
-  ZONES.forEach((z,i)=>z.light.intensity=14+Math.sin(t*2+i)*3);
+  ZONES.forEach((z,i)=>z.light.intensity=9+Math.sin(t*1.1+i)*1.8);
   chain.children.forEach((l,i)=>l.material&&(l.rotation.y+=dt*0.4));
   // dust drift
   const dp=dust.geometry.attributes.position.array; for(let i=0;i<dustN;i++){ dp[i*3+1]+=dt*0.25; if(dp[i*3+1]>16)dp[i*3+1]=0; } dust.geometry.attributes.position.needsUpdate=true; dust.rotation.y+=dt*0.01;
