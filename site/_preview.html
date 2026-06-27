@@ -1,0 +1,24 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{margin:0;overflow:hidden}</style>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+const r=new THREE.WebGLRenderer({antialias:true}); r.setSize(innerWidth,innerHeight); r.outputColorSpace=THREE.SRGBColorSpace; document.body.appendChild(r.domElement);
+const sc=new THREE.Scene(); sc.background=new THREE.Color(0x8a8a8a);
+const cam=new THREE.PerspectiveCamera(40,innerWidth/innerHeight,0.01,1000);
+sc.add(new THREE.HemisphereLight(0xffffff,0x555555,2.2)); const d=new THREE.DirectionalLight(0xffffff,2.2); d.position.set(2,4,3); sc.add(d);
+new GLTFLoader().load('../assets/models/drmineral_raw.glb',g=>{
+  const o=g.scene; o.traverse(m=>{ if(m.isMesh&&m.material){ m.material.side=THREE.DoubleSide; m.material.metalness=0; m.material.roughness=1; } });
+  const box=new THREE.Box3().setFromObject(o); const c=box.getCenter(new THREE.Vector3()), s=box.getSize(new THREE.Vector3());
+  o.position.sub(c); sc.add(o);
+  const rad=Math.max(s.x,s.y,s.z)||1; cam.position.set(0,rad*0.05,rad*1.7); cam.lookAt(0,0,0);
+  // two copies: FRONT (sharp, from the input) and a 3/4 turn
+  const front=o; front.rotation.y=0.5+Math.PI; front.position.x-=rad*0.5;
+  const q=o.clone(); q.rotation.y=0.5+Math.PI*1.4; q.position.x+=rad*0.5; sc.add(q);
+  cam.position.set(0,rad*0.05,rad*2.4);
+  let n=0; (function loop(){ r.render(sc,cam); if(n++<90) requestAnimationFrame(loop); })();
+}, undefined, e=>{ document.body.innerHTML='<h2 style="color:red">load error: '+e+'</h2>'; });
+</script>
+</body></html>
