@@ -58,6 +58,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 window.addEventListener('error', e=>{ const l=document.getElementById('loading'); if(l){ l.style.display='flex'; l.textContent='⚠ '+(e.message||'error'); } });
 
@@ -213,6 +214,16 @@ function makeSquirrel3D(){
 
 // keepers
 const drM=makeSquirrel3D(); drM.position.set(0,0,0); scene.add(drM);
+// load the real image-to-3D model (TripoSR .glb); swap in over the code-built one when ready
+let heroGlb=null;
+new GLTFLoader().load('../../assets/models/dr-mineral.glb', (gltf)=>{
+  const m=gltf.scene;
+  const box=new THREE.Box3().setFromObject(m), size=new THREE.Vector3(); box.getSize(size);
+  const s=3.4/(size.y||1); m.scale.setScalar(s);
+  const b2=new THREE.Box3().setFromObject(m); m.position.set(0,-b2.min.y,0); m.userData.baseY=m.position.y;
+  m.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; if(o.material) o.material.envMapIntensity=1.0; } });
+  scene.add(m); heroGlb=m; drM.visible=false;
+}, undefined, e=>{ console.warn('glb load failed (keeping code-built squirrel):', e); });
 const tally=sprite(URLS.tally,2.0); tally.position.set(lp.x+1.6,0,lp.z+0.4); setY(tally,0);
 const vellum=sprite(URLS.vellum,1.9); vellum.position.set(vp.x+1.6,0,vp.z+0.2); setY(vellum,0);
 // miners at the mines (bob)
@@ -262,7 +273,9 @@ function loop(){
   requestAnimationFrame(loop);
   const dt=Math.min(0.05,clock.getDelta()), t=clock.getElapsedTime();
   // keepers bob
-  drM.position.y=Math.abs(Math.sin(t*1.4))*0.04; drM.rotation.y=Math.sin(t*0.25)*0.4; setY(tally,Math.sin(t*2+1)*0.05);
+  drM.position.y=Math.abs(Math.sin(t*1.4))*0.04; drM.rotation.y=Math.sin(t*0.25)*0.4;
+  if(heroGlb){ heroGlb.position.y=heroGlb.userData.baseY+Math.abs(Math.sin(t*1.4))*0.03; heroGlb.rotation.y=Math.sin(t*0.22)*0.45; }
+  setY(tally,Math.sin(t*2+1)*0.05);
   // miners bob + occasional dig
   miners.forEach((s,i)=>{ const ph=s.userData.phase; setY(s,Math.abs(Math.sin(t*3+ph))*0.18); flip(s,Math.sin(t*0.6+i)<0); });
   // haulers Mine->Foundry->Mine
