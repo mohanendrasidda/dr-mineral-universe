@@ -90,6 +90,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -129,6 +130,7 @@ scene.add(new THREE.HemisphereLight(0x3a2c18,0x0a0604,0.3));
 const shaftLight=new THREE.SpotLight(0xffe6b4,40,66,Math.PI*0.15,0.6,1.4);
 shaftLight.position.set(0,32,0); shaftLight.target.position.set(0,0,0); scene.add(shaftLight); scene.add(shaftLight.target);
 shaftLight.castShadow=true; shaftLight.shadow.mapSize.set(2048,2048); shaftLight.shadow.camera.near=4; shaftLight.shadow.camera.far=64; shaftLight.shadow.bias=-0.0006; shaftLight.shadow.radius=4;
+scene.add(new THREE.HemisphereLight(0x4e4028,0x080604,0.45)); // faint warm fill so the 3D characters never read as a pure-black silhouette
 
 // material helpers (defined before first use)
 const cMat=c=>new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:1.0,roughness:.3,metalness:.2});
@@ -439,16 +441,35 @@ drM.position.set(Math.cos(drMAng)*DRAD,0,Math.sin(drMAng)*DRAD);
 function drMNext(){ drMFromAng=drMAng; drMU=0; drMWalking=true; }
 // --- PATH B PROOF: a real rigged + animated 3D character (CC0 Khronos Fox) driven by Dr. Mineral's patrol ---
 // proves the pipeline: GLTFLoader + skeletal walk/idle + real turning to face travel direction + retexture to our gloom.
-let fox=null, foxMix=null, foxWalk=null, foxIdle=null, foxHeadX=0, foxHeadZ=1; const FOX_YAW=0; // facing offset; add Math.PI if it ever faces backward
-new GLTFLoader().load('../../assets/models/fox.glb', g=>{
-  fox=g.scene; const box=new THREE.Box3().setFromObject(fox); const s=2.4/(box.max.y-box.min.y); fox.scale.setScalar(s);
-  fox.traverse(o=>{ if(o.isMesh){ o.castShadow=true; if(o.material){ o.material.metalness=0; o.material.roughness=1; if(o.material.color) o.material.color.multiplyScalar(0.9); } } });
-  foxMix=new THREE.AnimationMixer(fox); const byName={}; g.animations.forEach(c=>byName[c.name]=c);
-  foxWalk=foxMix.clipAction(byName['Walk']||g.animations[1]||g.animations[0]);
-  foxIdle=foxMix.clipAction(byName['Survey']||g.animations[0]);
-  foxWalk.play(); foxIdle.play();
-  drM.visible=false; fox.position.copy(drM.position); scene.add(fox);
-}, undefined, e=>console.warn('fox load failed', e));
+let fox=null, foxMix=null, foxWalk=null, foxIdle=null, foxHeadX=0, foxHeadZ=1; const FOX_YAW=Math.PI; // Mixamo facing offset; flip by ±PI if he faces the wrong way
+const drMKey=new THREE.PointLight(0xffd29a,12,18,2.0); scene.add(drMKey); // warm hero key-light that follows Dr. Mineral
+// strip horizontal root drift from a clip so the body stays pinned to the patrol (keeps the vertical bob)
+function inPlace(clip){ clip.tracks.forEach(t=>{ if(t.name.endsWith('.position')){ const v=t.values; for(let i=0;i<v.length;i+=3){ v[i]=v[0]; v[i+2]=v[2]; } } }); return clip; }
+// voxel colour transfer: paint the colourless Mixamo mesh from the original vertex-coloured InstantMesh GLB
+function recolorMesh(mesh, srcPos, srcCol){ const G=40, grid=new Float32Array(G*G*G*3), cnt=new Uint32Array(G*G*G), id=(x,y,z)=>(x*G+y)*G+z;
+  let mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9]; const N=srcPos.count;
+  for(let i=0;i<N;i++){const x=srcPos.getX(i),y=srcPos.getY(i),z=srcPos.getZ(i); if(x<mn[0])mn[0]=x;if(y<mn[1])mn[1]=y;if(z<mn[2])mn[2]=z; if(x>mx[0])mx[0]=x;if(y>mx[1])mx[1]=y;if(z>mx[2])mx[2]=z;}
+  const ss=Math.max(mx[0]-mn[0],mx[1]-mn[1],mx[2]-mn[2])||1, vx=(v,m)=>Math.min(G-1,Math.max(0,Math.floor((v-m)/ss*G)));
+  for(let i=0;i<N;i++){const gi=id(vx(srcPos.getX(i),mn[0]),vx(srcPos.getY(i),mn[1]),vx(srcPos.getZ(i),mn[2])); grid[gi*3]+=srcCol.getX(i);grid[gi*3+1]+=srcCol.getY(i);grid[gi*3+2]+=srcCol.getZ(i);cnt[gi]++;}
+  const tp=mesh.geometry.attributes.position, M=tp.count; let tmn=[1e9,1e9,1e9],tmx=[-1e9,-1e9,-1e9];
+  for(let i=0;i<M;i++){const x=tp.getX(i),y=tp.getY(i),z=tp.getZ(i); if(x<tmn[0])tmn[0]=x;if(y<tmn[1])tmn[1]=y;if(z<tmn[2])tmn[2]=z; if(x>tmx[0])tmx[0]=x;if(y>tmx[1])tmx[1]=y;if(z>tmx[2])tmx[2]=z;}
+  const ts=Math.max(tmx[0]-tmn[0],tmx[1]-tmn[1],tmx[2]-tmn[2])||1, tvx=(v,m)=>Math.min(G-1,Math.max(0,Math.floor((v-m)/ts*G)));
+  const col=new Float32Array(M*3), near=(gx,gy,gz)=>{ for(let r=0;r<8;r++)for(let dx=-r;dx<=r;dx++)for(let dy=-r;dy<=r;dy++)for(let dz=-r;dz<=r;dz++){const x=gx+dx,y=gy+dy,z=gz+dz; if(x<0||y<0||z<0||x>=G||y>=G||z>=G)continue; const gi=id(x,y,z); if(cnt[gi])return[grid[gi*3]/cnt[gi],grid[gi*3+1]/cnt[gi],grid[gi*3+2]/cnt[gi]];} return [0.55,0.45,0.35];};
+  for(let i=0;i<M;i++){const c=near(tvx(tp.getX(i),tmn[0]),tvx(tp.getY(i),tmn[1]),tvx(tp.getZ(i),tmn[2])); col[i*3]=c[0];col[i*3+1]=c[1];col[i*3+2]=c[2];}
+  mesh.geometry.setAttribute('color', new THREE.BufferAttribute(col,3));
+  const mats=Array.isArray(mesh.material)?mesh.material:[mesh.material]; mats.forEach(mm=>{ if(mm){ mm.vertexColors=true; if(mm.color)mm.color.setScalar(1); if('map' in mm) mm.map=null; mm.needsUpdate=true; } });
+}
+const _fbx=new FBXLoader();
+_fbx.load('../../assets/models/drmineral-walk.fbx', m=>{
+  fox=m; const box=new THREE.Box3().setFromObject(m); const sc0=2.4/((box.max.y-box.min.y)||1); m.scale.setScalar(sc0);
+  let skin=null; m.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; if(!skin)skin=o; } });
+  foxMix=new THREE.AnimationMixer(m);
+  if(m.animations[0]){ foxWalk=foxMix.clipAction(inPlace(m.animations[0])); foxWalk.play(); }
+  _fbx.load('../../assets/models/drmineral-idle.fbx', mi=>{ if(mi.animations[0]){ foxIdle=foxMix.clipAction(inPlace(mi.animations[0])); foxIdle.play(); } }, undefined, e=>console.warn('idle fbx', e));
+  new GLTFLoader().load('../../assets/models/drmineral_raw.glb', g=>{ let src=null; g.scene.traverse(o=>{ if(o.isMesh)src=o; }); const ca=src&&src.geometry.attributes.color;
+    if(skin&&src&&ca) recolorMesh(skin, src.geometry.attributes.position, ca); else console.warn('recolor: missing src colors'); }, undefined, e=>console.warn('recolor src', e));
+  drM.visible=false; m.position.copy(drM.position); scene.add(m);
+}, undefined, e=>console.warn('drM walk fbx load failed', e));
 
 // ---------- click to focus ----------
 const ray=new THREE.Raycaster(), mouse=new THREE.Vector2(); let camFocus=null, downXY=null;
@@ -551,7 +572,8 @@ function loop(){
   if(drMWalking){ foxHeadX=-Math.sin(drMAng)*drMDir; foxHeadZ=Math.cos(drMAng)*drMDir; }
   if(fox){ foxMix.update(dt); fox.position.set(drM.position.x,0,drM.position.z);
     fox.rotation.y=Math.atan2(foxHeadX,foxHeadZ)+FOX_YAW; // turn to face heading — real 3D turning
-    const w=drM.userData.state==='walk'?1:0; foxWalk.setEffectiveWeight(w); foxIdle.setEffectiveWeight(1-w); }
+    drMKey.position.set(drM.position.x - foxHeadX*1.6, 3.2, drM.position.z - foxHeadZ*1.6); // key light on the camera side so his lit side faces us
+    const w=drM.userData.state==='walk'?1:0; if(foxWalk)foxWalk.setEffectiveWeight(w); if(foxIdle)foxIdle.setEffectiveWeight(1-w); }
   orb.position.set(drM.position.x+0.85,1.85+Math.sin(t*2.4)*0.16,drM.position.z+0.3); orb.rotation.y=Math.sin(t*1.1)*0.4; orbSh.position.set(orb.position.x,0.05,orb.position.z);
   // token minting: a coin struck every couple of seconds, Foundry -> Vault
   coinTimer-=dt; if(coinTimer<=0){ coinTimer=2.2+Math.random()*1.6; mintCoin(); }
