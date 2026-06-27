@@ -69,7 +69,7 @@ renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.toneMappingExposure=0.8;
 document.getElementById('app').appendChild(renderer.domElement);
 
-const scene=new THREE.Scene(); scene.background=new THREE.Color(0x040201); scene.fog=new THREE.FogExp2(0x060302,0.042);
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0a0603); scene.fog=new THREE.FogExp2(0x140d06,0.04);
 // environment map -> real reflections on metal & glass
 const pmrem=new THREE.PMREMGenerator(renderer);
 scene.environment=pmrem.fromScene(new RoomEnvironment(),0.5).texture;
@@ -84,7 +84,7 @@ const bloom=new UnrealBloomPass(new THREE.Vector2(W(),H()),0.65,0.35,0.82);
 composer.addPass(bloom);
 
 // ---------- lighting (dark cave; the shaft is the drama) ----------
-scene.add(new THREE.HemisphereLight(0x2a2016,0x050302,0.2));
+scene.add(new THREE.HemisphereLight(0x3a2c18,0x0a0604,0.3));
 const shaftLight=new THREE.SpotLight(0xfff0d0,80,70,Math.PI*0.14,0.55,1.3);
 shaftLight.position.set(0,32,0); shaftLight.target.position.set(0,0,0); scene.add(shaftLight); scene.add(shaftLight.target);
 shaftLight.castShadow=true; shaftLight.shadow.mapSize.set(2048,2048); shaftLight.shadow.camera.near=4; shaftLight.shadow.camera.far=64; shaftLight.shadow.bias=-0.0006; shaftLight.shadow.radius=4;
@@ -103,20 +103,38 @@ const shaftCone=new THREE.Mesh(new THREE.ConeGeometry(6.5,36,64,1,true),new THRE
 const pool=new THREE.Mesh(new THREE.CircleGeometry(4.6,44),new THREE.MeshBasicMaterial({color:0xffe2a8,transparent:true,opacity:0.085,depthWrite:false,blending:THREE.AdditiveBlending})); pool.rotation.x=-Math.PI/2; pool.position.y=0.06; scene.add(pool);
 // a field of tiny warm lanterns buried in the depth (glow via bloom; no debris crystals)
 const colMat=stone(0x1a1209);
-const lanternMat=new THREE.MeshStandardMaterial({color:0x3a2810,emissive:0xffa238,emissiveIntensity:1.3,roughness:1});
-function lantern(x,y,z,s){ const m=new THREE.Mesh(new THREE.SphereGeometry(s||0.15,8,8),lanternMat); m.position.set(x,y,z); scene.add(m); return m; }
-// tier upon tier of colonnaded galleries rising into the dark
-for(let tier=0;tier<5;tier++){
-  const ry=2.4+tier*4.3, rad=25-tier*1.3;
-  const ledge=new THREE.Mesh(new THREE.CylinderGeometry(rad,rad+0.7,0.8,48,1,true),colMat); ledge.material.side=THREE.DoubleSide; ledge.position.y=ry; scene.add(ledge);
-  const cols=24; for(let i=0;i<cols;i++){ const a=i/cols*6.283; const x=Math.cos(a)*(rad-0.4), z=Math.sin(a)*(rad-0.4);
-    const col=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.36,3.6,8),colMat); col.position.set(x,ry+1.9,z); scene.add(col);
-    if(i%2===0) lantern(Math.cos(a)*(rad-1.2),ry+0.9,Math.sin(a)*(rad-1.2)); }
-}
+const lanternMat=new THREE.MeshStandardMaterial({color:0x3a2810,emissive:0xffa238,emissiveIntensity:1.2,roughness:1});
+// a lantern (emissive housing); a few become real dim point-lights so galleries stay readable from any angle (P6)
+let realLights=0; const MAX_LIGHTS=10;
+function lantern(x,y,z,s,light){ const m=new THREE.Mesh(new THREE.SphereGeometry(s||0.15,8,8),lanternMat); m.position.set(x,y,z); scene.add(m);
+  if(light && realLights<MAX_LIGHTS){ const L=new THREE.PointLight(0xffa848,2.8,15,2.2); L.position.set(x,y,z); scene.add(L); realLights++; } return m; }
+
+// tier upon tier of carved colonnaded galleries (instanced) rising into the dark — columns + entablature + balustrade
+const colGeo=new THREE.CylinderGeometry(0.3,0.34,3.4,8);
+const balGeo=new THREE.CylinderGeometry(0.07,0.07,0.66,6);
+const tiers=[{ry:2.4,rad:25,cols:26,off:0},{ry:6.8,rad:23.4,cols:24,off:0.5},{ry:11.0,rad:21.6,cols:22,off:0},{ry:15.0,rad:19.6,cols:20,off:0.5},{ry:18.8,rad:17.4,cols:18,off:0}];
+let totalCols=0,totalBal=0; tiers.forEach(t=>{ totalCols+=t.cols; totalBal+=t.cols*4; });
+const colInst=new THREE.InstancedMesh(colGeo,colMat,totalCols);
+const balInst=new THREE.InstancedMesh(balGeo,colMat,totalBal);
+const dum=new THREE.Object3D(); let ci=0,bi=0;
+tiers.forEach(t=>{
+  const ledge=new THREE.Mesh(new THREE.CylinderGeometry(t.rad+0.5,t.rad+0.9,0.7,48,1,true),colMat); ledge.material.side=THREE.DoubleSide; ledge.position.y=t.ry; scene.add(ledge);
+  const band=new THREE.Mesh(new THREE.CylinderGeometry(t.rad-0.15,t.rad-0.15,0.6,48,1,true),colMat); band.material.side=THREE.DoubleSide; band.position.y=t.ry+3.7; scene.add(band);
+  const rail=new THREE.Mesh(new THREE.TorusGeometry(t.rad+0.5,0.09,6,64),colMat); rail.rotation.x=Math.PI/2; rail.position.y=t.ry+0.82; scene.add(rail);
+  for(let i=0;i<t.cols;i++){ const a=(i+t.off)/t.cols*6.283, cr=t.rad-0.3;
+    dum.position.set(Math.cos(a)*cr,t.ry+1.9,Math.sin(a)*cr); dum.rotation.set(0,0,0); dum.updateMatrix(); colInst.setMatrixAt(ci++,dum.matrix);
+    for(let b=0;b<4;b++){ const ba=((i+t.off)+(b+0.5)/4)/t.cols*6.283, br=t.rad+0.5; dum.position.set(Math.cos(ba)*br,t.ry+0.48,Math.sin(ba)*br); dum.updateMatrix(); balInst.setMatrixAt(bi++,dum.matrix); }
+    if(i%2===0) lantern(Math.cos(a+0.12)*(t.rad-1.0),t.ry+1.0,Math.sin(a+0.12)*(t.rad-1.0),0.15,(i%6===0));
+  }
+});
+colInst.instanceMatrix.needsUpdate=true; balInst.instanceMatrix.needsUpdate=true; scene.add(colInst); scene.add(balInst);
+// a couple of bridges between the lower tiers — break the perfect circle
+[0.6,3.7].forEach(a=>{ const r0=tiers[0].rad,r1=tiers[1].rad; const x0=Math.cos(a)*r0,z0=Math.sin(a)*r0,x1=Math.cos(a)*r1,z1=Math.sin(a)*r1;
+  const br=new THREE.Mesh(new THREE.BoxGeometry(Math.hypot(x1-x0,z1-z0),0.4,1.6),colMat); br.position.set((x0+x1)/2,(tiers[0].ry+tiers[1].ry)/2,(z0+z1)/2); br.rotation.y=-Math.atan2(z1-z0,x1-x0); scene.add(br); });
 // stalactites + scattered deep lanterns for atmospheric depth
-for(let i=0;i<16;i++){const a=Math.random()*6.283,r=6+Math.random()*17,h=2+Math.random()*5;
-  const m=new THREE.Mesh(new THREE.ConeGeometry(0.4+Math.random()*0.7,h,6),stone(0x0f0a06)); m.position.set(Math.cos(a)*r,25-h/2,Math.sin(a)*r); m.rotation.x=Math.PI; scene.add(m);}
-for(let i=0;i<44;i++){ lantern((Math.random()-0.5)*48, 1.5+Math.random()*23, (Math.random()-0.5)*48, 0.12+Math.random()*0.06); }
+for(let i=0;i<14;i++){const a=Math.random()*6.283,r=6+Math.random()*16,h=2+Math.random()*5;
+  const m=new THREE.Mesh(new THREE.ConeGeometry(0.4+Math.random()*0.7,h,6),stone(0x0f0a06)); m.position.set(Math.cos(a)*r,26-h/2,Math.sin(a)*r); m.rotation.x=Math.PI; scene.add(m);}
+for(let i=0;i<34;i++){ lantern((Math.random()-0.5)*48,2+Math.random()*22,(Math.random()-0.5)*48,0.11+Math.random()*0.05); }
 
 // ---------- zones ----------
 const R=9.2;
@@ -186,7 +204,7 @@ function groundShadow(w){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,w*0.58
 const FR={}; function tex(url){ if(!FR[url]){ const t=texLoader.load(url,()=>ready()); t.colorSpace=THREE.SRGBColorSpace; FR[url]=t; } return FR[url]; }
 function critter(urls,h,opts){ opts=opts||{};
   const textures=urls.map(tex);
-  const m=new THREE.SpriteMaterial({map:textures[0],transparent:true,depthWrite:false,color:new THREE.Color(0xb6aa8e)});
+  const m=new THREE.SpriteMaterial({map:textures[0],transparent:true,depthWrite:false,alphaTest:0.06,color:new THREE.Color(0x8a7e64)});
   const s=new THREE.Sprite(m); s.scale.set(h,h,1);
   s.userData=Object.assign({h,textures,frame:0,ft:0,fps:opts.fps||5,state:opts.state||'idle',phase:Math.random()*6.28,facing:1,baseY:opts.baseY||0},opts);
   scene.add(s); return s; }
@@ -203,18 +221,19 @@ function tickCritter(s,dt,t){ const u=s.userData;
 
 const WALK=['../sprites/walk-a.png','../sprites/walk-b.png'];
 // the cast — all consistent animated 2.5D sprites
-const drM=critter(['../../assets/keyed/char-drmineral-hero-v1.png'],3.2,{state:'idle'}); drM.position.set(0,0,0);
-const tally=critter(['../../assets/keyed/char-tally-v1.png'],2.0,{state:'idle'}); tally.position.set(lp.x+1.6,0,lp.z+0.4);
-const vellum=critter(['../../assets/keyed/char-vellum-v1.png'],1.9,{state:'idle',fps:2}); vellum.position.set(vp.x+1.6,0,vp.z+0.2);
-const miners=[]; for(let i=0;i<3;i++){ const a=i/3*6.28; const s=critter(WALK,1.7,{state:'mine',fps:2}); s.position.set(mp.x+Math.cos(a)*1.7,0,mp.z+Math.sin(a)*1.7); s.userData.facing=(Math.cos(a)<0?-1:1); miners.push(s); }
-const haulers=[]; for(let i=0;i<3;i++){ const s=critter(WALK,1.7,{state:'walk',fps:3}); s.userData.t=i*0.66; haulers.push({s,crystal:octo(mp,0xc89a46,0.26,1.1),prev:0}); }
+// keeper: small, off-centre, half-lit in the gloom (not a spotlit mascot)
+const drM=critter(['../../assets/keyed/char-drmineral-hero-v1.png'],2.0,{state:'idle'}); drM.position.set(5.5,0,-3.5); drM.material.color.setHex(0x665c46);
+const tally=critter(['../../assets/keyed/char-tally-v1.png'],1.4,{state:'idle'}); tally.position.set(lp.x+1.4,0,lp.z+0.4);
+const vellum=critter(['../../assets/keyed/char-vellum-v1.png'],1.55,{state:'idle',fps:2}); vellum.position.set(vp.x+1.5,0,vp.z+0.2);
+const miners=[]; for(let i=0;i<2;i++){ const a=i/2*6.28+0.5; const s=critter(WALK,1.6,{state:'mine',fps:2}); s.position.set(mp.x+Math.cos(a)*1.6,0,mp.z+Math.sin(a)*1.6); s.userData.facing=(Math.cos(a)<0?-1:1); miners.push(s); }
+const haulers=[]; for(let i=0;i<2;i++){ const s=critter(WALK,1.6,{state:'walk',fps:3}); s.userData.t=i*1.0; haulers.push({s,crystal:octo(mp,0xc89a46,0.26,1.1),prev:0}); }
 // contact shadows under every character
 const shadowed=[drM,tally,vellum,...miners,...haulers.map(h=>h.s)];
 const shadows=shadowed.map(s=>groundShadow(s.userData.h*0.85));
 
 // ---------- the growing chain (Foundry -> Ledger) ----------
 const chain=new THREE.Group(); scene.add(chain);
-const chainMat=new THREE.MeshStandardMaterial({color:0xf7cf86,emissive:0xc8902e,emissiveIntensity:.3,metalness:1.0,roughness:.22,envMapIntensity:1.4});
+const chainMat=new THREE.MeshStandardMaterial({color:0xe6b86a,emissive:0xa8761f,emissiveIntensity:.16,metalness:1.0,roughness:.28,envMapIntensity:1.2});
 const flyers=[]; // blocks traveling forge->ledger
 let blocks=0; const CAP=22;
 function forgeBlock(){ blocks++; document.getElementById('blocks').textContent=blocks;
@@ -225,10 +244,10 @@ function landBlock(cube){ if(chain.children.length>=CAP){ scene.remove(cube); do
   cube.position.set(p.x,1.0,p.z); cube.rotation.z=(i%2)*Math.PI/2; chain.add(cube); document.getElementById('chainlen').textContent='CHAIN '+chain.children.length; }
 
 // ---------- dust motes ----------
-const dustN=160, dpos=new Float32Array(dustN*3);
+const dustN=55, dpos=new Float32Array(dustN*3);
 for(let i=0;i<dustN;i++){ dpos[i*3]=(Math.random()-0.5)*44; dpos[i*3+1]=Math.random()*16; dpos[i*3+2]=(Math.random()-0.5)*44; }
 const dust=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',new THREE.BufferAttribute(dpos,3)),
-  new THREE.PointsMaterial({color:0xf6c878,size:0.07,transparent:true,opacity:0.55,depthWrite:false}));
+  new THREE.PointsMaterial({color:0xe8b86a,size:0.055,transparent:true,opacity:0.28,depthWrite:false}));
 scene.add(dust);
 
 // ---------- click to focus ----------
