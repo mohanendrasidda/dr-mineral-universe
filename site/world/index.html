@@ -69,7 +69,8 @@
 <div id="cine-bars"></div>
 <div id="cine-cap"></div>
 <video id="intro-video" playsinline preload="auto"></video>
-<div id="intro-splash"><div><div class="ik">THE UNIVERSITY OF NEBRASKA</div><h2>Descend into the Lab</h2><button id="intro-go">&#9654;&nbsp;&nbsp;BEGIN</button><div class="ihint">~35 SECONDS &middot; OR SKIP</div></div></div>
+<audio id="intro-audio" preload="auto"></audio>
+<div id="intro-splash"><div><div class="ik">THE UNIVERSITY OF NEBRASKA</div><h2>Descend into the Lab</h2><button id="intro-go">&#9654;&nbsp;&nbsp;BEGIN</button><div class="ihint">SOUND ON &middot; ~35 SECONDS &middot; OR SKIP</div></div></div>
 <button id="cine-skip">SKIP &#8614;</button>
 <a class="back" href="../index.html">&#8592; BACK TO THE LANDING</a>
 <div id="hud"><div class="kick">THE UNIVERSITY OF NEBRASKA LAB</div><h1>THE LIVING CHAIN</h1><div class="sub">click a zone &middot; the lab is always working</div></div>
@@ -366,7 +367,10 @@ function updateCaption(tt){ if(CINE.caps===false)return; let c=''; for(const k o
   if(c!==capCur){ capCur=c; if(capEl){ capEl.style.opacity=0; setTimeout(()=>{capEl.textContent=c; capEl.style.opacity=c?1:0;},170);} } }
 function startCine(caps){ CINE.active=true; CINE.t=0; CINE.caps=(caps!==false); controls.enabled=false; controls.autoRotate=false; document.body.classList.add('cine');
   setTimeout(()=>{ const l=document.getElementById('loading'); if(l)l.style.display='none'; },900); }
-function endCine(){ CINE.active=false; controls.target.set(0,1.4,5); controls.enabled=true; controls.autoRotate=true; document.body.classList.remove('cine'); if(capEl)capEl.style.opacity=0; }
+function endCine(){ CINE.active=false; controls.target.set(0,1.4,5); controls.enabled=true; controls.autoRotate=true; document.body.classList.remove('cine'); if(capEl)capEl.style.opacity=0; fadeAudio(document.getElementById('intro-audio'),0,2500,true); }
+function fadeAudio(el,to,ms,stop){ if(!el)return; const from=el.volume||0,t0=performance.now();
+  (function step(now){ const k=Math.min(1,(now-t0)/ms); el.volume=Math.max(0,Math.min(1,from+(to-from)*k)); if(k<1)requestAnimationFrame(step); else if(stop){try{el.pause();}catch(e){}} })(performance.now()); }
+function startScore(){ const a=document.getElementById('intro-audio'); if(!a)return; a.src='../../assets/audio/intro-score.mp3'; a.volume=0; const p=a.play(); if(p&&p.then)p.then(()=>fadeAudio(a,0.8,1600)).catch(()=>{}); else fadeAudio(a,0.8,1600); }
 function skipCine(){ const f=CINE.frames[CINE.frames.length-1]; camera.position.copy(f.p); camera.lookAt(f.l); endCine(); }
 // video intro (campus flyover -> descent) if present, else the in-engine 3D dive
 function finishVideoIntro(){ const vid=document.getElementById('intro-video'), f=CINE.frames[CINE.frames.length-1];
@@ -375,7 +379,7 @@ function finishVideoIntro(){ const vid=document.getElementById('intro-video'), f
   setTimeout(()=>{ if(vid)vid.style.display='none'; document.body.classList.remove('introvid'); endCine(); },800); }
 function startVideoIntro(src){ const vid=document.getElementById('intro-video'), splash=document.getElementById('intro-splash'), go=document.getElementById('intro-go');
   document.body.classList.add('introvid'); const l=document.getElementById('loading'); if(l)l.style.display='none';
-  if(go)go.addEventListener('click',()=>{ if(splash)splash.style.display='none'; vid.src=src; vid.muted=false; vid.style.opacity=1; const pr=vid.play(); if(pr&&pr.catch)pr.catch(()=>{vid.muted=true;vid.play();}); });
+  if(go)go.addEventListener('click',()=>{ if(splash)splash.style.display='none'; vid.src=src; vid.muted=false; vid.style.opacity=1; const pr=vid.play(); if(pr&&pr.catch)pr.catch(()=>{vid.muted=true;vid.play();}); startScore(); });
   if(vid)vid.addEventListener('ended',videoToWorld); }
 function videoToWorld(){ startCine(false); const vid=document.getElementById('intro-video');
   if(vid){ vid.style.opacity=0; setTimeout(()=>{ vid.style.display='none'; document.body.classList.remove('introvid'); },1200); } }
