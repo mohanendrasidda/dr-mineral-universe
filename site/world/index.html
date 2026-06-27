@@ -491,14 +491,14 @@ function loadProp(url, o={}){
     const s=(o.h||1.2)/((box.max.y-box.min.y)||1); m.scale.setScalar(s);
     m.traverse(c=>{ if(c.isMesh){ c.castShadow=true; c.receiveShadow=true;
       const mats=Array.isArray(c.material)?c.material:[c.material];
-      mats.forEach(x=>{ if(!x)return; if(o.tint&&x.color)x.color.multiply(new THREE.Color(o.tint));
+      mats.forEach(x=>{ if(!x)return; if(o.tint&&x.color)x.color.set(o.tint); // override (not multiply) so warm tints land predictably
         if(o.emissive&&'emissive' in x){ x.emissive=new THREE.Color(o.emissive); x.emissiveIntensity=o.emissiveIntensity??0.5; }
         if('metalness' in x)x.metalness=Math.min(x.metalness??0,0.2); if(x.fog===false)x.fog=true; }); } });
     m.position.set(o.x||0, o.y||0, o.z||0); if(o.ry)m.rotation.y=o.ry; scene.add(m); if(o.onload)o.onload(m);
   }, undefined, e=>console.warn('prop load failed', url, e));
 }
-// district prop placements get wired here once the research returns direct-download urls:
-// e.g. loadProp('../../assets/models/props/crystal-cluster.glb', {x:mp.x, z:mp.z, h:1.6, emissive:0xffb24a, emissiveIntensity:0.7});
+// district props (CC0 GLBs, warm-tinted + emissive to sit in the candlelit gloom)
+// (crystal CC0 prop reverted — low-poly cartoon style clashed with the painterly cavern; see the strategic note)
 
 // ---------- click to focus ----------
 const ray=new THREE.Raycaster(), mouse=new THREE.Vector2(); let camFocus=null, downXY=null;
