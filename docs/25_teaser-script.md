@@ -6,8 +6,9 @@
 
 **Canon fit:** the "mining" is reframed as **the security work itself** — bugs, CTFs, forensics, secure code — which becomes glowing crystals, forged into blockchain links in the Foundry and recorded on the chain. Keeps the painterly underground world; foregrounds the real Lab Reward Coin mission.
 
-## Style anchor — prepend to EVERY Gemini image
-> *Warm candlelit underground fantasy academy, painterly cinematic, deep amber-and-gold palette with cool shadow accents, volumetric god-rays and floating golden dust, Rembrandt lighting, Pixar warmth, ultra-detailed, filmic depth of field, 16:9, no text, no watermark.*
+## Style — PRESTIGE CINEMA (Nolan × Cameron), not Pixar/golden  → see `assets/teaser-v2/keyframes/GEMINI-PROMPTS.md`
+Photorealistic large-format film (IMAX 70mm / anamorphic), Hoyte van Hoytema / Roger Deakins lighting; photoreal *creature* characters (Lion King 2019 grade), not cartoon. **Cold→warm arc:** stormy steel-blue surface → warm bioluminescent underground (Avatar glow) → still aurora/snow dawn. Weather carries mood (storm, rain, fog, snow, aurora). High dynamic range, deep blacks, volumetric atmosphere, 2.39:1.
+> Anchor: *Photorealistic cinematic film still, IMAX 70mm anamorphic, Nolan/Cameron style (van Hoytema/Deakins), epic scale, dramatic practical lighting, high dynamic range, deep inky blacks, heavy volumetric atmosphere, hyper-detailed photoreal textures, shallow DOF, subtle 70mm grain, 2.39:1, ultra-sharp, no text, no watermark.*
 
 ## Cast & world anchors (keep identical across shots)
 - **Dr. Mineral** — russet red squirrel, warm intelligent eyes, small brass spectacles, worn leather scholar's apron over a deep-green coat. The keeper.

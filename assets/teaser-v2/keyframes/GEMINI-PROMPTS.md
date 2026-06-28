@@ -1,96 +1,58 @@
-# Core-10 — exact Gemini image prompts (Teaser V2 "The Hidden Lab")
+# Core-10 — Gemini prompts (Teaser V2 "The Hidden Lab") — PRESTIGE CINEMA style
 
-**How to use (important):**
-1. For each **Hailuo** shot you make TWO images: **START** then **END**. Generate START first; then to make END, **upload the START image into Gemini as a reference** and use the END prompt — so the two frames are the SAME scene with only the described change. (If START↔END differ too much, Hailuo morphs.)
-2. For **Kling** shots make ONE image.
-3. **Reuse characters:** generate Dr. Mineral once (S3) and reuse him as a reference for S15; generate the beaver Smith once (S13) and reuse for S14. This keeps faces consistent.
-4. Save as: `S1-start.png`, `S1-end.png`, `S10.png`, etc. in this folder.
-5. **World rule:** the surface campus = humans (the ordinary world); the hidden lab below = squirrels. Dr. Mineral is a squirrel who moves between both.
+**Look:** photorealistic large-format cinema — Christopher Nolan × James Cameron. NOT cartoon, NOT uniformly golden.
+**Arc:** cold stormy steel-blue SURFACE → warm bioluminescent UNDERGROUND → still aurora/snow DAWN bookend.
 
----
+## STYLE ANCHOR — prepend to EVERY prompt
+> *Photorealistic cinematic film still, shot on large-format IMAX 70mm, anamorphic lens, in the style of Christopher Nolan and James Cameron (cinematography evoking Hoyte van Hoytema and Roger Deakins). Epic scale, dramatic naturalistic and practical lighting, high dynamic range, deep inky blacks and controlled highlights, heavy volumetric atmosphere, hyper-detailed photoreal textures, shallow cinematic depth of field, subtle 70mm film grain, 2.39:1 cinematic framing, ultra-sharp, no text, no watermark.*
 
-## S1 — Surface establishing (Hailuo: push toward the oak)
-**START:**
-> Painterly cinematic Pixar-style wide aerial of a quiet Midwest university campus at golden hour, autumn trees, a tall clock tower, brick academic buildings, a few human students walking the paths with long shadows, warm hazy sunlight, volumetric god-rays, ultra-detailed, filmic depth of field, 16:9, no text, no watermark.
+## CHARACTER look (for any creature)
+> *photorealistic anthropomorphic [animal] with lifelike detailed fur and expressive real eyes, hyper-real cinematic creature design (in the style of The Lion King 2019 / Narnia creatures), wearing [clothing]*
 
-**END:**
-> The same Midwest university campus, same warm golden-hour painterly Pixar style, but the camera is now lower and closer, pushed in toward one large ancient oak tree on the central quad; the buildings recede into the background, fewer students, long shadows, volumetric light, ultra-detailed, 16:9, no text, no watermark.
+## Rules
+1. Hailuo shots = TWO images (START then END); make END by uploading START as a reference + the END prompt (same scene, only the change). 2. Reuse Dr. Mineral (S3→S15) and the beaver (S13→S14) as references. 3. Surface = humans; underground = squirrels. 4. Save as `S1-start.png`, `S1-end.png`, `S10.png`…
 
 ---
 
-## S3 — Someone stays behind (Hailuo: he watches, then darts off)  ← Dr. Mineral reference
-**START:**
-> Painterly cinematic Pixar-style shot at golden dusk. A small russet-red squirrel with warm intelligent eyes and tiny round brass spectacles, wearing a worn little leather scholar's apron over a deep-green coat, sits on a thick branch of a giant ancient oak, watching the last human student walk away far below on the campus path. Warm rim light, soft bokeh, ultra-detailed fur, filmic depth of field, 16:9, no text, no watermark.
+## S1 — Surface establishing (Hailuo: slow push toward the oak through the storm)
+**START:** Photorealistic cinematic IMAX 70mm anamorphic film still, in the style of Nolan and Cameron. A high, wide aerial of a quiet Midwest university campus at a stormy blue-hour dusk — red-brick academic buildings, a clock tower, and on the horizon a tall art-deco capitol tower (evoking Lincoln, Nebraska) under churning dark storm clouds; distant lightning, light rain, wet reflective paths, a few human students hurrying with umbrellas, cold steel-blue palette, heavy volumetric haze, high dynamic range, deep blacks, subtle film grain, 2.39:1, ultra-sharp, no text, no watermark.
+**END:** The same stormy campus, same cold cinematic Nolan/Cameron style, but the camera is lower and pushed in toward one massive ancient oak tree on the quad; the buildings recede into rain and haze, lightning flickering behind, wet ground gleaming, cold blue light, volumetric atmosphere, deep blacks, 2.39:1, no text, no watermark.
 
-**END:**
-> The same ancient oak branch, same painterly Pixar style and dusk light, but the branch is now EMPTY — the squirrel is gone, a few leaves drifting in the air, the campus below quiet and darkening. Warm rim light, soft bokeh, ultra-detailed, 16:9, no text, no watermark.
+## S3 — Someone stays behind (Hailuo: he watches, then is gone)  ← Dr. Mineral reference
+**START:** Photorealistic cinematic IMAX film still, Nolan/Cameron style, stormy blue dusk, light rain. A photorealistic anthropomorphic russet red squirrel with lifelike detailed wet fur, expressive real eyes, tiny round brass spectacles, wearing a worn leather scholar's apron over a dark coat (hyper-real creature design, Lion King 2019 grade), perched on a thick branch of a giant ancient oak, watching the last human student hurry away under an umbrella far below; raindrops on fur and bark, cold rim light, shallow depth of field, volumetric mist, deep blacks, film grain, 2.39:1, ultra-sharp, no text, no watermark.
+**END:** The same rain-soaked oak branch, same cold cinematic style, but the branch is now EMPTY — the squirrel gone, wet leaves trembling, rain falling, the dark campus below lit by distant lightning, cold blue palette, volumetric mist, deep blacks, 2.39:1, no text, no watermark.
 
----
+## S6 — The descent (Hailuo: cold above gives way to a warm glow below)
+**START:** Photorealistic cinematic IMAX film still, Nolan/Cameron style. Interior of an ancient deep underground stone shaft — wet rock walls, aged brass gears and a single guttering lantern, rainwater trickling down from above, cold blue light from the surface, a faint distant pinpoint of warm amber light far below, drifting mist and dust, heavy volumetric atmosphere, deep inky blacks, film grain, 2.39:1, ultra-sharp, no text, no watermark.
+**END:** The same underground stone shaft, same cinematic style, but the warm amber glow from far below has SWELLED to fill the lower half of the frame, golden light climbing the wet rock and meeting the cold blue from above (cold-to-warm gradient), thick glowing dust, volumetric god-rays, high dynamic range, deep blacks, 2.39:1, no text, no watermark.
 
-## S6 — The descent toward the glow (Hailuo: the glow swells as we fall)
-**START:**
-> Painterly cinematic Pixar-style interior of an ancient underground stone shaft, aged brass gears and a worn lantern on damp rock walls, cool shadowy darkness, a single distant pinpoint of warm golden light far below, faint floating dust, volumetric, ultra-detailed, 16:9, no text, no watermark.
+## S7 — THE REVEAL (Hailuo: monumental crane-out over the hidden civilization)
+**START:** Photorealistic cinematic IMAX 70mm film still, Nolan/Cameron style, from a dark rocky tunnel mouth at the edge of a colossal underground cavern — the first glimpse of a vast glowing civilization beyond, warm amber and bioluminescent cyan light pouring in, silhouetted rugged rock frame, heavy volumetric haze, deep blacks, 2.39:1, ultra-sharp, no text, no watermark.
+**END:** Epic monumental wide reveal, photorealistic IMAX 70mm, Cameron-scale: an ENORMOUS hidden underground academy-civilization in a cathedral-sized cavern — countless tiny creatures, colossal colonnaded research halls, glowing holographic maps, mine shafts, fiery forges, suspended lanterns, and a GIGANTIC bioluminescent golden blockchain of light snaking across the cavern like a luminous river (Avatar-grade glow). Awe-inspiring scale, warm amber light against cool cavern shadow, dense volumetric god-rays and haze, hyper-detailed, high dynamic range, deep blacks, film grain, 2.39:1, ultra-sharp, no text, no watermark.
 
-**END:**
-> The same underground stone shaft, same painterly Pixar style, but the warm golden glow from below has SWELLED to fill the lower half of the frame, golden light spilling up the rock walls, glowing dust drifting thick, the darkness retreating, volumetric god-rays, ultra-detailed, 16:9, no text, no watermark.
+## S10 — The bug hunter (Kling: single image)
+Photorealistic cinematic IMAX film still, Nolan style. Tight shot in a dark underground lab: a photorealistic anthropomorphic young squirrel (lifelike fur, expressive eyes, earth-toned cloak, hyper-real creature design) leans intently toward a glowing floating holographic crystal terminal where a stark RED crack has split across a holographic system diagram (a discovered vulnerability). Cold cyan screen-glow and a hard red alert light raking across her face, deep shadow, drifting dust, shallow depth of field, high dynamic range, deep blacks, film grain, 2.39:1, ultra-sharp, no text, no watermark.
+**Kling motion:** "she leans in; the red crack pulses and spreads across the holographic screen; she reacts, tense."
 
----
-
-## S7 — THE REVEAL (Hailuo: crane-out revealing scale)
-**START:**
-> Painterly cinematic Pixar-style view from a tunnel mouth at the edge of a vast underground cavern, the first glimpse of a golden candlelit city beyond the rocky opening, warm light pouring in, silhouetted rock frame, volumetric, ultra-detailed, 16:9, no text, no watermark.
-
-**END:**
-> Epic wide painterly Pixar-style reveal: an ENORMOUS underground academy-civilization in a colossal cavern — countless tiny squirrels, colonnaded research halls, glowing holographic maps, mine shafts, fiery forges, hanging lanterns, and a GIGANTIC glowing golden blockchain of light stretching across the cavern like a river. Awe-inspiring scale, warm amber-and-gold candlelight, volumetric god-rays, floating dust, ultra-detailed, cinematic, 16:9, no text, no watermark.
-> *(If Hailuo morphs badly here, regenerate START as a partial view of the cavern already visible, so START→END is a smaller change.)*
-
----
-
-## S10 — The bug hunter finds it (Kling: single image)
-> Painterly cinematic Pixar-style close shot in a warm candlelit underground classroom: a young squirrel student in an earth-toned study cloak leans intently toward a glowing floating crystal "screen" — a holographic rune-terminal — where a bright RED crack has just split across a holographic system diagram (a discovered vulnerability). Tense focused expression, red glow on her face over warm rim light, floating dust, ultra-detailed, filmic depth of field, 16:9, no text, no watermark.
-> **Kling motion:** "the squirrel leans in; the red crack pulses and spreads across the screen; she reacts, focused."
-
----
-
-## S13 — The foundry, setting the crystal (Hailuo: he sets it & raises the hammer)  ← Smith reference
-**START:**
-> Painterly cinematic Pixar-style wide shot of a magnificent underground forge: a broad beaver blacksmith in a leather apron carefully setting a glowing amber crystal into a stone mold on a great anvil, molten forge fire blazing behind, sparks, hanging chains, warm orange light, ultra-detailed, filmic, 16:9, no text, no watermark.
-
-**END:**
-> The same underground forge, same beaver blacksmith and painterly Pixar style, but he has now RAISED a massive glowing hammer high overhead, forge blazing brighter, sparks streaming upward, the crystal glowing white-hot in the mold, dramatic warm light, ultra-detailed, 16:9, no text, no watermark.
-
----
+## S13 — The foundry, setting the crystal (Hailuo: sets crystal, raises hammer)  ← Smith reference
+**START:** Photorealistic cinematic IMAX film still, Nolan/Cameron style. A vast underground forge in dramatic chiaroscuro: a photorealistic anthropomorphic broad beaver blacksmith (lifelike fur, leather apron, hyper-real creature design) carefully setting a glowing amber crystal into a stone mold on a massive anvil, a roaring molten forge behind throwing intense orange light and sparks into deep shadow, hanging chains, heavy smoke and volumetric haze, high dynamic range, deep blacks, film grain, 2.39:1, ultra-sharp, no text, no watermark.
+**END:** The same forge and beaver blacksmith, same cinematic style, but he has now RAISED a massive glowing hammer high overhead, the forge blazing brighter, sparks streaming upward through the smoke, the crystal glowing white-hot in the mold, dramatic firelight against deep shadow, volumetric atmosphere, deep blacks, 2.39:1, no text, no watermark.
 
 ## S14 — The hammer strike (Kling: single image)
-> Painterly cinematic Pixar-style dynamic shot: a broad beaver blacksmith bringing a massive glowing hammer DOWN onto a white-hot crystal in a stone mold on an anvil, the impact forging a glowing golden BLOCKCHAIN LINK, brilliant sparks and embers bursting outward, molten forge fire behind, the link locking into a chain of light, intense warm orange-gold glow, ultra-detailed, filmic, 16:9, no text, no watermark.
-> **Kling motion:** "the hammer strikes down, sparks burst outward, the forged golden chain-link flares and locks into the glowing chain."
-
----
+Photorealistic cinematic IMAX 70mm film still, Nolan/Cameron style, high-speed dynamic moment: a photorealistic anthropomorphic beaver blacksmith driving a massive glowing hammer DOWN onto a white-hot crystal on an anvil, the impact forging a glowing golden BLOCKCHAIN LINK; a violent burst of brilliant sparks and embers exploding outward, molten forge fire behind, the new link locking into a chain of bioluminescent light, intense orange-and-gold glow against deep shadow, motion blur on the hammer, hyper-detailed, high dynamic range, deep blacks, film grain, 2.39:1, ultra-sharp, no text, no watermark.
+**Kling motion:** "the hammer strikes down hard, sparks explode outward, the forged golden link flares and locks into the glowing chain."
 
 ## S15 — Dr. Mineral (Hailuo: walks, stops, turns to camera)  ← reuse S3's squirrel
-**START:**
-> Painterly cinematic Pixar-style shot: Dr. Mineral — a russet-red squirrel with warm intelligent eyes, small round brass spectacles, a worn leather scholar's apron over a deep-green coat — walks slowly through a glowing candlelit workshop, half in warm shadow, watching young squirrel students working at glowing crystal terminals, a faint gentle smile. Soft warm light, floating dust, ultra-detailed fur, filmic depth of field, 16:9, no text, no watermark.
-
-**END:**
-> The same Dr. Mineral squirrel, same workshop and painterly Pixar style, but he has now stopped and turned to look DIRECTLY toward the camera, warm golden light on his face, calm and knowing, holding our gaze, soft glowing bokeh of terminals behind him, ultra-detailed, 16:9, no text, no watermark.
-
----
+**START:** Photorealistic cinematic IMAX film still, Nolan/Cameron style. Dr. Mineral — a photorealistic anthropomorphic russet red squirrel (lifelike detailed fur, expressive real eyes, small round brass spectacles, worn leather scholar's apron over a dark coat, hyper-real creature design) — walks slowly through a glowing candlelit underground workshop, half in deep shadow, watching young squirrels working at glowing crystal terminals, a faint knowing expression; warm practical light and cool fill, drifting dust, shallow depth of field, high dynamic range, deep blacks, film grain, 2.39:1, ultra-sharp, no text, no watermark.
+**END:** The same Dr. Mineral squirrel and workshop, same cinematic style, but he has now stopped and turned to look DIRECTLY into the camera, warm key light carving his face out of deep shadow (Deakins-style portrait), calm and resolute, holding our gaze, soft glowing bokeh behind, hyper-detailed fur, deep blacks, 2.39:1, no text, no watermark.
 
 ## S17 — The coin (Hailuo: spins, symbols ignite, blocks orbit)
-**START:**
-> Painterly cinematic Pixar-style extreme close-up: a single freshly-forged glowing gold coin floating and slowly rotating in dark warm space, plain smooth surface catching warm light, faint glowing dust around it, shallow depth of field, ultra-detailed, 16:9, no text, no watermark.
+**START:** Photorealistic cinematic IMAX macro film still, Nolan/Cameron style. A single freshly-forged glowing gold coin floating and slowly rotating in dark volumetric space, photoreal hammered-metal surface catching a single dramatic warm light, faint glowing embers and dust around it, deep black background, shallow depth of field, high dynamic range, film grain, 2.39:1, ultra-sharp, no text, no watermark.
+**END:** The same glowing gold coin, same cinematic macro style, now mid-spin with engraved glowing symbols ignited across its face and rim — small photoreal icons of a bug, a book, a flask, a handshake, a shield, a code bracket — and tiny luminous bioluminescent blockchain blocks ORBITING the coin (Avatar-grade glow), radiant golden light against deep black, volumetric, hyper-detailed, 2.39:1, no text, no watermark.
 
-**END:**
-> The same glowing gold coin, same painterly style, now mid-spin with engraved glowing symbols ignited around its rim and face — small icons of a bug, a book, a flask, a handshake, a shield, a code bracket — and tiny luminous blockchain blocks beginning to ORBIT around the coin, radiant golden light, ultra-detailed, 16:9, no text, no watermark.
-
----
-
-## S20 — The surface bookend (Hailuo: the coin rises, the student reaches)
-**START:**
-> Painterly cinematic Pixar-style shot, soft morning light on a university campus quad, a young human student with a backpack pausing curiously beneath a giant ancient oak tree, ordinary world, warm hazy sunlight, filmic depth of field, 16:9, no text, no watermark.
-
-**END:**
-> The same student beneath the same oak, same painterly morning style, but a single glowing golden coin has now RISEN from between the roots and hovers in the air before them, the student reaching a hand toward it, soft magical glow, dust motes, warm light, ultra-detailed, 16:9, no text, no watermark.
+## S20 — Surface bookend (Hailuo: the coin rises, the student reaches)
+**START:** Photorealistic cinematic IMAX 70mm film still, Nolan/Cameron style. A still, cold, misty dawn on a Midwest university campus after the storm, faint AURORA / northern-lights shimmer low on the horizon over the plains, breath-fog in the air, a young human student with a backpack pausing curiously beneath a giant ancient oak tree, snow dusting the ground, cold blue-and-violet palette with a hint of warm light, volumetric mist, high dynamic range, deep blacks, film grain, 2.39:1, ultra-sharp, no text, no watermark.
+**END:** The same student beneath the same oak at misty dawn, same cinematic style, but a single glowing golden coin has now RISEN from between the roots and hovers before them casting warm light into the cold blue air, the student reaching a hand toward it, breath-fog, drifting snow and dust, aurora faint behind, volumetric, hyper-detailed, 2.39:1, no text, no watermark.
 
 ---
-*World choice to confirm: S20's "new student" is a HUMAN here (the coin reaching a real student = the recruitment hook). Swap to a young squirrel if you'd rather keep it all-squirrel.*
+*QC note: if photoreal anthropomorphic faces look uncanny, dial the character line to "hyperreal stylized creature" (a touch less literal). Confirm S20's student = human (the coin reaching a real student) vs a young squirrel.*
