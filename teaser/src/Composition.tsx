@@ -226,39 +226,39 @@ const SubLabel: React.FC<{ tag: string; line: string; outS: number; outE: number
   );
 };
 
+type Dist = { img: string; clip?: string; tag: string; line: string; d: number };
 const Districts: React.FC = () => {
-  const items: [string, string, string][] = [
-    ["mines.png", "01 · MINE", "Do the security work."],
-    ["foundry.png", "02 · FORGE", "Mint the reward onto the chain."],
-    ["ledger.png", "03 · RECORD", "Logged on-chain, forever."],
-    ["vault.png", "04 · VAULT", "The treasury it controls."],
-    ["watch.png", "05 · GUARD", "Audited. Monitored. Secured."],
+  const items: Dist[] = [
+    { img: "mines.png", clip: "district-mines.mp4", tag: "01 · MINE", line: "Do the security work.", d: 78 },
+    { img: "foundry.png", clip: "district-foundry.mp4", tag: "02 · FORGE", line: "Mint the reward onto the chain.", d: 84 },
+    { img: "ledger.png", tag: "03 · RECORD", line: "Logged on-chain, forever.", d: 60 },
+    { img: "vault.png", tag: "04 · VAULT", line: "The treasury it controls.", d: 60 },
+    { img: "watch.png", clip: "district-watch.mp4", tag: "05 · GUARD", line: "Audited. Monitored. Secured.", d: 70 },
   ];
-  const D = 56;
+  let acc = 0;
   return (
     <AbsoluteFill style={{ background: BG }}>
-      {items.map(([img, tag, line], i) => (
-        <Sequence key={img} from={i * D} durationInFrames={D + 16}>
-          <AbsoluteFill>
-            <KB
-              src={img}
-              from={1.07}
-              to={1.2}
-              panX={i % 2 ? -20 : 20}
-              outS={D - 4}
-              outE={D + 14}
-              total={D + 16}
-            />
-            {i < 2 ? (
-              <Overlay src="fx-embers.mp4" opacity={0.65} total={D + 16} />
-            ) : (
-              <Overlay src="fx-dust.mp4" opacity={0.45} rate={0.9} total={D + 16} />
-            )}
-            <Grade />
-            <SubLabel tag={tag} line={line} outS={D - 6} outE={D + 12} />
-          </AbsoluteFill>
-        </Sequence>
-      ))}
+      {items.map((it, i) => {
+        const from = acc;
+        acc += it.d;
+        const total = it.d + 16;
+        return (
+          <Sequence key={it.img} from={from} durationInFrames={total}>
+            <AbsoluteFill style={{ background: BG }}>
+              {it.clip ? (
+                <ClipScene src={it.clip} rate={0.95} total={total} outS={it.d - 4} outE={total} fromScale={1.0} toScale={1.06} />
+              ) : (
+                <>
+                  <KB src={it.img} from={1.07} to={1.2} panX={i % 2 ? -20 : 20} outS={it.d - 4} outE={total} total={total} />
+                  <Overlay src="fx-dust.mp4" opacity={0.45} rate={0.9} total={total} />
+                </>
+              )}
+              <Grade />
+              <SubLabel tag={it.tag} line={it.line} outS={it.d - 6} outE={total - 2} />
+            </AbsoluteFill>
+          </Sequence>
+        );
+      })}
     </AbsoluteFill>
   );
 };
@@ -447,12 +447,12 @@ export const Teaser: React.FC = () => {
       </Sequence>
 
       {/* 7 — the core loop across the five districts */}
-      <Sequence from={785} durationInFrames={300}>
+      <Sequence from={785} durationInFrames={366}>
         <Districts />
       </Sequence>
 
       {/* 8 — the line */}
-      <Sequence from={1075} durationInFrames={155}>
+      <Sequence from={1136} durationInFrames={155}>
         <AbsoluteFill
           style={{
             background: `radial-gradient(80% 80% at 50% 45%, #15110c 0%, ${BG} 78%)`,
@@ -465,7 +465,7 @@ export const Teaser: React.FC = () => {
       </Sequence>
 
       {/* 9 — title card / CTA (overlaps the line to crossfade, no dead gap) */}
-      <Sequence from={1205} durationInFrames={durationInFrames - 1205}>
+      <Sequence from={1266} durationInFrames={durationInFrames - 1266}>
         <CTA />
       </Sequence>
     </AbsoluteFill>

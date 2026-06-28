@@ -8,6 +8,7 @@ cp assets/video/ltx-samples/descent-cavern-01.mp4 "$P/clip-cavern.mp4"
 cp assets/video/footage/lincoln-dusk.mp4 "$P/clip-lincoln.mp4"
 cp assets/video/footage/unl-campus-aerial.mp4 "$P/clip-campus.mp4"
 for c in fx-dust fx-embers fx-sparks fx-godrays fx-forest fx-molten fx-crystal fx-candle; do cp "assets/video/footage/$c.mp4" "$P/$c.mp4"; done
+for c in district-mines district-foundry district-watch; do cp "assets/video/footage/$c.mp4" "$P/$c.mp4"; done
 cp assets/audio/intro-score.mp3 "$P/score.mp3"
 cp assets/characters/drmineral-keeper-walk.png "$P/drmineral.png"
 echo "staged teaser assets into $P"
