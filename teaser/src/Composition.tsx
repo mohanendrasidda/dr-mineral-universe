@@ -226,11 +226,11 @@ const SubLabel: React.FC<{ tag: string; line: string; outS: number; outE: number
   );
 };
 
-type Dist = { img: string; clip?: string; tag: string; line: string; d: number };
+type Dist = { img: string; clip?: string; tag: string; line: string; d: number; sfx?: string };
 const Districts: React.FC = () => {
   const items: Dist[] = [
     { img: "mines.png", clip: "district-mines.mp4", tag: "01 · MINE", line: "Do the security work.", d: 78 },
-    { img: "foundry.png", clip: "district-foundry.mp4", tag: "02 · FORGE", line: "Mint the reward onto the chain.", d: 84 },
+    { img: "foundry.png", clip: "district-foundry.mp4", tag: "02 · FORGE", line: "Mint the reward onto the chain.", d: 84, sfx: "foundry-sfx.m4a" },
     { img: "ledger.png", tag: "03 · RECORD", line: "Logged on-chain, forever.", d: 60 },
     { img: "vault.png", tag: "04 · VAULT", line: "The treasury it controls.", d: 60 },
     { img: "watch.png", clip: "district-watch.mp4", tag: "05 · GUARD", line: "Audited. Monitored. Secured.", d: 70 },
@@ -253,6 +253,7 @@ const Districts: React.FC = () => {
                   <Overlay src="fx-dust.mp4" opacity={0.45} rate={0.9} total={total} />
                 </>
               )}
+              {it.sfx && <Audio src={staticFile(it.sfx)} volume={0.5} playbackRate={0.95} />}
               <Grade />
               <SubLabel tag={it.tag} line={it.line} outS={it.d - 6} outE={total - 2} />
             </AbsoluteFill>
