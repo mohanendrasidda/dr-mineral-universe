@@ -1,68 +1,82 @@
-# Teaser script — "The Hidden Lab"  (authored v2)
+# THE HIDDEN LAB — Teaser V2  ("Nothing Here Is Given")
 
-**Goal:** a ~55s cinematic teaser, authored shot-by-shot, built from **Gemini HD keyframes → Hailuo (start-frame→end-frame) / Kling (single-image action) → SFX + BGM.** Opening on an ordinary surface, descending to the reveal of the hidden blockchain-mining lab, and surfacing on the Lab Reward Coin.
+**Duration:** 60–75s · **Built from:** Gemini HD keyframes → Hailuo (start-frame→end-frame) / Kling (single-image action) → SFX + BGM. This is the locked story (Sidd's, refined into a shot board).
 
-**Pipeline per shot**
-- **Hailuo (start→end frame):** generate a START image + an END image of the *same scene with a controlled change* (camera push, light growing, an action's beginning→end). Hailuo interpolates the in-between → smooth, directed motion. Use for camera moves, reveals, transitions.
-- **Kling (single image → motion):** generate ONE image; Kling adds the action (hammer swing, dig). Use for character action beats. Comes with usable audio.
-- This supersedes the current mix-and-match cut (`teaser/teaser.mp4`).
+**Logline:** Every university teaches students — only a few teach them to *protect the future*. Beneath an ordinary campus, a hidden academy turns real security work into something that can't be bought: a coin you can only earn.
 
----
+**Canon fit:** the "mining" is reframed as **the security work itself** — bugs, CTFs, forensics, secure code — which becomes glowing crystals, forged into blockchain links in the Foundry and recorded on the chain. Keeps the painterly underground world; foregrounds the real Lab Reward Coin mission.
 
-## Logline
-Beneath an ordinary university, a hidden civilization mines a different kind of value — *proof of real work.* We fall from the quiet surface into a living, candlelit blockchain-mining world, meet its keeper, and rise with a promise: a coin you can only earn.
+## Style anchor — prepend to EVERY Gemini image
+> *Warm candlelit underground fantasy academy, painterly cinematic, deep amber-and-gold palette with cool shadow accents, volumetric god-rays and floating golden dust, Rembrandt lighting, Pixar warmth, ultra-detailed, filmic depth of field, 16:9, no text, no watermark.*
 
-## Tone & look (the consistency anchor — prepend to EVERY Gemini image)
-> *Warm candlelit underground fantasy, painterly cinematic, deep amber-and-gold palette with cool shadow accents, volumetric god-rays and floating dust, Rembrandt lighting, Pixar warmth, ultra-detailed, filmic depth of field, 16:9, no text, no watermark.*
+## Cast & world anchors (keep identical across shots)
+- **Dr. Mineral** — russet red squirrel, warm intelligent eyes, small brass spectacles, worn leather scholar's apron over a deep-green coat. The keeper.
+- **Student squirrels** — young, varied; hooded study-cloaks in earth tones, at glowing crystal workstations.
+- **The Smith** — broad beaver blacksmith, leather apron, forge-lit. The Foundry.
+- **The Mentor** — an older squirrel/owl reviewing work, calm authority.
+- **Cyber-magic look** — security work shown as **glowing crystal "terminals" and floating rune-screens**: holographic malware structures, network-traffic constellations, cryptographic glyphs, smart-contract sigils — magical-tech, never literal modern PCs.
+- **The chain of light** — a literal chain of glowing golden links across the cavern: the blockchain made physical. **The coin** — a warm gold disc that becomes a glowing digital artifact with orbiting blocks.
 
-## Cast anchors (keep identical across shots)
-- **Dr. Mineral** — a russet red squirrel, intelligent warm eyes, small round brass spectacles, a worn leather scholar's apron over a deep-green coat. Humble, curious. The keeper.
-- **Vellum** — an ancient tortoise, shell carved with glowing runes, a scribe's mantle. The Ledger keeper.
-- **The Smith** — a broad beaver blacksmith, leather apron, forge-lit. The Foundry.
-- **The Sentinel** — a lean meerkat in a hooded watch-cloak, lantern in hand. The Watch.
-- **Tally** — a black-white-and-blue magpie, quick and bright. The messenger.
-- **The chain of light** — a literal chain of glowing golden links threading the whole cavern: the blockchain made physical.
-
-## Sound design & BGM arc (one cue that builds)
-- **Surface (0–12s):** near-silence; soft wind, distant campus bell, a lone piano note. Mystery.
-- **Descent (12–24s):** low sub-drone + a slow heartbeat; earth rumble, pebbles, a deep echo as space opens.
-- **Reveal (24–30s):** the music BLOOMS — swelling strings + a soft choir pad; a single bright bell.
-- **Core loop (30–46s):** rhythmic percussion built from the work itself — pick strikes, hammer clinks (use the Kling clip audio), chain links igniting like struck crystal.
-- **Keeper + rise (46–54s):** strings resolve to a warm theme; one orchestral swell on his line.
-- **CTA (54–58s):** the theme settles; a single sustained gold tone.
-- *Free BGM sources:* a cinematic/trailer cue from Pixabay Music, Mixkit, or Uppbeat (royalty-free); or commission a 60s custom theme. SFX: Pexels/Mixkit/Freesound (CC0).
+## Sound & BGM arc (one cue that builds)
+Surface = soft piano, wind, birds · Stays-behind = low strings + heartbeat · Descent = sub-drone + rumble, music grows · Reveal = BLOOM (strings + choir + a bell) · Learning = hopeful, light percussion · Bug hunters = rhythmic build (cuts on the beat) · Foundry = hammer echoes (use Kling clip audio) · Dr. Mineral = music softens, intimate · The Coin = emotional peak (full orchestra) · Surface bookend = held breath → near-silence · Title = one sustained gold tone. *Free: Pixabay Music / Mixkit / Uppbeat (BGM); Freesound / Mixkit (SFX).*
 
 ---
 
-## The board (12 shots)
+## The board (≈20 shots)
+H = Hailuo start→end (give BOTH frames). K = Kling single image (add motion; keeps foley).
 
-| # | Beat / dur | Tool | START frame (Gemini) | END frame (Gemini) | Motion result | Text / VO | SFX |
-|---|---|---|---|---|---|---|---|
-| 1 | **Surface** · 4s | Hailuo | High aerial of a quiet Midwest university town at golden dusk, autumn trees, a clock tower, long shadows. | Same town, camera lower and pushed in toward one old oak on the quad. | Slow drone descent toward the campus | kicker: *UNIVERSITY OF NEBRASKA* | wind, distant bell |
-| 2 | **The clue** · 4s | Hailuo | A lone russet squirrel at the base of a gnarled old oak at dusk, an acorn in its paws, nobody around. | The squirrel slipping into a dark gap between the roots, only its tail visible. | Squirrel disappears into the roots | *"Nobody ever looks twice."* | leaves, a soft chitter |
-| 3 | **Threshold** · 4s | Hailuo | Inside a dark earthy root-tunnel, a faint warm glow far below. | The warm glow now filling the lower frame, golden light spilling up. | Falling/descent toward the glow | *"Until you look beneath it."* | earth rumble, low drone in |
-| 4 | **THE REVEAL** · 5s | Hailuo | The lip of a vast underground cavern, edge of a colonnaded golden city just visible. | Pushed out over a huge candlelit cavern-civilization: arches, lanterns, a great glowing chain of light spanning a central well. | Epic crane-out over the cavern | *"A civilization beneath it."* | music BLOOMS, choir, a bell |
-| 5 | **Mines** · 4s | Kling | Squirrel miners swinging picks at a seam of glowing amber crystal "blocks" in a warm cavern, lanterns, dust. | — (single image; Kling adds the swing) | Miners actively dig; a block glows free | label *01 · MINE* — *"Do the real work."* | pick strikes (rhythm starts) |
-| 6 | **Foundry** · 4s | Kling | The beaver Smith raising a hammer over a glowing crystal block on an anvil, molten forge behind, sparks. | — (Kling adds the strike) | Smith hammers the block onto the chain | label *02 · FORGE* — *"Forge it onto the chain."* | hammer clinks (use clip audio) |
-| 7 | **Ledger** · 4s | Hailuo | Vellum the tortoise at a carved stone ledger, one claw near the glowing chain, a gap where a link is missing. | Same, a brand-new golden link now ignited and fused into the chain, light spreading. | A new chain-link ignites & locks in | label *03 · RECORD* — *"Logged forever."* | a crystalline *chime*/ignite |
-| 8 | **Vault** · 3s | Hailuo | A dim vault doorway, a hint of treasure-glow inside. | Pushed through into a treasury of glowing minted blocks and coins, slow glints. | Dolly into the vault | label *04 · VAULT* | low resonant hum |
-| 9 | **Watch** · 3s | Hailuo | The meerkat Sentinel on a high ledge, hooded, lantern low, the chain of light below. | Same, the Sentinel lifts the lantern; its light sweeps across the chain. | Lantern lifts, light sweeps | label *05 · GUARD* — *"Secured."* | a single low watch-bell |
-| 10 | **The keeper** · 5s | Hailuo | Dr. Mineral in shadow at the cavern's heart, head bowed, the chain glowing beside him. | Same, he steps into a shaft of light and looks UP toward the surface, eyes catching the light. | He steps into light, looks up | *"I don't collect treasure. I collect discoveries."* | music swell, his theme |
-| 11 | **The rise** · 4s | Hailuo | The chain of light deep in the cavern, a pulse beginning to travel up it. | The pulse races up and BREAKS the surface as a single glinting gold coin above the campus at dawn. | Light races up; a coin forms at the surface | (no text) | a rising whoosh → bright tone |
-| 12 | **CTA** · 4s | (still + motion text) | Black/gold. — | — | Title fades up | **THE LAB REWARD COIN** · University of Nebraska / *a coin for real security work* / *enter the lab* | sustained gold tone |
+### SCENE 1 — Every university has students · 0:00–0:07
+- **S1 · H · 4s** — START: golden-hour aerial of a quiet Midwest campus, students leaving classrooms, long shadows, a clock tower. END: camera lower, pushing toward one old oak on the quad. *VO: "Every university teaches students…"* · piano, wind, birds.
+- **S2 · H · 3s** — START: ground level, students walking off with laptops, laughing, ordinary. END: the quad emptying, dusk deepening, the oak prominent. *VO: "…but only a few teach them to protect the future."*
 
-**Total ≈ 52–58s.**
+### SCENE 2 — Someone stays behind · 0:07–0:14
+- **S3 · H · 4s** — START: a tiny russet squirrel on an oak branch, watching the last student leave below. END: the branch empty, leaves settling, he's gone. *VO: "Because beneath every great university…"* · low strings, heartbeat in.
+- **S4 · H · 3s** — START: the squirrel slipping toward a dark gap in the oak roots. END: only his tail vanishing under the roots, the world above blurring out. *VO: "…another classroom waits."*
+
+### SCENE 3 — The descent · 0:14–0:22
+- **S5 · H · 4s** — START: stone tunnels, an ancient brass elevator and slow gears, lanterns, cool dark. END: warmer light, glowing dust drifting, deeper down. *VO: "A place where curiosity is work."*
+- **S6 · H · 4s** — START: the shaft darker, a pinpoint of golden light far below. END: the golden glow swelling to fill the lower frame. *VO: "Work becomes trust. And trust is never forgotten."* · rumble, music grows.
+
+### SCENE 4 — The hidden lab (THE REVEAL) · 0:22–0:31
+- **S7 · H · 5s** — START: the tunnel mouth at the cavern's edge, first glimpse of a golden city. END: craned out over an ENORMOUS underground academy — thousands of squirrels, research halls, glowing holo-maps, mines, forges, and a giant glowing blockchain like a river of light across the cavern. *VO: "Welcome… to The Hidden Lab."* · music BLOOMS, choir, a bell.
+
+### SCENE 5 — Learning · 0:31–0:39
+- **S8 · H · 4s** — START: a glowing cavern classroom — student squirrels at crystal terminals: one over a holographic malware structure, one a forensic timeline, one a network-traffic constellation, one a crypto glyph, one a smart-contract sigil. END: a solved challenge releasing tiny golden particles that lift off. *VO: "Every lesson matters."*
+- **S9 · H · 3s** — START: a close student finishing a puzzle, focused. END: golden particles floating upward from the work. *VO: "Every skill leaves a mark."* · hopeful music.
+
+### SCENE 6 — The bug hunters (fast cuts) · 0:39–0:48
+- **S10 · K · 3s** — a squirrel finds a vulnerability: a glowing red crack splits a holographic system; she leans in. *VO: "Find a bug."*
+- **S11 · H · 3s** — START: the student sends a glowing report; the Mentor leans to review. END: a green "approved" glow blooms, the contribution-particle brightens. *VO: "Solve a challenge. Secure a system. Help someone learn."*
+- **S12 · H · 3s** — START: a captured CTF flag / a strand of secure code, light gathering. END: it crystallizes into a bright glowing crystal. *VO: "Every contribution has value."* · rhythmic build.
+
+### SCENE 7 — The foundry · 0:48–0:57
+- **S13 · H · 4s** — START: glowing contribution-crystals arriving at a magnificent underground forge; the beaver Smith setting one into a glowing mold. END: the Smith raising the great hammer, forge blazing. *VO: "Here… rewards are never printed."*
+- **S14 · K · 4s** — the Smith strikes: massive hammer hits, forging a blockchain LINK (not gold); the link locks permanently into the chain, the blockchain brighter. *(Kling action + its forge audio.)* *VO: "They are forged."* · hammer echo.
+
+### SCENE 8 — Dr. Mineral · 0:57–1:05
+- **S15 · H · 5s** — START: Dr. Mineral walking slowly through the glowing workshop, watching students, half in shadow, a faint smile. END: he stops and looks directly toward us, warm light on his face. *VO (him): "Coins can be bought."* (pause) · music softens.
+- **S16 · H · 4s** — START: he lifts one glowing coin in his paw. END: the coin bright in his paw, holding our gaze. *VO (him): "Trust… has to be earned."*
+
+### SCENE 9 — The coin · 1:05–1:13
+- **S17 · H · 4s** — START: the newly forged coin rotating in the air, plain gold. END: as it spins, engraved symbols ignite around its rim — *Bug Bounty · Learning · Research · Contribution · Open Source · Security · Mentorship* — tiny blocks begin to orbit it. *VO: "Every coin tells a story."*
+- **S18 · H · 4s** — START: the coin as a glowing digital artifact, blocks orbiting. END: its identity locks onto the blockchain; the whole chain ILLUMINATES the cavern. *VO: "Not of money. Of impact."* · emotional peak.
+
+### SCENE 10 — The surface · 1:13–1:20
+- **S19 · H · 4s** — START: morning, students crossing campus, ordinary, most never notice. END: one NEW student pauses beneath the ancient oak.
+- **S20 · H · 4s** — START: the student at the oak roots; a single golden coin beginning to rise. END: the coin risen and glowing, the student reaching toward it → **cut to black.** · held breath → silence.
+
+### TITLE / CTA · 1:20–1:28
+- **S21 · title** — **THE HIDDEN LAB** → subtitle *The Lab Reward Coin* → final lines, in beats: *"Not mined. Earned." / "Not purchased. Proven." / "The future of cybersecurity starts here."* · one sustained gold tone. (I build this in Remotion — no generation needed.)
 
 ---
 
-## Production order (so we never block on one piece)
-1. **Lock the script** (this doc) — Sidd signs off / tweaks lines + beats.
-2. **Generate keyframes in Gemini** — for Hailuo shots make BOTH start+end; for Kling shots make the single image. Use the style anchor + cast anchors every time; reuse a character reference image across shots for consistency.
-3. **Generate clips** — Hailuo (start→end) for 1,2,3,4,7,8,9,10,11; Kling for 5,6. ~11 clips.
-4. **Sound** — pick a building BGM cue + grab the SFX; keep each Kling clip's native audio for foley.
-5. **Assemble in Remotion** — drop clips into a fresh composition, time to the BGM, add the labels/VO text + CTA, grade warm, render 1080p.
+## Scope / clip count
+~20 generated clips (S1–S20) + ~30 Gemini keyframes (H shots need start+end). **If you want to prove the pipeline first, do the "core 10" — S1, S3, S6, S7, S10, S13, S14, S15, S17, S20 — that already tells the whole arc; we add the rest after.**
 
-## Handing off the asset work
-You generate (your hands): the Gemini images + the Hailuo/Kling clips + pick the BGM. Drop everything in `assets/teaser-v2/` (I'll make the folder structure: `keyframes/`, `clips/`, `audio/`). I do: assembly, timing, text, grade, render — the whole edit.
+## Workflow
+1. **(now)** Lock this script.
+2. **You generate** the Gemini keyframes (style + cast anchors every time; reuse a Dr. Mineral reference for consistency), then the Hailuo/Kling clips.
+3. **Drop assets** in `assets/teaser-v2/keyframes/` (name `S7-start.png` / `S7-end.png`) and `assets/teaser-v2/clips/` (name `S7.mp4`); BGM/SFX in `assets/teaser-v2/audio/`.
+4. **I assemble** in Remotion — timing to the BGM, VO/text, grade, render 1080p. (VO: AI voice or your own; I can wire either.)
 
-*(SFX/BGM licensing + any UNL imagery clearance = Sidd, before public.)*
+*(SFX/BGM licensing + UNL imagery clearance = Sidd, before public.)*
