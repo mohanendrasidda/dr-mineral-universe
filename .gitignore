@@ -24,3 +24,6 @@ logs/
 
 # heavy stock clips — reproducible via scripts/teaser-fetch-footage.sh
 assets/video/footage/fx-*.mp4
+
+assets/teaser-v2/audio/the-descent.mp3
+assets/teaser-v2/audio/epical-drums.mp3

@@ -120,9 +120,9 @@ export const HiddenLab: React.FC = () => {
     <AbsoluteFill style={{ background: "#000" }}>
       {/* music bed (builds) */}
       <Audio
-        src={staticFile("score.mp3")}
+        src={staticFile("v2-music.mp3")}
         volume={(f) =>
-          interpolate(f, [0, 60, 300, durationInFrames - 60, durationInFrames - 4], [0, 0.3, 0.4, 0.5, 0], {
+          interpolate(f, [0, 24, durationInFrames - 40, durationInFrames - 4], [0, 0.72, 0.72, 0], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
           })
