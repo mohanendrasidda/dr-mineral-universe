@@ -356,7 +356,7 @@ function tickSheet(s,dt){ const u=s.userData; u.ft+=dt; const spf=1/u.fps; while
 const SP='../../assets/sprites/';
 // the cast — consistent animated 2.5D sprites, per-state frames keyed from the painterly art
 // keeper: small, off-centre, half-lit in the gloom (not a spotlit mascot)
-const drM=critter([],2.0,{state:'idle',fps:4,states:{idle:[SP+'drmineral-idle.png'],walk:[SP+'drmineral-walk-a.png']}}); drM.position.set(7.2,0,-4.6);
+const drM=critter([],2.6,{state:'idle',fps:4,tint:0xffffff,states:{idle:[SP+'drmineral-idle.png'],walk:[SP+'drmineral-walk-a.png']}}); drM.position.set(7.2,0,-4.6);
 const tally=critter([],1.5,{state:'idle',fps:3,states:{idle:[SP+'tally-idle.png',SP+'tally-idle.png',SP+'tally-idle.png',SP+'tally-hop.png']}}); tally.position.set(lp.x+1.4,0,lp.z+0.4); tally.userData.facing=(tally.position.x>0?-1:1);
 const vellum=critter([],1.7,{state:'idle',fps:2,states:{idle:[SP+'vellum-idle.png']}}); vellum.position.set(vp.x+1.5,0,vp.z+0.2); vellum.userData.facing=(vellum.position.x>0?-1:1);
 // SMALL CAST FIRST — one miner only (stationary, working the seam). We stabilise 4 characters before scaling up.
@@ -479,7 +479,7 @@ _fbx.load('../../assets/models/drmineral-walk.fbx', m=>{
   inPlace(wclip); foxWalk.play();
   if(gs>0.25){ drMSpeed=Math.min(3.0,Math.max(1.2,gs)); foxWalk.timeScale=drMSpeed/gs; } else { drMSpeed=1.7; foxWalk.timeScale=1.05; } // sync stride speed to movement → feet stick
   _fbx.load('../../assets/models/drmineral-idle.fbx', mi=>{ if(mi.animations[0]){ foxIdle=foxMix.clipAction(inPlace(mi.animations[0])); foxIdle.play(); } }, undefined, e=>console.warn('idle fbx', e));
-  drM.visible=false; m.position.copy(drM.position); scene.add(m);
+  m.visible=false; drM.visible=true; m.position.copy(drM.position); scene.add(m); // photoreal billboard is the keeper now; the pale FBX stays hidden
 }, undefined, e=>console.warn('drM walk fbx load failed', e));
 
 // ---- reusable 3D prop loader: drop a CC0 GLB into a district with one call ----
