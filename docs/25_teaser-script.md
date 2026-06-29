@@ -81,3 +81,15 @@ H = Hailuo start→end (give BOTH frames). K = Kling single image (add motion; k
 4. **I assemble** in Remotion — timing to the BGM, VO/text, grade, render 1080p. (VO: AI voice or your own; I can wire either.)
 
 *(SFX/BGM licensing + UNL imagery clearance = Sidd, before public.)*
+
+---
+
+## FINAL MASTER (delivered)
+- **`~/Downloads/THE-HIDDEN-LAB-4K.mp4`** — 3840×2160, ~46s, 128 MB (the master)
+- **`~/Downloads/THE-HIDDEN-LAB-teaser.mp4`** — 1920×1080, 32 MB (sharing)
+
+**Pipeline:** Gemini keyframes (3200×1344) → Hailuo start/end + single-image clips → delogo → **Real-ESRGAN 2× AI-upscale** (`realesr-animevideov3`, 1716×720→3432×1440; run inline in 48-frame chunks — the binary segfaults in folder-mode >~64 frames AND when launched from a script file, so process inline) → Remotion assemble (`HiddenLabTeaser`, 24fps) → render `--scale 2` (4K) → ffmpeg grade + 70mm grain → 1080p lanczos downscale.
+
+**Cut:** S1 surface → S3 stays-behind → S6 descent → **dead-silence + "THE HIDDEN LAB" on black** → S7 cavern (clean) → S10 bug-hunter → S13/S14 forge (hammer clang) → S15 Dr. Mineral → **S17 coin-with-symbols (climax)** → end card. No VO (pending a TTS-scoped ElevenLabs key for the "Not mined. Earned." line).
+
+**Credits:** Music "The Descent" — Kevin MacLeod (CC BY 4.0); SFX — Mixkit (free license).
