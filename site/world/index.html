@@ -357,13 +357,16 @@ const SP='../../assets/sprites/';
 // the cast — consistent animated 2.5D sprites, per-state frames keyed from the painterly art
 // keeper: small, off-centre, half-lit in the gloom (not a spotlit mascot)
 const drM=critter([],2.6,{state:'idle',fps:4,tint:0xffffff,states:{idle:[SP+'drmineral-idle.png'],walk:[SP+'drmineral-walk-a.png']}}); drM.position.set(7.2,0,-4.6);
-const tally=critter([],1.5,{state:'idle',fps:3,states:{idle:[SP+'tally-idle.png',SP+'tally-idle.png',SP+'tally-idle.png',SP+'tally-hop.png']}}); tally.position.set(lp.x+1.4,0,lp.z+0.4); tally.userData.facing=(tally.position.x>0?-1:1);
-const vellum=critter([],1.7,{state:'idle',fps:2,states:{idle:[SP+'vellum-idle.png']}}); vellum.position.set(vp.x+1.5,0,vp.z+0.2); vellum.userData.facing=(vellum.position.x>0?-1:1);
-// SMALL CAST FIRST — one miner only (stationary, working the seam). We stabilise 4 characters before scaling up.
-const miners=[]; { const s=critter([],1.7,{state:'mine',fps:2,states:{idle:[SP+'worker-idle.png'],mine:[SP+'worker-mine-a.png',SP+'worker-mine-b.png']}}); s.position.set(mp.x+1.7,0,mp.z+0.3); s.userData.facing=(s.position.x>mp.x?-1:1); miners.push(s); }
+const tally=critter([],1.7,{state:'idle',fps:3,tint:0xffffff,states:{idle:[SP+'tally-idle.png',SP+'tally-idle.png',SP+'tally-idle.png',SP+'tally-hop.png']}}); tally.position.set(lp.x+1.4,0,lp.z+0.4); tally.userData.facing=(tally.position.x>0?-1:1);
+const vellum=critter([],2.0,{state:'idle',fps:2,tint:0xffffff,states:{idle:[SP+'vellum-idle.png']}}); vellum.position.set(vp.x+1.5,0,vp.z+0.2); vellum.userData.facing=(vellum.position.x>0?-1:1);
+// the working cast — photoreal, true-colour billboards
+const miners=[]; { const s=critter([],1.8,{state:'mine',fps:2,tint:0xffffff,states:{idle:[SP+'worker-idle.png'],mine:[SP+'worker-mine-a.png',SP+'worker-mine-b.png']}}); s.position.set(mp.x+1.7,0,mp.z+0.3); s.userData.facing=(s.position.x>mp.x?-1:1); miners.push(s); }
+// Castor the smith at the Foundry · Sasha the sentinel at the Watch
+const castor=critter([],1.95,{state:'idle',fps:2,tint:0xffffff,states:{idle:[SP+'castor-idle.png']}}); castor.position.set(fp.x+1.7,0,fp.z+0.5); castor.userData.facing=(castor.position.x>fp.x?-1:1);
+const _wp=Z('watch').pos; const sasha=critter([],2.0,{state:'idle',fps:2,tint:0xffffff,states:{idle:[SP+'sasha-idle.png']}}); sasha.position.set(_wp.x+1.4,0,_wp.z+0.3); sasha.userData.facing=(sasha.position.x>_wp.x?-1:1);
 const haulers=[]; let forgeTimer=4; // haulers removed for now (they clipped through props); chain kept alive by a timer
 // contact shadows under every character
-const shadowed=[drM,tally,vellum,...miners];
+const shadowed=[drM,tally,vellum,castor,sasha,...miners];
 const shadows=shadowed.map(s=>groundShadow(s.userData.h*0.85));
 workstation(mp.x+2.8, mp.z+1.2, -0.7); workstation(fp.x-2.4, fp.z+1.8, 0.9);  // grounded benches (shadowTex ready now)
 function crate(x,z,s){ const m=new THREE.Mesh(new THREE.BoxGeometry(s,s,s),stone(0x281c10)); m.position.set(x,s/2,z); m.rotation.y=Math.random()*3; m.castShadow=true; scene.add(m); const sh=groundShadow(s*1.7); sh.position.set(x,0.05,z); return m; }
@@ -601,7 +604,7 @@ function loop(){
   requestAnimationFrame(loop);
   const dt=Math.min(0.05,clock.getDelta()), t=clock.getElapsedTime();
   // animated 2.5D cast
-  tickCritter(tally,dt,t); tickCritter(vellum,dt,t);
+  tickCritter(tally,dt,t); tickCritter(vellum,dt,t); tickCritter(castor,dt,t); tickCritter(sasha,dt,t);
   miners.forEach(s=>tickCritter(s,dt,t));
   // keeper patrol (Dr. Mineral oversees the lab) + his hovering assistant orb
   { if(drMWalking){ drMU+=dt*drMSpeed/(DRAD*STEP);
