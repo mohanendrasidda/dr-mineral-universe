@@ -72,7 +72,7 @@
 <div id="cine-cap"></div>
 <video id="intro-video" playsinline preload="auto"></video>
 <audio id="intro-audio" preload="auto"></audio>
-<div id="intro-splash"><div><div class="ik">THE UNIVERSITY OF NEBRASKA</div><h2>Descend into the Lab</h2><button id="intro-go">&#9654;&nbsp;&nbsp;BEGIN</button><div class="ihint">SOUND ON &middot; ~35 SECONDS &middot; OR SKIP</div></div></div>
+<div id="intro-splash"><div><div class="ik">THE UNIVERSITY OF NEBRASKA</div><h2>Descend into the Lab</h2><button id="intro-go">&#9654;&nbsp;&nbsp;BEGIN</button><div class="ihint">SOUND ON &middot; ~46 SECONDS &middot; OR SKIP</div></div></div>
 <button id="cine-skip">SKIP &#8614;</button>
 <a class="back" href="../index.html">&#8592; BACK TO THE LANDING</a>
 <div id="hud"><div class="kick">THE UNIVERSITY OF NEBRASKA LAB</div><h1>THE LIVING CHAIN</h1><div class="sub">click a zone &middot; the lab is always working</div></div>
@@ -90,6 +90,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -99,7 +100,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 window.addEventListener('error', e=>{ const l=document.getElementById('loading'); if(l){ l.style.display='flex'; l.textContent='⚠ '+(e.message||'error'); } });
 
 const W=()=>innerWidth, H=()=>innerHeight;
-const renderer=new THREE.WebGLRenderer({antialias:true});
+const renderer=new THREE.WebGLRenderer({antialias:true, preserveDrawingBuffer:location.search.includes('shot')});
 renderer.setSize(W(),H()); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.0;
 renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
@@ -421,13 +422,13 @@ _ninscr.userData.panel={step:'THE LAB · THE WORK',title:'What the lab is buildi
   mean:'THIS CYCLE — the blockchain core is being forged.\n\nSOON — the first version of the tokenomics ecosystem, and a test-token dApp on the testnet.\n\nHere the lab posts its releases and honours its contributors.'};
 // the keeper's assistant — a small glowing teal creature with two antenna curls + eyes; always drifts beside him
 const orb=new THREE.Group();
-const _atc=new THREE.MeshStandardMaterial({color:0x07343a,emissive:0x2fe0d0,emissiveIntensity:1.25,roughness:.4,metalness:.2});
-orb.add(new THREE.Mesh(new THREE.SphereGeometry(0.22,18,16),_atc));
+const _atc=new THREE.MeshStandardMaterial({color:0x0a3036,emissive:0x36c2b4,emissiveIntensity:0.7,roughness:.4,metalness:.2});
+orb.add(new THREE.Mesh(new THREE.SphereGeometry(0.17,18,16),_atc));
 function _antenna(side){ const a=new THREE.Mesh(new THREE.TorusGeometry(0.12,0.02,6,16,Math.PI*1.05),_atc); a.position.set(side*0.09,0.19,0); a.rotation.z=side*0.7; a.rotation.y=side*0.35; return a; }
 orb.add(_antenna(1),_antenna(-1));
 const _eyeMat=new THREE.MeshStandardMaterial({color:0x041a1a,roughness:.3});
 const _e1=new THREE.Mesh(new THREE.SphereGeometry(0.038,8,8),_eyeMat); _e1.position.set(0.075,0.03,0.2); const _e2=_e1.clone(); _e2.position.set(-0.075,0.03,0.2);
-orb.add(_e1,_e2); orb.add(new THREE.PointLight(0x40e0d0,1.0,4.5,2)); scene.add(orb);
+orb.add(_e1,_e2); orb.add(new THREE.PointLight(0x40e0d0,0.5,4,2)); scene.add(orb);
 const orbSh=groundShadow(0.6);
 drM.userData.panel={step:'THE KEEPER',title:'Dr. Mineral',c:0xd8b06a,scroll:true,
   mean:'Above ground, an ordinary campus squirrel. Below it, the keeper of this lab — he sees that every contribution is mined, forged onto the chain, and remembered, so no one is ever forgotten.\n\nDIRECTIVE, this cycle — harden the chain core. Miners to the seam. Foundry, keep forging.'};
@@ -445,7 +446,7 @@ function drMNext(){ drMFromAng=drMAng; drMU=0; drMWalking=true; }
 // --- PATH B PROOF: a real rigged + animated 3D character (CC0 Khronos Fox) driven by Dr. Mineral's patrol ---
 // proves the pipeline: GLTFLoader + skeletal walk/idle + real turning to face travel direction + retexture to our gloom.
 let fox=null, foxMix=null, foxWalk=null, foxIdle=null, foxHeadX=0, foxHeadZ=1; const FOX_YAW=0; // Mixamo faces +Z → no offset (was backward at PI)
-const drMKey=new THREE.PointLight(0xffe2b4,95,28,2.0); scene.add(drMKey); let camHeadX=0, camHeadZ=1; // STRONG warm hero key-light (world-space, follows him) + smoothed camera heading
+const drMKey=new THREE.PointLight(0xffe2b4,7,16,2.0); scene.add(drMKey); let camHeadX=0, camHeadZ=1; // STRONG warm hero key-light (world-space, follows him) + smoothed camera heading
 // strip horizontal root drift from a clip so the body stays pinned to the patrol (keeps the vertical bob)
 function inPlace(clip){ clip.tracks.forEach(t=>{ if(t.name.endsWith('.position')){ const v=t.values; for(let i=0;i<v.length;i+=3){ v[i]=v[0]; v[i+2]=v[2]; } } }); return clip; }
 // re-weight stray Mixamo-rig vertices (the diagonal "spike") onto a good neighbour, judged from a real walk pose
@@ -560,23 +561,25 @@ function skipCine(){ camera.position.copy(_pts[_pts.length-1]); camera.lookAt(_l
 function finishVideoIntro(){ const vid=document.getElementById('intro-video');
   camera.position.copy(_pts[_pts.length-1]); camera.lookAt(_looks[_looks.length-1]);
   if(vid){ vid.style.opacity=0; try{vid.pause();}catch(e){} }
-  setTimeout(()=>{ if(vid)vid.style.display='none'; document.body.classList.remove('introvid'); endCine(); },800); }
+  setTimeout(()=>{ if(vid)vid.style.display='none'; document.body.classList.remove('introvid'); startSoundscape(); endCine(); },800); }
 function startVideoIntro(src){ const vid=document.getElementById('intro-video'), splash=document.getElementById('intro-splash');
   document.body.classList.add('introvid'); const l=document.getElementById('loading'); if(l)l.style.display='none';
-  if(splash)splash.style.display='none';
-  if(vid)vid.addEventListener('ended',videoToWorld);
-  // muted autoplay is always allowed → the intro starts immediately, NO "BEGIN" gate; sound fades in on the first tap
-  if(vid){ vid.src=src; vid.muted=true; vid.style.opacity=1; vid.play().catch(()=>{});
-    const unmute=()=>{ try{ vid.muted=false; }catch(e){} startScore(); };
-    document.addEventListener('pointerdown',unmute,{once:true});
-  } }
-function videoToWorld(){ startCine(false); fadeAudio(document.getElementById('intro-audio'),0.92,3200); // swell as the descent into the lab begins
+  if(splash)splash.style.display='none'; // NO begin gate — the teaser plays straight after Enter the Lab
+  if(!vid){ startCine(); return; }
+  vid.addEventListener('ended',videoToWorld); vid.src=src; vid.style.opacity=1;
+  // play WITH the teaser's own sound; if the browser blocks unmuted autoplay, start muted then unmute on first interaction
+  vid.muted=false; const p=vid.play();
+  if(p&&p.catch) p.catch(()=>{ vid.muted=true; vid.play().catch(()=>{});
+    const unmute=()=>{ try{vid.muted=false;}catch(e){} };
+    document.addEventListener('pointerdown',unmute,{once:true}); document.addEventListener('keydown',unmute,{once:true}); });
+}
+function videoToWorld(){ startCine(false); // descent into the live world begins
   const vid=document.getElementById('intro-video');
-  if(vid){ vid.style.opacity=0; setTimeout(()=>{ vid.style.display='none'; document.body.classList.remove('introvid'); },1200); } }
+  if(vid){ vid.style.opacity=0; try{vid.muted=true;}catch(e){} setTimeout(()=>{ vid.style.display='none'; document.body.classList.remove('introvid'); startSoundscape(); },1200); } } // world music starts only AFTER the teaser
 function unifiedSkip(){ if(document.body.classList.contains('introvid'))finishVideoIntro(); else skipCine(); }
 const _sk=document.getElementById('cine-skip'); if(_sk)_sk.addEventListener('click',unifiedSkip);
 if(/[?&]intro=1/.test(location.search)){
-  const _src='../../assets/video/intro.mp4';
+  const _src='../media/teaser-4k.mp4'; // the teaser is now the Enter-the-Lab intro (moved off the landing page)
   fetch(_src,{method:'HEAD'}).then(r=>{ if(r.ok)startVideoIntro(_src); else startCine(); }).catch(()=>startCine());
 }
 
@@ -595,14 +598,100 @@ sndBeds.push(posBed('world-water.mp3',0.5,new THREE.Vector3(0,0.3,0),5,24));
 sndBeds.push(posBed('world-fire.mp3',0.6,new THREE.Vector3(fp.x,1.1,fp.z),5,22));
 const oneShotBuf={}; ['world-forge.mp3','world-mine.mp3','world-chain.mp3'].forEach(f=>aLoad.load(SND+f,b=>oneShotBuf[f]=b));
 function oneShot(file,vol,pos,ref){ const b=oneShotBuf[file]; if(!b||!sndOn)return; const a=new THREE.PositionalAudio(listener); a.setBuffer(b); a.setVolume(vol); a.setRefDistance(ref||6); const o=new THREE.Object3D(); o.position.copy(pos); o.add(a); scene.add(o); a.onEnded=()=>scene.remove(o); a.play(); }
-function startSoundscape(){ if(sndOn)return; sndOn=true; const ctx=listener.context; if(ctx.state==='suspended')ctx.resume(); sndBeds.forEach(a=>{ if(a.buffer&&!a.isPlaying){ a.play(); fadeSnd(a,a._t,2200);} }); }
-addEventListener('pointerdown',startSoundscape,{once:true});
+function startSoundscape(){ if(sndOn)return; if(document.body.classList.contains('introvid'))return; sndOn=true; const ctx=listener.context; if(ctx.state==='suspended')ctx.resume(); sndBeds.forEach(a=>{ if(a.buffer&&!a.isPlaying){ a.play(); fadeSnd(a,a._t,2200);} }); } // never starts while the teaser is playing
+addEventListener('pointerdown',startSoundscape);
+
+// ============ 3D MODEL REVIEW — temporary showroom under the shaft (remove once placement approved) ============
+// Places the real image-to-3D models (decimated + Draco) at each district, replacing the 2.5D billboards.
+const M3D='../../assets/3d/web/';
+const glLoader=new GLTFLoader();
+const draco=new DRACOLoader(); draco.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/'); glLoader.setDRACOLoader(draco);
+const live3D=[]; // {grp, spin, bob, phase}
+// hide the billboards (and their contact shadows) we're replacing — kept in scene, just invisible (easy to revert)
+[tally,vellum,castor,sasha,...miners].forEach(s=>s.visible=false); drM.visible=false; shadows.forEach(s=>s.visible=false);
+// Dr. Mineral keeps ROAMING (the north-star keeper): the patrol drives drM.position; the 3D model (drMGrp) follows it in the loop.
+// place one GLB: centre X/Z on bbox, drop feet to floor, scale to target height, face yaw, shadows, subtle warm read
+const MIX=[]; // skeletal-animation mixers to tick each frame
+function place3D(file,x,z,h,yaw,opts){ opts=opts||{};
+  const grp=new THREE.Group(); grp.position.set(x,0,z); grp.rotation.y=yaw; scene.add(grp);
+  const sh=groundShadow(h*0.8); sh.position.set(x,0.05,z);
+  const rec={grp, spin:opts.spin||0, bob:opts.bob||0, phase:Math.random()*6.28, sh, follow:!!opts.follow, mixer:null, actions:{}, cur:null};
+  live3D.push(rec);
+  glLoader.load(M3D+file, gltf=>{ const o=gltf.scene;
+    const box=new THREE.Box3().setFromObject(o), size=new THREE.Vector3(), ctr=new THREE.Vector3(); box.getSize(size); box.getCenter(ctr);
+    const sc=h/(size.y||1); o.scale.setScalar(sc); o.position.set(-ctr.x*sc, -box.min.y*sc + (opts.yOff||0), -ctr.z*sc);
+    console.log('[3D]',file,'bbox', size.x.toFixed(2),size.y.toFixed(2),size.z.toFixed(2), '| scale',sc.toFixed(3),'| targetH',h);
+    o.traverse(n=>{ if(n.isMesh){ n.castShadow=!opts.noShadow; n.receiveShadow=false; n.frustumCulled=false; // skinned bounds are unreliable headless
+      // glTF COLOR_0 is read as linear, but these were baked as sRGB → convert so they're not washed-out
+      if(n.geometry&&n.geometry.attributes.color){ const a=n.geometry.attributes.color, col=new THREE.Color(), hsl={}, sat=opts.sat||1;
+        for(let i=0;i<a.count;i++){ col.setRGB(a.getX(i),a.getY(i),a.getZ(i)); col.convertSRGBToLinear();
+          if(sat!==1){ col.getHSL(hsl); col.setHSL(hsl.h, Math.min(1,hsl.s*sat), hsl.l); }
+          a.setX(i,col.r);a.setY(i,col.g);a.setZ(i,col.b); } a.needsUpdate=true; }
+      if(n.material){ n.material.metalness=opts.metal!==undefined?opts.metal:0.0; n.material.roughness=opts.rough!==undefined?opts.rough:0.78;
+        if(opts.tint!==undefined){ n.material.color=new THREE.Color(opts.tint); } // recolour untextured models (rat, etc.)
+        if(opts.emiColor!==undefined && n.material.emissive){ n.material.emissive=new THREE.Color(opts.emiColor); n.material.emissiveIntensity=opts.emi||0.3; }
+        else if(!opts.noFloor && n.material.emissive){ n.material.emissive=new THREE.Color(0x3a2410); n.material.emissiveIntensity=0.26; } // warm floor: no keeper falls to dark clay
+        n.material.needsUpdate=true; } } });
+    if(gltf.animations && gltf.animations.length){ const mx=new THREE.AnimationMixer(o); rec.mixer=mx; MIX.push(mx);
+      gltf.animations.forEach(cl=>{ rec.actions[cl.name.split('|').pop().toLowerCase()]=mx.clipAction(cl); });
+      const want=(opts.clip||'idle').toLowerCase(); const key=Object.keys(rec.actions).find(k=>k.includes(want))||Object.keys(rec.actions)[0];
+      if(key){ rec.cur=rec.actions[key]; rec.cur.play(); } }
+    rec.model=o; grp.add(o); ready(); }, undefined, err=>console.warn('3D load fail',file,err));
+  return grp; }
+// tight warm fill so each keeper reads in the gloom (cave stays moody)
+function keepFill(x,z,c,inten){ const d=Math.hypot(x,z)||1, ox=x/d, oz=z/d; // outward = toward the visitor (camera is outside the ring)
+  const L=new THREE.PointLight(c||0xffd49a,inten||4.8,8,2.2); L.position.set(x+ox*2.0,2.9,z+oz*2.0); scene.add(L); return L; }
+const fc=k=>{const p=Z(k).pos;return p;};
+// --- keepers at their districts (1:1 with the old billboard spots; yaw faces the cavern centre) ---
+// yaw faces OUTWARD (toward the visitor, who approaches from outside the ring). heights tuned per creature shape.
+const drMGrp=place3D('drmineral-color.glb', 5.5,-2.2, 2.2, 0, {bob:0.05, follow:true}); // the roaming keeper (tallest); follows the patrol, lit by drMKey which tracks him
+// --- district workers: free CC0/CC-BY critters, skinned + animated, cast to suit the lab (swap freely) ---
+{const p=fc('mines');  place3D('raccoon.glb', p.x+1.7,p.z+0.3, 1.35, Math.atan2(p.x+1.7,p.z+0.3), {clip:'headbutt', sat:1.25}); keepFill(p.x+1.7,p.z+0.3,0xffe0b0,5.2);}  // miner pecking the seam
+{const p=fc('foundry');place3D('beaver.glb',  p.x+1.7,p.z+0.5, 1.45, Math.atan2(p.x+1.7,p.z+0.5), {bob:0.04, tint:0x8a5a32}); keepFill(p.x+1.7,p.z+0.5,0xffcf9a,5.5);}     // engineer at the forge
+{const p=fc('ledger'); place3D('hedgehog.glb',p.x+1.4,p.z+0.4, 1.05, Math.atan2(p.x+1.4,p.z+0.4), {clip:'idle'}); keepFill(p.x+1.4,p.z+0.4,0xe8eeff,5.5);}                  // scribe at the ledger
+{const p=fc('vault');  place3D('tortoise.glb',p.x+1.6,p.z+0.2, 0.95, Math.atan2(p.x+1.6,p.z+0.2), {bob:0.02}); keepFill(p.x+1.6,p.z+0.2,0xffe8c8,5.0);}                      // old keeper at the vault
+{const p=fc('watch');  place3D('weasel.glb',  p.x+1.4,p.z+0.3, 1.15, Math.atan2(p.x+1.4,p.z+0.3), {bob:0.03}); keepFill(p.x+1.4,p.z+0.3,0xffe6c0,5.2);}                      // sentry on watch
+// --- haulers: workers walking the chain loop, carrying glowing blocks (the world's living movement) ---
+function hauler(file,seg,speed,blockC,tint){
+  place3D(file, ZONES[seg].pos.x, ZONES[seg].pos.z, 1.05, 0, {clip:'walk', sat:1.2, tint:tint});
+  const r=live3D[live3D.length-1]; // place3D pushes the record here
+  const blk=new THREE.Mesh(new THREE.BoxGeometry(0.32,0.32,0.32), new THREE.MeshStandardMaterial({color:blockC, emissive:blockC, emissiveIntensity:0.55, roughness:0.4}));
+  blk.position.set(0,1.0,0.32); r.grp.add(blk);
+  r.seg=seg; r.u=Math.random(); r.speed=speed; haulers.push(r); return r;
+}
+hauler('rat.glb', 0, 1.8, 0xffb24a, 0x6b5640);
+hauler('raccoon.glb', 2, 1.6, 0xff8a3c, undefined);
+// --- environment props (free CC0 dressing; swap for custom later). prop() = place3D under props/ with no warm-clay floor ---
+function prop(file,x,z,h,yaw,opts){ return place3D('props/'+file,x,z,h,yaw,Object.assign({noFloor:true},opts||{})); }
+{const p=fc('foundry'); prop('forge.glb', p.x-0.2,p.z-1.7, 2.1, Math.atan2(-p.x,-p.z)); prop('anvil.glb', p.x-1.7,p.z+0.6, 0.65, 0.6); prop('cauldron.glb', p.x+0.6,p.z-2.0, 0.85, 0, {emiColor:0xff7020, emi:0.5});}
+{const p=fc('ledger');  prop('bookcase.glb', p.x-1.9,p.z-0.3, 2.4, Math.atan2(-p.x,-p.z)); prop('table.glb', p.x-0.5,p.z-1.5, 0.7, 0); prop('books.glb', p.x-0.5,p.z-1.5, 0.32, 0.4, {yOff:0.72}); prop('scroll.glb', p.x+0.4,p.z-1.6, 0.16, 0, {yOff:0.72}); prop('candles.glb', p.x-1.1,p.z-1.7, 0.42, 0, {emiColor:0xffb050, emi:0.7, yOff:0.72});}
+{const p=fc('vault');   prop('chest-gold.glb', p.x-1.3,p.z-1.2, 0.95, Math.atan2(-p.x,-p.z), {emiColor:0x6a4a10, emi:0.22}); prop('gear.glb', p.x+1.0,p.z-1.5, 0.7, 0, {spin:0.6, metal:0.7, rough:0.4, yOff:0.85});}
+{const p=fc('watch');   prop('torch.glb', p.x-1.7,p.z-0.9, 1.35, 0, {emiColor:0xffa040, emi:0.9}); prop('torch.glb', p.x+1.7,p.z-0.9, 1.35, 0, {emiColor:0xffa040, emi:0.9}); prop('banner.glb', p.x,p.z-2.3, 2.2, Math.atan2(-p.x,-p.z));}
+{const p=fc('mines');   prop('chain.glb', p.x-2.0,p.z-1.0, 1.6, 0, {tint:0x4a4036});
+  prop('minecart.glb', p.x-1.4,p.z+1.3, 0.8, 0.7, {tint:0x6a5240}); prop('crystal-a.glb', p.x+1.6,p.z-0.5, 0.8, 0, {emiColor:0xffb060, emi:0.55}); prop('gold-ore.glb', p.x-1.9,p.z-0.5, 0.65, 0);
+  prop('barrel.glb', p.x+1.3,p.z+1.4, 0.7, 0); prop('mushrooms.glb', p.x-2.3,p.z+0.9, 0.45, 0, {emiColor:0x3a8cff, emi:0.35}); prop('lantern.glb', p.x+2.1,p.z+0.3, 0.5, 0, {emiColor:0xffa848, emi:1.0}); prop('beam.glb', p.x-0.3,p.z-2.3, 2.0, 0, {tint:0x4a3826});}
+{const p=fc('vault');   prop('gold-ingots.glb', p.x+1.3,p.z+1.0, 0.35, 0, {emiColor:0x6a4a10, emi:0.32});}
+// --- hero hand-props: the coin floats at the Vault, the crystal sits at the Mines (slow turntables) ---
+{const p=fc('vault'); place3D('coin.glb',    p.x,p.z+1.4, 1.5, 0, {yOff:1.7, spin:0.6, metal:0.9, rough:0.35, emiColor:0x6a4a10, emi:0.28, noShadow:true, noFloor:true});}
+mineCrys.forEach(c=>c.visible=false); // hide the old dull seam crystals so the new hero crystal doesn't collide
+{const p=fc('mines'); place3D('crystal.glb', p.x,p.z,     1.5, 0, {yOff:0.9, spin:0.25, emiColor:0xffb060, emi:0.34, noShadow:true, noFloor:true});}
+// expose for offscreen capture (only when URL has ?shot)
+if(location.search.includes('shot')) window.__W={camera,controls,scene,renderer,composer,THREE,drM,drMGrp};
+// ============ end 3D keepers ============
 
 const clock=new THREE.Clock();
 function lerpV(a,b,t){ return a.clone().lerp(b,t); }
 function loop(){
   requestAnimationFrame(loop);
   const dt=Math.min(0.05,clock.getDelta()), t=clock.getElapsedTime();
+  for(let i=0;i<MIX.length;i++) MIX[i].update(dt); // skeletal anims (workers walk/idle/mine)
+  for(let i=0;i<haulers.length;i++){ const hl=haulers[i]; const a=ZONES[hl.seg].pos, b=ZONES[(hl.seg+1)%ZONES.length].pos, d=a.distanceTo(b)||1;
+    hl.u+=dt*hl.speed/d; if(hl.u>=1){ hl.u-=1; hl.seg=(hl.seg+1)%ZONES.length; }
+    const px=a.x+(b.x-a.x)*hl.u, pz=a.z+(b.z-a.z)*hl.u; hl.grp.position.set(px,0,pz);
+    hl.grp.rotation.y=Math.atan2(b.x-a.x,b.z-a.z); if(hl.sh)hl.sh.position.set(px,0.05,pz); }
+  for(let i=0;i<live3D.length;i++){ const o=live3D[i];
+    if(o.follow){ o.grp.position.set(drM.position.x, (o.bob?Math.sin(t*1.3+o.phase)*o.bob:0), drM.position.z); o.grp.rotation.y=Math.atan2(foxHeadX,foxHeadZ); if(o.sh)o.sh.position.set(drM.position.x,0.05,drM.position.z); }
+    else { if(o.spin) o.grp.rotation.y+=dt*o.spin; if(o.bob) o.grp.position.y=Math.sin(t*1.3+o.phase)*o.bob; } } // keepers breathe, props turn, the keeper roams
   // animated 2.5D cast
   tickCritter(tally,dt,t); tickCritter(vellum,dt,t); tickCritter(castor,dt,t); tickCritter(sasha,dt,t);
   miners.forEach(s=>tickCritter(s,dt,t));
@@ -621,7 +710,7 @@ function loop(){
     fox.rotation.y=Math.atan2(foxHeadX,foxHeadZ)+FOX_YAW; // turn to face heading — real 3D turning
     drMKey.position.set(drM.position.x - foxHeadX*1.6, 3.2, drM.position.z - foxHeadZ*1.6); // key light on the camera side so his lit side faces us
     const w=drM.userData.state==='walk'?1:0; if(foxWalk)foxWalk.setEffectiveWeight(w); if(foxIdle)foxIdle.setEffectiveWeight(1-w); }
-  orb.position.set(drM.position.x+0.85,1.85+Math.sin(t*2.4)*0.16,drM.position.z+0.3); orb.rotation.y=Math.sin(t*1.1)*0.4; orbSh.position.set(orb.position.x,0.05,orb.position.z);
+  orb.position.set(drM.position.x+1.5,2.7+Math.sin(t*2.4)*0.16,drM.position.z+1.1); orb.rotation.y=Math.sin(t*1.1)*0.4; orbSh.position.set(orb.position.x,0.05,orb.position.z); // hover at his shoulder, clear of the 3D face
   // token minting: a coin struck every couple of seconds, Foundry -> Vault
   coinTimer-=dt; if(coinTimer<=0){ coinTimer=2.2+Math.random()*1.6; mintCoin(); }
   for(let i=coins.length-1;i>=0;i--){ const cn=coins[i]; cn.t+=dt*0.5; const p=lerpV(fp,Z('vault').pos,Math.min(1,cn.t)); cn.m.position.set(p.x,1.4+Math.sin(cn.t*Math.PI)*1.1,p.z); cn.m.rotation.y+=dt*5; cn.m.rotation.z+=dt*3; if(cn.t>=1){ scene.remove(cn.m); coins.splice(i,1); } }

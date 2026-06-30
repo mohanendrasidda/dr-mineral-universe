@@ -36,3 +36,6 @@ assets/teaser-v2/audio/vo/
 assets/teaser-v2/clips/S*.mp4
 
 assets/teaser-v2/clips/upscaled/
+
+# editor backups + heavy experimental 3D work (not used by the live site)
+site/world/index.html.bak

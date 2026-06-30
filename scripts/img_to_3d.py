@@ -35,7 +35,7 @@ os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
 if model == "trellis":
     if not token:
         print("WARN: no HF_TOKEN — TRELLIS needs one for ZeroGPU quota (free at hf.co/settings/tokens)")
-    c = Client("trellis-community/TRELLIS", hf_token=token, verbose=False)
+    c = Client("trellis-community/TRELLIS", token=token, verbose=False)
     try:
         c.predict(api_name="/start_session")
     except Exception:
@@ -54,7 +54,7 @@ if model == "trellis":
     shutil.copy(glbs[0], out)
 else:  # triposr
     mc = float(sys.argv[4]) if len(sys.argv) > 4 else 256.0
-    c = Client("stabilityai/TripoSR", hf_token=token, verbose=False)
+    c = Client("stabilityai/TripoSR", token=token, verbose=False)
     print("preprocessing...")
     proc = c.predict(handle_file(src), True, 0.85, api_name="/preprocess")
     print("generating mesh...")
