@@ -59,6 +59,18 @@ Last major session: 2026-06-29.
 - **Blender headless:** `/Applications/Blender.app/Contents/MacOS/Blender -b -P script.py -- args`.
 - **Inspect a glb's anims/colours:** import in headless Blender, list `bpy.data.actions` + `color_attributes`.
 
+## 5b. Tools EVALUATED & parked (don't re-litigate) ⛔
+Our world is **real-time Three.js meshes**, so the cast must be **riggable mesh** (carve → bake → Mixamo → glb).
+Gaussian-splat & video-mocap tools only earn a spot for *offline cinematics* or *one bespoke hero move* — never the working cast.
+
+| Tool | Output | Fits the animated world? | Revisit only when… |
+|------|--------|--------------------------|--------------------|
+| **TripoSplat** (VAST-AI) | Gaussian splats (.ply/.splat) | ❌ un-riggable, needs 2nd renderer, soft look clashes with toon world | a **static photoreal showpiece** (e.g. rotating hero statue) |
+| **ComfyUI-MotionCapture** (GVHMR/SMPL) | human BVH from video | ⚠️ still needs retarget onto our rig + heavy GPU/SMPL-license setup, noisy monocular mocap | one **signature hero gesture** Mixamo lacks (e.g. "eureka") |
+| **3DGS Render — KIRI** (Blender addon) | splats *inside Blender* (offline render) | ❌ offline only; doesn't reach Three.js; splats still un-riggable | rendering a splat into the **teaser** cinematic |
+
+**Why splats lose for props too:** they bake their own appearance → won't take cavern torchlight/shadows/fog, and a "mirror" is a Three.js `Reflector` not an asset. **Use Poly Pizza CC0 meshes for furniture/props** (chair/table/mirror-frame/etc.) — same GLTFLoader, lit natively, free, instant.
+
 ## 6. Open threads
 - MAX-quality Dr. Mineral carve running overnight → auto bake+render+push when done.
 - HCC Swan GPU account applied (free, 48GB L40S) — the real path to a clean textured hero.

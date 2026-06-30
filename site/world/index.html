@@ -445,7 +445,12 @@ drM.position.set(Math.cos(drMAng)*DRAD,0,Math.sin(drMAng)*DRAD);
 function drMNext(){ drMFromAng=drMAng; drMU=0; drMWalking=true; }
 // --- PATH B PROOF: a real rigged + animated 3D character (CC0 Khronos Fox) driven by Dr. Mineral's patrol ---
 // proves the pipeline: GLTFLoader + skeletal walk/idle + real turning to face travel direction + retexture to our gloom.
-let fox=null, foxMix=null, foxWalk=null, foxIdle=null, foxHeadX=0, foxHeadZ=1; const FOX_YAW=0; // Mixamo faces +Z → no offset (was backward at PI)
+let fox=null, foxMix=null, foxWalk=null, foxIdle=null, foxTalk=null, foxAxe=null, foxHeadX=0, foxHeadZ=1; const FOX_YAW=0; // Mixamo/Meshy faces +Z → no offset (was backward at PI)
+let heroCur=null, heroIdleVariant='idle'; // which idle-family clip he plays while paused at a district
+// crossfade the hero to a named clip (walk / idle / talk / axe); no-op if already on it or not yet loaded
+function playHero(name){ if(!foxMix) return; const map={walk:foxWalk,idle:foxIdle,talk:foxTalk,axe:foxAxe}; const next=map[name];
+  if(!next||next===heroCur) return; next.enabled=true; next.setEffectiveWeight(1); next.reset(); next.play();
+  if(heroCur) heroCur.crossFadeTo(next,0.35,false); else next.fadeIn(0.35); heroCur=next; }
 const drMKey=new THREE.PointLight(0xffe2b4,7,16,2.0); scene.add(drMKey); let camHeadX=0, camHeadZ=1; // STRONG warm hero key-light (world-space, follows him) + smoothed camera heading
 // strip horizontal root drift from a clip so the body stays pinned to the patrol (keeps the vertical bob)
 function inPlace(clip){ clip.tracks.forEach(t=>{ if(t.name.endsWith('.position')){ const v=t.values; for(let i=0;i<v.length;i+=3){ v[i]=v[0]; v[i+2]=v[2]; } } }); return clip; }
@@ -469,22 +474,24 @@ function fixSpike(skin, mixer, action, root){
     mixer.setTime(0);
   }catch(e){ console.warn('fixSpike skipped', e); }
 }
-const _fbx=new FBXLoader();
-_fbx.load('../../assets/models/drmineral-walk.fbx', m=>{
-  fox=m;
-  let skin=null; m.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; if(!skin)skin=o;
-    o.material=new THREE.MeshStandardMaterial({color:0x9c5026, roughness:0.82, metalness:0, emissive:0x3a1d0b, emissiveIntensity:0.18, fog:true}); } }); // flat russet, LIT — takes the key-light + casts a shadow; emissive floor so never pure black
-  foxMix=new THREE.AnimationMixer(m); const wclip=m.animations[0];
-  // measure the walk's natural ground speed (root displacement) BEFORE stripping it, to kill foot-slide
-  let gs=0; if(wclip){ const hip=wclip.tracks.find(t=>/hips?\.position$/i.test(t.name))||wclip.tracks.find(t=>t.name.endsWith('.position')); if(hip){ const u=hip.values,L=u.length; gs=Math.hypot(u[L-3]-u[0],u[L-1]-u[2])/(wclip.duration||1); } }
-  foxWalk=foxMix.clipAction(wclip);
-  fixSpike(skin, foxMix, foxWalk, m); // BEFORE scaling + before stripping root
-  const box=new THREE.Box3().setFromObject(m); const sc0=3.4/((box.max.y-box.min.y)||1); m.scale.setScalar(sc0); gs*=sc0;
-  inPlace(wclip); foxWalk.play();
-  if(gs>0.25){ drMSpeed=Math.min(3.0,Math.max(1.2,gs)); foxWalk.timeScale=drMSpeed/gs; } else { drMSpeed=1.7; foxWalk.timeScale=1.05; } // sync stride speed to movement → feet stick
-  _fbx.load('../../assets/models/drmineral-idle.fbx', mi=>{ if(mi.animations[0]){ foxIdle=foxMix.clipAction(inPlace(mi.animations[0])); foxIdle.play(); } }, undefined, e=>console.warn('idle fbx', e));
-  m.visible=false; drM.visible=true; m.position.copy(drM.position); scene.add(m); // photoreal billboard is the keeper now; the pale FBX stays hidden
-}, undefined, e=>console.warn('drM walk fbx load failed', e));
+// THE HERO: Meshy-rigged + textured Dr. Mineral (Walk + Idle + Talk + Axe clips), driven by the patrol.
+const _heroGltf=new GLTFLoader();
+_heroGltf.load('../../assets/3d/web/drmineral-hero.glb', g=>{
+  const m=g.scene; fox=m;
+  m.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.frustumCulled=false;
+    const mats=Array.isArray(o.material)?o.material:[o.material];
+    mats.forEach(x=>{ if(!x)return; x.fog=true; if('emissive' in x){ x.emissive=new THREE.Color(0x2a1a0c); x.emissiveIntensity=0.14; } }); } }); // keep Meshy's baked texture; tiny emissive floor so he never goes pure-black in the gloom
+  const box=new THREE.Box3().setFromObject(m); const sc0=2.5/((box.max.y-box.min.y)||1); m.scale.setScalar(sc0);
+  m.position.copy(drM.position); scene.add(m);
+  foxMix=new THREE.AnimationMixer(m);
+  const find=n=>g.animations.find(a=>new RegExp(n,'i').test(a.name))||null;
+  const wc=find('walk'), ic=find('idle'), tc=find('talk'), ac=find('axe');
+  if(wc){ inPlace(wc); foxWalk=foxMix.clipAction(wc); foxWalk.play(); foxWalk.setEffectiveWeight(0); foxWalk.timeScale=1.0; }
+  if(ic){ foxIdle=foxMix.clipAction(ic); foxIdle.play(); foxIdle.setEffectiveWeight(1); heroCur=foxIdle; }
+  if(tc){ inPlace(tc); foxTalk=foxMix.clipAction(tc); foxTalk.play(); foxTalk.setEffectiveWeight(0); } // hands-open talk gesture (announcing)
+  if(ac){ inPlace(ac); foxAxe =foxMix.clipAction(ac); foxAxe.play();  foxAxe.setEffectiveWeight(0);  } // axe breathe + look-around (the keeper at work)
+  drMSpeed=1.6; drM.visible=false; // the textured 3D hero replaces the old sprite/melty placeholder
+}, undefined, e=>console.warn('hero glb load failed', e));
 
 // ---- reusable 3D prop loader: drop a CC0 GLB into a district with one call ----
 // loadProp(url, {x,z, y, h:targetHeight, ry, tint, emissive, emissiveIntensity, onload})
@@ -644,7 +651,7 @@ function keepFill(x,z,c,inten){ const d=Math.hypot(x,z)||1, ox=x/d, oz=z/d; // o
 const fc=k=>{const p=Z(k).pos;return p;};
 // --- keepers at their districts (1:1 with the old billboard spots; yaw faces the cavern centre) ---
 // yaw faces OUTWARD (toward the visitor, who approaches from outside the ring). heights tuned per creature shape.
-const drMGrp=place3D('drmineral-color.glb', 5.5,-2.2, 2.2, 0, {bob:0.05, follow:true}); // the roaming keeper (tallest); follows the patrol, lit by drMKey which tracks him
+const drMGrp=null; // OLD melty drmineral-color.glb retired — the Meshy-rigged hero (fox) follows the patrol directly (see hero loader above)
 // --- district workers: free CC0/CC-BY critters, skinned + animated, cast to suit the lab (swap freely) ---
 {const p=fc('mines');  place3D('raccoon.glb', p.x+1.7,p.z+0.3, 1.35, Math.atan2(p.x+1.7,p.z+0.3), {clip:'headbutt', sat:1.25}); keepFill(p.x+1.7,p.z+0.3,0xffe0b0,5.2);}  // miner pecking the seam
 {const p=fc('foundry');place3D('beaver.glb',  p.x+1.7,p.z+0.5, 1.45, Math.atan2(p.x+1.7,p.z+0.5), {bob:0.04, tint:0x8a5a32}); keepFill(p.x+1.7,p.z+0.5,0xffcf9a,5.5);}     // engineer at the forge
@@ -697,7 +704,8 @@ function loop(){
   miners.forEach(s=>tickCritter(s,dt,t));
   // keeper patrol (Dr. Mineral oversees the lab) + his hovering assistant orb
   { if(drMWalking){ drMU+=dt*drMSpeed/(DRAD*STEP);
-      if(drMU>=1){ drMU=1; drMWalking=false; drMWatch=3+Math.random()*3.5; if(Math.random()<0.3) drMDir*=-1; }
+      if(drMU>=1){ drMU=1; drMWalking=false; drMWatch=3+Math.random()*3.5; if(Math.random()<0.3) drMDir*=-1;
+        const r=Math.random(); heroIdleVariant = r<0.5?'idle' : r<0.78?'talk' : 'axe'; } // pick how he behaves while inspecting this district
       const e=drMU<0.5?2*drMU*drMU:1-Math.pow(-2*drMU+2,2)/2; drMAng=drMFromAng+drMDir*STEP*e;
       const px=Math.cos(drMAng)*DRAD, pz=Math.sin(drMAng)*DRAD;
       drM.userData.facing=((px-drM.position.x)<0?-1:1); drM.position.x=px; drM.position.z=pz; drM.userData.state='walk'; }
@@ -709,7 +717,7 @@ function loop(){
   if(fox){ foxMix.update(dt); fox.position.set(drM.position.x,0,drM.position.z);
     fox.rotation.y=Math.atan2(foxHeadX,foxHeadZ)+FOX_YAW; // turn to face heading — real 3D turning
     drMKey.position.set(drM.position.x - foxHeadX*1.6, 3.2, drM.position.z - foxHeadZ*1.6); // key light on the camera side so his lit side faces us
-    const w=drM.userData.state==='walk'?1:0; if(foxWalk)foxWalk.setEffectiveWeight(w); if(foxIdle)foxIdle.setEffectiveWeight(1-w); }
+    playHero(drM.userData.state==='walk'?'walk':heroIdleVariant); } // walk while patrolling; while paused, the chosen idle-family clip (idle / talk / axe)
   orb.position.set(drM.position.x+1.5,2.7+Math.sin(t*2.4)*0.16,drM.position.z+1.1); orb.rotation.y=Math.sin(t*1.1)*0.4; orbSh.position.set(orb.position.x,0.05,orb.position.z); // hover at his shoulder, clear of the 3D face
   // token minting: a coin struck every couple of seconds, Foundry -> Vault
   coinTimer-=dt; if(coinTimer<=0){ coinTimer=2.2+Math.random()*1.6; mintCoin(); }
